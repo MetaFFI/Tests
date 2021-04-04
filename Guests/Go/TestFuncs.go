@@ -20,10 +20,6 @@ func DivIntegers(x int, y int) float32{
 	return float32(x) / float32(y)
 }
 
-func PrintMap(m map[string]string){
-	println(m)
-}
-
 func JoinStrings(arrs []string) string{
 	return strings.Join(arrs, ",")
 }
