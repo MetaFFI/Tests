@@ -1,4 +1,4 @@
-package sanity
+package main
 
 import "testing"
 
