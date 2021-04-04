@@ -61,3 +61,4 @@ go.sum
 
 # Dependency directories (remove the comment below to include it)
 vendor/
+Guests/Python3/Test_OpenFFIGuest.py
