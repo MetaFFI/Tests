@@ -1,4 +1,4 @@
-package main
+package sanity
 
 import "testing"
 
@@ -40,7 +40,7 @@ func TestJoinStrings(t *testing.T){
 	}
 
 	if res != "A, b, C"{
-		t.Fatalf("Expected AbC. Got: %v", res)
+		t.Fatalf("Expected A, b, C. Got: %v", res)
 	}
 }
 //--------------------------------------------------------------------
