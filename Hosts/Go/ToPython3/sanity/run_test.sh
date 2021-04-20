@@ -13,8 +13,12 @@ echo building guest
 echo building host
 ./build_host.sh
 
-echo running tests
+echo Running Tests
+go get -u
 go test
+echo Tests ran successfully!
+
+echo Starting cleanup...
 
 echo Deleting guest files
 rm build_guest.sh
@@ -24,5 +28,6 @@ rm Test_OpenFFIGuest.py
 
 echo Delete host file
 rm Test_OpenFFIHost.go
+rm go.sum
 
 echo Done Go to Python3
