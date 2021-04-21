@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+// openffi_target_language: "go"
+
+// openffi_function_path: "module=github.com/Masterminds/goutils"
+service Test
+{
+	rpc initials (initials_params) returns (initials_return); // prints hello_world. openffi_function_path: "function=Initials"
+}
+
+message initials_params
+{
+	string input = 1;
+}
+message initials_return
+{
+	string res = 1;
+}
