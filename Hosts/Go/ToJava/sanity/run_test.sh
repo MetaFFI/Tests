@@ -2,7 +2,7 @@
 
 set -e
 
-echo Copying python3 test code
+echo Copying Java test code
 cp ../../../../Guests/Java/sanity/build_guest.sh .
 cp ../../../../Guests/Java/sanity/Test.proto .
 cp ../../../../Guests/Java/sanity/TestFuncs.java .
@@ -25,5 +25,6 @@ rm Test_OpenFFIGuest.jar
 
 echo Delete host file
 rm Test_OpenFFIHost.go
+rm TestFuncs.class
 
 echo Done Go to Java

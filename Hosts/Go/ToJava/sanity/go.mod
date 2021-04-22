@@ -1,4 +1,4 @@
-module GoToPython3
+module GoToJava
 
 go 1.16
 
