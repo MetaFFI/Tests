@@ -14,8 +14,7 @@ echo building host
 ./build_host.sh
 
 echo running tests
-go get -t
-go test
+python3 -m unittest Main_test.TestSanity
 
 echo Deleting guest files
 rm build_guest.sh
