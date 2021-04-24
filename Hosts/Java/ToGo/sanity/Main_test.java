@@ -37,13 +37,18 @@ public class Main_test
 			System.out.println("Test should have failed");
 			System.exit(1);
 		}
-		catch(Exception e){}
+		catch(Exception e)
+		{
+			if(!e.getMessage().equals("Panic in Go function. Panic Data: An error from ReturnsAnError"))
+			{
+				System.out.println("Unexpected error message.\nExpected: Panic in Go function. Panic Data: An error from ReturnsAnError\nReceived: "+e.getMessage());
+				System.exit(1);
+			}
+		}
 	}
 
 	private static void testDivIntegers() throws Exception
 	{
-		System.out.println("==== Test Div ====");
-
 		float res = t.DivIntegers(1, 2);
         if(res != 0.5)
         {
@@ -53,18 +58,22 @@ public class Main_test
 
         try
         {
-            System.out.println("==== Test Div Zero ====");
             t.DivIntegers(1, 0);
             System.out.println("Expected an error - divisor is 0");
             System.exit(1);
         }
-        catch(Exception e){}
+        catch(Exception e)
+        {
+            if(!e.getMessage().equals("Panic in Go function. Panic Data: Divisor is 0"))
+            {
+                System.out.println("Unexpected error message.\nExpected: Panic in Go function. Panic Data: Divisor is 0\nReceived: "+e.getMessage());
+                System.exit(1);
+            }
+        }
 	}
 
 	private static void testJoinStrings() throws Exception
 	{
-		System.out.println("==== Test Join ====");
-
 		String res = t.JoinStrings(new String[]{"A","b","C"});
     	if(!res.equals("A,b,C"))
     	{
