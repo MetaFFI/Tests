@@ -14,13 +14,10 @@ echo building host
 ./build_host.sh
 
 echo Compiling Test Code
-kotlinc -cp "Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test.kt
+scalac -cp "Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test.scala
 
 echo running tests
-kotlin -cp ".:./sanity:Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_testKt
-echo Tests ran successfully!
-
-echo Starting cleanup...
+scala -cp ".:Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" sanity.Main_test
 
 echo Deleting guest files
 rm build_guest.sh
@@ -30,7 +27,6 @@ rm Test_OpenFFIGuest.py
 
 echo Delete host file
 rm Test_OpenFFIHost.jar
-rm Main_testKt.class
-rm -r META-INF
+rm -r sanity
 
-echo Done Kotlin to Python3
+echo Done Scala to Go

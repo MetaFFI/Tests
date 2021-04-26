@@ -15,13 +15,10 @@ echo building host
 ./build_host.sh
 
 echo Compiling Test Code
-groovyc -cp "./..:Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test.groovy
+scalac -cp "Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test.scala
 
 echo running tests
-groovy -cp ".:Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test
-echo Tests ran successfully!
-
-echo Starting cleanup...
+scala -cp ".:Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" sanity.Main_test
 
 echo Deleting guest files
 rm build_guest.sh
@@ -34,4 +31,4 @@ echo Delete host file
 rm Test_OpenFFIHost.jar
 rm -r sanity
 
-echo Done Groovy to Go
+echo Done Scala to Go

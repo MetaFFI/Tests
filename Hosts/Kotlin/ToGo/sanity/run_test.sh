@@ -35,4 +35,4 @@ rm Test_OpenFFIHost.jar
 rm Main_testKt.class
 rm -r META-INF
 
-echo Done Java to Go
+echo Done Kotlin to Go

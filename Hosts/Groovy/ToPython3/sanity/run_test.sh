@@ -32,4 +32,4 @@ echo Delete host file
 rm Test_OpenFFIHost.jar
 rm -r sanity
 
-echo Done Java to Python3
+echo Done Groovy to Python3
