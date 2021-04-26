@@ -5,7 +5,7 @@ class TestFuncs{
 
 		@JvmStatic
 		fun helloWorld() {
-			println("Hello World - From Java");
+			println("Hello World - From Kotlin");
 		}
 
 		@JvmStatic
