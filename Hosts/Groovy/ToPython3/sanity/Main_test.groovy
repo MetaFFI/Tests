@@ -75,7 +75,7 @@ public class Main_test
 	private static void testJoinStrings() throws Exception
 	{
 		String res = t.join_strings(new String[]{"A","b","C"});
-    	if(!res.equals("A, b, C"))
+    	if(!res.equals("A,b,C"))
     	{
     	    System.out.println("Expected A,b,C. Got: "+res);
     	    System.exit(1);

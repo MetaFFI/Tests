@@ -78,9 +78,9 @@ class Main_test; object Main_test
 	def testJoinStrings()
 	{
 		var res = t.join_strings(Array("A","b","C"));
-    	if(!res.equals("A, b, C"))
+    	if(!res.equals("A,b,C"))
     	{
-    	    System.out.println("Expected A, b, C. Got: "+res);
+    	    System.out.println("Expected A,b,C. Got: "+res);
     	    System.exit(1);
     	}
 	}

@@ -39,8 +39,8 @@ func TestJoinStrings(t *testing.T){
 		t.Fatal(err)
 	}
 
-	if res != "A, b, C"{
-		t.Fatalf("Expected A, b, C. Got: %v", res)
+	if res != "A,b,C"{
+		t.Fatalf("Expected A,b,C. Got: %v", res)
 	}
 }
 //--------------------------------------------------------------------

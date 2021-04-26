@@ -13,7 +13,7 @@ def div_integers(x, y):
 
 
 def join_strings(arr):
-    res = ', '.join(arr)
+    res = ','.join(arr)
     return res
 
 
