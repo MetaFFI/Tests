@@ -6,5 +6,3 @@ groovyc TestFuncs.groovy -d ..
 
 echo openffi -c --idl Test.proto -t
 openffi -c --idl Test.proto -t
-
-rm *.class

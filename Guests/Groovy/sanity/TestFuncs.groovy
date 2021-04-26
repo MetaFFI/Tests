@@ -6,7 +6,7 @@ public class TestFuncs
 
 	public static void helloWorld()
 	{
-		System.out.println("Hello World - From Java");
+		System.out.println("Hello World - From Groovy");
 	}
 
 	public static void returnsAnError() throws Exception

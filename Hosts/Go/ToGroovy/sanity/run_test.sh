@@ -2,10 +2,10 @@
 
 set -e
 
-echo Copying Java test code
-cp ../../../../Guests/Java/sanity/build_guest.sh .
-cp ../../../../Guests/Java/sanity/Test.proto .
-cp ../../../../Guests/Java/sanity/TestFuncs.java .
+echo Copying Groovy test code
+cp ../../../../Guests/Groovy/sanity/build_guest.sh .
+cp ../../../../Guests/Groovy/sanity/Test.proto .
+cp ../../../../Guests/Groovy/sanity/TestFuncs.groovy .
 
 echo building guest
 ./build_guest.sh
@@ -20,11 +20,12 @@ go test
 echo Deleting guest files
 rm build_guest.sh
 rm Test.proto
-rm TestFuncs.java
+rm TestFuncs.groovy
 rm Test_OpenFFIGuest.jar
 rm TestFuncs.class
 
 echo Delete host file
 rm Test_OpenFFIHost.go
 
-echo Done Go to Java
+
+echo Done Go to Groovy
