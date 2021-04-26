@@ -2,7 +2,7 @@ package sanity;
 
 class TestFuncs; object TestFuncs{
 	def helloWorld() = {
-		System.out.println("Hello World - From Java");
+		System.out.println("Hello World - From Scala");
 	}
 
 	def returnsAnError() = {
