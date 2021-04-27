@@ -8,21 +8,7 @@ service python_string_utils
 	rpc is_json (is_json_params) returns (is_json_return); // verifies JSON. openffi_function_path: "function=is_json"
 	rpc strip_html (strip_html_params) returns (strip_html_return); // always returns an error. openffi_function_path: "function=strip_html"
 }
-
-message is_json_params
-{
-	string json = 1;
-}
-message is_json_return
-{
-	bool is_json = 1;
-}
-
-message strip_html_params
-{
-	string input = 1;
-}
-message strip_html_return
-{
-	string result = 1;
-}
+message is_json_params   {	string json   = 1; }
+message is_json_return   {	bool is_json  = 1; }
+message strip_html_params{  string input  = 1; }
+message strip_html_return{  string result = 1; }
