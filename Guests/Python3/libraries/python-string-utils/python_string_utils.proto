@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 // openffi_target_language: "python3"
-
 // openffi_function_path: "module=string_utils"
 service python_string_utils
 {

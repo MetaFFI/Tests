@@ -13,8 +13,8 @@ echo building host
 ./build_host.sh
 
 echo Running Tests
-go get -u
-go build
+groovyc -cp ".:python_string_utils_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test.groovy
+groovy -cp ".:python_string_utils_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test
 echo Tests ran successfully!
 
 echo Starting cleanup...
@@ -25,8 +25,7 @@ rm python_string_utils.proto
 rm *.py
 
 echo Delete host file
-rm python_string_utils_OpenFFIHost.go
-rm go.sum
-rm main
+rm python_string_utils_OpenFFIHost.jar
+rm -r StringUtilsTest
 
 echo Done Go to Python3

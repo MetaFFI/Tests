@@ -4,7 +4,7 @@ set -e
 
 echo Copying python3 test code
 cp ../../../../Guests/Python3/sanity/build_guest.sh .
-cp ../../../../Guests/Python3/sanity/Test.proto .
+cp ../../../../Guests/Python3/sanity/Test.proto .groovy
 cp ../../../../Guests/Python3/sanity/TestFuncs.py .
 
 echo building guest
