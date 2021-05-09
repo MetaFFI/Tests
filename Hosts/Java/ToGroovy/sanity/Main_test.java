@@ -39,9 +39,9 @@ public class Main_test
 		}
 		catch(Exception e)
 		{
-			if(!e.getMessage().equals("Panic in Go function. Panic Data: An error from ReturnsAnError"))
+			if(!e.getMessage().equals("java.lang.Exception: Returning an error"))
 			{
-				System.out.println("Unexpected error message.\nExpected: Panic in Go function. Panic Data: An error from ReturnsAnError\nReceived: "+e.getMessage());
+				System.out.println("Unexpected error message.\nExpected: java.lang.Exception: Returning an error\nReceived: "+e.getMessage());
 				System.exit(1);
 			}
 		}
@@ -56,7 +56,7 @@ public class Main_test
             System.exit(1);
         }
 
-        try
+		try
         {
             t.divIntegers(1, 0);
             System.out.println("Expected an error - divisor is 0");
@@ -64,9 +64,9 @@ public class Main_test
         }
         catch(Exception e)
         {
-            if(!e.getMessage().equals("Panic in Go function. Panic Data: Divisor is 0"))
+            if(!e.getMessage().equals("java.lang.ArithmeticException: Divisor is 0"))
             {
-                System.out.println("Unexpected error message.\nExpected: Panic in Go function. Panic Data: Divisor is 0\nReceived: "+e.getMessage());
+                System.out.println("Unexpected error message.\nExpected: java.lang.ArithmeticException: Divisor is 0\nReceived: "+e.getMessage());
                 System.exit(1);
             }
         }
