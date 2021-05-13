@@ -21,9 +21,9 @@ rm build_guest.sh
 rm Test.proto
 rm TestFuncs.scala
 rm Test_OpenFFIGuest.jar
-rm *.class
+rm -r sanity
 
 echo Delete host file
 rm Test_OpenFFIHost_pb2.py
 
-echo Done Go to Scala
+echo Done Python3 to Scala

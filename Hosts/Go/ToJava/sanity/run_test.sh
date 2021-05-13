@@ -22,7 +22,7 @@ rm build_guest.sh
 rm Test.proto
 rm TestFuncs.java
 rm Test_OpenFFIGuest.jar
-rm TestFuncs.class
+rm -r sanity
 
 echo Delete host file
 rm Test_OpenFFIHost.go

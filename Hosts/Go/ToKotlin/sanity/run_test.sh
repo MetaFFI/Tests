@@ -22,8 +22,8 @@ rm build_guest.sh
 rm Test.proto
 rm TestFuncs.kt
 rm Test_OpenFFIGuest.jar
-rm *.class
-rm -r ./../META-INF
+rm -r META-INF
+rm -r sanity
 
 echo Delete host file
 rm Test_OpenFFIHost.go

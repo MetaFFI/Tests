@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 // openffi_target_language: "openjdk"
-// openffi_function_path: "classpath=$PWD/..:/usr/share/scala/lib/scala-library.jar,package=sanity,class=TestFuncs"
+// openffi_function_path: "classpath=.:/usr/share/scala/lib/scala-library.jar,package=sanity,class=TestFuncs"
 
 service Test
 {

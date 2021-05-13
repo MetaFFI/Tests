@@ -21,9 +21,10 @@ rm build_guest.sh
 rm Test.proto
 rm TestFuncs.kt
 rm Test_OpenFFIGuest.jar
+rm -r sanity
+rm -r META-INF
 
 echo Delete host file
 rm Test_OpenFFIHost_pb2.py
-rm TestFuncs.class
 
-echo Done Go to Kotlin
+echo Done Python3 to Kotlin

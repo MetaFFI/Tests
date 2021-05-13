@@ -21,9 +21,9 @@ rm build_guest.sh
 rm Test.proto
 rm TestFuncs.java
 rm Test_OpenFFIGuest.jar
+rm -r sanity
 
 echo Delete host file
 rm Test_OpenFFIHost_pb2.py
-rm TestFuncs.class
 
-echo Done Go to Java
+echo Done Python3 to Java

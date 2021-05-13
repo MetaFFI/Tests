@@ -1,5 +1,3 @@
-package sanity;
-
 import openffi.*;
 
 public class Main_test
