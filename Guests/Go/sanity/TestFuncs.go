@@ -13,6 +13,7 @@ func ReturnsAnError(){
 }
 
 func DivIntegers(x int, y int) float32{
+
 	if y == 0{
 		panic("Divisor is 0")
 	}

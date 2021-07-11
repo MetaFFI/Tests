@@ -4,5 +4,5 @@
 echo groovyc TestFuncs.groovy -d .
 groovyc TestFuncs.groovy -d .
 
-echo openffi -c --idl Test.proto -t
-openffi -c --idl Test.proto -t
+echo openffi -c --idl Test.proto -g
+openffi -c --idl Test.proto -g

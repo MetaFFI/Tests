@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -e
 
-echo openffi -c --idl Test.proto -f go --host-options "package=sanity"
-openffi -c --idl Test.proto -f go --host-options "package=sanity"
+echo openffi -c --idl Test.proto -h go --host-options "package=sanity"
+openffi -c --idl Test.proto -h go --host-options "package=sanity"

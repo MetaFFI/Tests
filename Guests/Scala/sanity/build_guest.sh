@@ -4,5 +4,5 @@
 echo scalac TestFuncs.scala
 scalac TestFuncs.scala -d .
 
-echo openffi -c --idl Test.proto -t
-openffi -c --idl Test.proto -t
+echo openffi -c --idl Test.proto -g
+openffi -c --idl Test.proto -g

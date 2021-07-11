@@ -3,10 +3,9 @@
 set -e
 
 echo Copying python3 test code
-cp ../../../../Guests/Go/sanity/build_guest.sh .
-cp ../../../../Guests/Go/sanity/go.mod .
-cp ../../../../Guests/Go/sanity/Test.proto .
-cp ../../../../Guests/Go/sanity/TestFuncs.go .
+cp ../../../../../Guests/Go/libraries/goutils/build_guest.sh .
+cp ../../../../../Guests/Go/libraries/goutils/go.mod .
+cp ../../../../../Guests/Go/libraries/goutils/Test.proto .
 
 echo building guest
 ./build_guest.sh
@@ -21,7 +20,6 @@ echo Deleting guest files
 rm build_guest.sh
 rm go.mod
 rm Test.proto
-rm TestFuncs.go
 rm Test_OpenFFIGuest.so
 rm -R __pycache__
 

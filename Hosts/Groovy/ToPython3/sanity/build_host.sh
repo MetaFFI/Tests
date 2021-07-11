@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-echo openffi -c --idl Test.proto -f openjdk
-openffi -c --idl Test.proto -f openjdk
+echo openffi -c --idl Test.proto -h openjdk
+openffi -c --idl Test.proto -h openjdk

@@ -15,8 +15,8 @@ message Void {}
 
 message div_params
 {
-	int32 x = 1;
-	int32 y = 2;
+	int64 x = 1; // openffi_type_alias: "int"
+	int64 y = 2; // openffi_type_alias: "int"
 }
 message div_return
 {

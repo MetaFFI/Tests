@@ -25,6 +25,7 @@ rm build_guest.sh
 rm Test.proto
 rm TestFuncs.py
 rm Test_OpenFFIGuest.py
+rm -r __pycache__
 
 echo Delete host file
 rm Test_OpenFFIHost.go

@@ -1,5 +1,5 @@
 import unittest
-from Test_OpenFFIHost_pb2 import *
+from Test_OpenFFIHost import *
 
 class TestSanity(unittest.TestCase):
 
@@ -13,17 +13,17 @@ class TestSanity(unittest.TestCase):
 		except:
 			pass
 
+
 	def test_div_integers(self):
 		res = DivIntegers(1, 2)
 		if res != 0.5:
-			self.fail('Expected 0.5, got: '+res)
+			self.fail('Expected 0.5, got: '+str(res))
 
 		try:
 			DivIntegers(1, 0)
 			self.fail('Expected an error - divisor is 0')
 		except:
 			pass
-
 
 	def test_join_strings(self):
 		res = JoinStrings(['A','b','C'])

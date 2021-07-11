@@ -15,6 +15,7 @@ echo building host
 echo Running Tests
 go get -u
 go build
+./main
 echo Tests ran successfully!
 
 echo Starting cleanup...
@@ -23,10 +24,10 @@ echo Deleting guest files
 rm build_guest.sh
 rm python_string_utils.proto
 rm *.py
+rm -r __pycache__
 
 echo Delete host file
 rm python_string_utils_OpenFFIHost.go
-rm go.sum
 rm main
 
 echo Done Go to Python3
