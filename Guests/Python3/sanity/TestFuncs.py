@@ -16,4 +16,3 @@ def join_strings(arr):
     res = ','.join(arr)
     return res
 
-

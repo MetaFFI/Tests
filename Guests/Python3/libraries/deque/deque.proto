@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+// openffi_target_language: "python3"
+// openffi_function_path: "module=collections"
+service deque
+{
+	// verifies JSON. openffi_function_path: "function=deque"
+	// openffi_function_type: "constructor"
+	rpc new_deque (Void) returns (new_deque_return);
+
+	// verifies JSON. openffi_function_path: "function=append"
+	// openffi_function_type: "method"
+	rpc append (append_params) returns (Void);
+
+	// Strips HTML. openffi_function_path: "function=pop"
+	// openffi_function_type: "method"
+	rpc pop (pop_params) returns (pop_return);
+}
+
+message Void{}
+message new_deque_return{ handle deque = 1; }
+
+message append_params   { handle deque_this = 1; any txt = 2; }
+
+message pop_params      { handle deque_this = 1; }
+message pop_return      { any txt = 1; }
+
+
