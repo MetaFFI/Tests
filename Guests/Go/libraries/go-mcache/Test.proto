@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+// openffi_target_language: "go"
+
+// openffi_function_path: "module=github.com/OrlovEvgeny/go-mcache"
+service Test
+{
+	rpc new (Void) returns (new_return); // prints hello_world. openffi_function_path: "function=New"
+	rpc set (set_params) returns (Void)
+	rpc get (get_params) returns (get_return)
+}
+
+message Void{}
+message new_return{	handle instance = 1; }
+
+message set_params{	handle instance = 1; }
+
+message get_params{	handle instance = 1; }
+message get_return{	handle instance = 1; }
+
