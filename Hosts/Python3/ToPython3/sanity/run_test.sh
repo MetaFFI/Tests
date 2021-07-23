@@ -26,4 +26,4 @@ rm -R __pycache__
 echo Delete host file
 rm Test_OpenFFIHost.py
 
-echo Done Python3 to Go
+echo Done Python3 to Python3
