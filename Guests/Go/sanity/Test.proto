@@ -9,6 +9,24 @@ service Test
 	rpc returns_an_error (Void) returns (Void); // always returns an error. openffi_function_path: "function=ReturnsAnError"
 	rpc div_integers (div_params) returns (div_return); // divides two integers. If dividing in 0, return an error. openffi_function_path: "function=DivIntegers"
 	rpc join_strings (join_strings_params) returns (join_strings_return); // joins the strings using a comma separator openffi_function_path: "function=JoinStrings"
+
+
+	// creates new map. openffi_function_path: "function=NewTestMap"
+	// openffi_function_type: "constructor"
+	rpc new_map(Void) returns (new_map_return);
+
+	// sets value. openffi_function_path: "function=SetKey,class=*TestMap"
+	// openffi_function_type: "method"
+	rpc set_key(set_key_params) returns (Void);
+
+	// get value. openffi_function_path: "function=GetKey,class=*TestMap"
+	// openffi_function_type: "method"
+	rpc get_key(get_key_params) returns (get_key_return);
+
+	// verifies key exists in map. openffi_function_path: "function=ContainsKey,class=*TestMap"
+	// openffi_function_type: "method"
+	rpc contains_key(contains_key_params) returns (contains_key_return);
+
 }
 
 message Void {}
@@ -35,4 +53,33 @@ message join_strings_params
 message join_strings_return
 {
 	string result = 1;
+}
+
+message new_map_return
+{
+	handle instance = 1;
+}
+message set_key_params
+{
+	handle instance = 1;
+	string key = 2;
+	any value = 3;
+}
+message get_key_params
+{
+	handle instance = 1;
+	string key = 2;
+}
+message get_key_return
+{
+	any value = 1;
+}
+message contains_key_params
+{
+	handle instance = 1;
+	string key = 2;
+}
+message contains_key_return
+{
+	bool exists = 1;
 }

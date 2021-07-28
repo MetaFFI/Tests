@@ -11,11 +11,11 @@ cp ../../../../Guests/Go/sanity/TestFuncs.go .
 echo building guest
 ./build_guest.sh
 
-echo building host
-./build_host.sh
-
 rm go.mod
 rm TestFuncs.go
+
+echo building host
+./build_host.sh
 
 echo running tests
 go mod init test

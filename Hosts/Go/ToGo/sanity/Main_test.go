@@ -46,3 +46,21 @@ func TestJoinStrings(t *testing.T){
 	}
 }
 //--------------------------------------------------------------------
+func TestTestMap(t* testing.T){
+
+	m, err := NewTestMap()
+	if err != nil{ t.Fatal(err) }
+	
+	err = SetKey(m, "k1", "v1")
+	if err != nil{ t.Fatal(err) }
+
+	exists, err := ContainsKey(m, "k1")
+	if err != nil{ t.Fatal(err) }
+	if !exists{ t.Fatalf("k1 should exist in map") }
+
+	v, err := GetKey(m, "k1")
+	if err != nil{ t.Fatal(err) }
+
+	if v != "v1"{ t.Fatalf("k1 value should be v1, while it is: %v", v) }
+}
+//--------------------------------------------------------------------

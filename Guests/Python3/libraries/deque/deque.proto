@@ -4,15 +4,15 @@ syntax = "proto3";
 // openffi_function_path: "module=collections"
 service deque
 {
-	// verifies JSON. openffi_function_path: "function=deque"
+	// creates new deque. openffi_function_path: "function=deque"
 	// openffi_function_type: "constructor"
 	rpc new_deque (Void) returns (new_deque_return);
 
-	// verifies JSON. openffi_function_path: "function=append"
+	// Appends to deque. openffi_function_path: "function=append"
 	// openffi_function_type: "method"
 	rpc append (append_params) returns (Void);
 
-	// Strips HTML. openffi_function_path: "function=pop"
+	// Pop from deque. openffi_function_path: "function=pop"
 	// openffi_function_type: "method"
 	rpc pop (pop_params) returns (pop_return);
 }

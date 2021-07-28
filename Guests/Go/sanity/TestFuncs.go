@@ -24,3 +24,24 @@ func DivIntegers(x int, y int) float32{
 func JoinStrings(arrs []string) string{
 	return strings.Join(arrs, ",")
 }
+
+type TestMap struct{
+	m map[string]interface{}
+}
+
+func NewTestMap() *TestMap{
+	return &TestMap{ m: make(map[string]interface{})}
+}
+
+func (this *TestMap) SetKey(k string, v interface{}){
+	this.m[k] = v
+}
+
+func (this *TestMap) GetKey(k string) interface{}{
+	return this.m[k]
+}
+
+func (this *TestMap) ContainsKey(k string) bool{
+	_, found := this.m[k]
+	return found
+}
