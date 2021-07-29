@@ -1,16 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
 
-/*
-#include <stdint.h>
-void* int64_to_unsafeptr(int64_t p)
-{
-	return (void*)p;
-}
-*/
+	/*
+	   #include <stdint.h>
+	   void* int64_to_unsafeptr(int64_t p)
+	   {
+	   	return (void*)p;
+	   }
+	*/
+
+	. "github.com/OpenFFI/lang-plugin-go/go-runtime"
+)
+
 import "C"
-
 
 func main(){
 	// inner deque
@@ -53,7 +57,7 @@ func main(){
     if x.(int64) != 1 { panic("x != 1") }
 
     popedInnerDeque, _ := Pop(deque)
-    x, _ = Pop(popedInnerDeque.(handle))
+    x, _ = Pop(popedInnerDeque.(Handle))
     fmt.Printf("%v\n", x)
     if x.(int64) != 100 { panic("inner deque x != 100") }
 
