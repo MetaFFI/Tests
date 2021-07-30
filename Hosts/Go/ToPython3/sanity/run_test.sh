@@ -24,11 +24,11 @@ echo Deleting guest files
 rm build_guest.sh
 rm Test.proto
 rm TestFuncs.py
-rm Test_OpenFFIGuest.py
+rm Test_MetaFFIGuest.py
 rm -r __pycache__
 
 echo Delete host file
-rm Test_OpenFFIHost.go
+rm Test_MetaFFIHost.go
 rm go.sum
 
 echo Done Go to Python3

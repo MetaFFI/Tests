@@ -1,6 +1,6 @@
 import unittest
 import time
-from mcache_OpenFFIHost import *
+from mcache_MetaFFIHost import *
 
 class TestSanity(unittest.TestCase):
 

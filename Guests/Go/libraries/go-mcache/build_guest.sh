@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-echo openffi -c --idl mcache.proto -g
-openffi -c --idl mcache.proto -g
+echo metaffi -c --idl mcache.proto -g
+metaffi -c --idl mcache.proto -g

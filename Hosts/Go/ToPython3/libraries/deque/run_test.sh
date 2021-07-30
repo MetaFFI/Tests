@@ -27,7 +27,7 @@ rm *.py
 rm -r __pycache__
 
 echo Delete host file
-rm deque_OpenFFIHost.go
+rm deque_MetaFFIHost.go
 rm main
 
 echo Done Go to Python3

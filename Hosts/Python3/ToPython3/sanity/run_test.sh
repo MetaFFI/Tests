@@ -19,11 +19,11 @@ python3 -m unittest Main_test.TestSanity
 echo Deleting guest files
 rm build_guest.sh
 rm Test.proto
-rm Test_OpenFFIGuest.py
+rm Test_MetaFFIGuest.py
 rm TestFuncs.py
 rm -R __pycache__
 
 echo Delete host file
-rm Test_OpenFFIHost.py
+rm Test_MetaFFIHost.py
 
 echo Done Python3 to Python3

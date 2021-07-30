@@ -21,10 +21,10 @@ echo Deleting guest files
 rm build_guest.sh
 rm Test.proto
 rm TestFuncs.java
-rm Test_OpenFFIGuest.jar
+rm Test_MetaFFIGuest.jar
 rm -r sanity
 
 echo Delete host file
-rm Test_OpenFFIHost.go
+rm Test_MetaFFIHost.go
 
 echo Done Go to Java

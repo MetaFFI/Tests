@@ -13,8 +13,8 @@ echo building host
 ./build_host.sh
 
 echo Running Tests
-groovyc -cp ".:python_string_utils_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test.groovy
-groovy -cp ".:python_string_utils_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test
+groovyc -cp ".:python_string_utils_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:$METAFFI_HOME/protobuf-java-3.15.2.jar" Main_test.groovy
+groovy -cp ".:python_string_utils_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:$METAFFI_HOME/protobuf-java-3.15.2.jar" Main_test
 echo Tests ran successfully!
 
 echo Starting cleanup...
@@ -25,7 +25,7 @@ rm python_string_utils.proto
 rm *.py
 
 echo Delete host file
-rm python_string_utils_OpenFFIHost.jar
+rm python_string_utils_MetaFFIHost.jar
 rm -r StringUtilsTest
 
 echo Done Go to Python3

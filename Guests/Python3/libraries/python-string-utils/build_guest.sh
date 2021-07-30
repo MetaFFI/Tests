@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-echo openffi -c --idl python_string_utils.proto -g
-openffi -c --idl python_string_utils.proto -g
+echo metaffi -c --idl python_string_utils.proto -g
+metaffi -c --idl python_string_utils.proto -g

@@ -11,7 +11,7 @@ import (
 	   }
 	*/
 
-	. "github.com/OpenFFI/lang-plugin-go/go-runtime"
+	. "github.com/MetaFFI/lang-plugin-go/go-runtime"
 )
 
 import "C"

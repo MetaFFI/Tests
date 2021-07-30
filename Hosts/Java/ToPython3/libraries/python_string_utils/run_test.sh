@@ -13,24 +13,24 @@ echo building host
 ./build_host.sh
 
 echo Compiling Tests
-javac -cp ".:python_string_utils_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test.java
+javac -cp ".:python_string_utils_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:$METAFFI_HOME/protobuf-java-3.15.2.jar" Main_test.java
 
 echo Running Tests
 cd ..
-cp python_string_utils/python_string_utils_OpenFFIGuest.py .
-java -cp ".:python_string_utils/python_string_utils_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" python_string_utils.Main_test
+cp python_string_utils/python_string_utils_MetaFFIGuest.py .
+java -cp ".:python_string_utils/python_string_utils_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:$METAFFI_HOME/protobuf-java-3.15.2.jar" python_string_utils.Main_test
 echo Tests ran successfully!
 cd python_string_utils
 echo Starting cleanup...
 
 echo Deleting guest files
-rm ./../python_string_utils_OpenFFIGuest.py
+rm ./../python_string_utils_MetaFFIGuest.py
 rm build_guest.sh
 rm python_string_utils.proto
 rm *.py
 
 echo Delete host file
-rm python_string_utils_OpenFFIHost.jar
+rm python_string_utils_MetaFFIHost.jar
 rm *.class
 
 echo Done Go to Python3

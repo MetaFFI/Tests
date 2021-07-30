@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-echo openffi -c --idl python_string_utils.proto -h openjdk
-openffi -c --idl python_string_utils.proto -h openjdk
+echo metaffi -c --idl python_string_utils.proto -h openjdk
+metaffi -c --idl python_string_utils.proto -h openjdk

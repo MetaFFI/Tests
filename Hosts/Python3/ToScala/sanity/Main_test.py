@@ -1,5 +1,5 @@
 import unittest
-from Test_OpenFFIHost_pb2 import *
+from Test_MetaFFIHost_pb2 import *
 
 class TestSanity(unittest.TestCase):
 

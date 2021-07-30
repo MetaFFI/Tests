@@ -20,10 +20,10 @@ echo Deleting guest files
 rm build_guest.sh
 rm go.mod
 rm mcache.proto
-rm mcache_OpenFFIGuest.so
+rm mcache_MetaFFIGuest.so
 rm -R __pycache__
 
 echo Delete host file
-rm mcache_OpenFFIHost.py
+rm mcache_MetaFFIHost.py
 
 echo Done Python3 to Go

@@ -20,10 +20,10 @@ echo Deleting guest files
 rm build_guest.sh
 rm Test.proto
 rm TestFuncs.java
-rm Test_OpenFFIGuest.jar
+rm Test_MetaFFIGuest.jar
 rm -r sanity
 
 echo Delete host file
-rm Test_OpenFFIHost_pb2.py
+rm Test_MetaFFIHost_pb2.py
 
 echo Done Python3 to Java

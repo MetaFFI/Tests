@@ -1,30 +1,30 @@
 syntax = "proto3";
 
-// openffi_target_language: "go"
+// metaffi_target_language: "go"
 
-// openffi_function_path: "module=$PWD, package=TestFuncs"
+// metaffi_function_path: "module=$PWD, package=TestFuncs"
 service Test
 {
-	rpc hello_world (Void) returns (Void); // prints hello_world. openffi_function_path: "function=HelloWorld"
-	rpc returns_an_error (Void) returns (Void); // always returns an error. openffi_function_path: "function=ReturnsAnError"
-	rpc div_integers (div_params) returns (div_return); // divides two integers. If dividing in 0, return an error. openffi_function_path: "function=DivIntegers"
-	rpc join_strings (join_strings_params) returns (join_strings_return); // joins the strings using a comma separator openffi_function_path: "function=JoinStrings"
+	rpc hello_world (Void) returns (Void); // prints hello_world. metaffi_function_path: "function=HelloWorld"
+	rpc returns_an_error (Void) returns (Void); // always returns an error. metaffi_function_path: "function=ReturnsAnError"
+	rpc div_integers (div_params) returns (div_return); // divides two integers. If dividing in 0, return an error. metaffi_function_path: "function=DivIntegers"
+	rpc join_strings (join_strings_params) returns (join_strings_return); // joins the strings using a comma separator metaffi_function_path: "function=JoinStrings"
 
 
-	// creates new map. openffi_function_path: "function=NewTestMap"
-	// openffi_function_type: "constructor"
+	// creates new map. metaffi_function_path: "function=NewTestMap"
+	// metaffi_function_type: "constructor"
 	rpc new_map(Void) returns (new_map_return);
 
-	// sets value. openffi_function_path: "function=SetKey,class=*TestMap"
-	// openffi_function_type: "method"
+	// sets value. metaffi_function_path: "function=SetKey,class=*TestMap"
+	// metaffi_function_type: "method"
 	rpc set_key(set_key_params) returns (Void);
 
-	// get value. openffi_function_path: "function=GetKey,class=*TestMap"
-	// openffi_function_type: "method"
+	// get value. metaffi_function_path: "function=GetKey,class=*TestMap"
+	// metaffi_function_type: "method"
 	rpc get_key(get_key_params) returns (get_key_return);
 
-	// verifies key exists in map. openffi_function_path: "function=ContainsKey,class=*TestMap"
-	// openffi_function_type: "method"
+	// verifies key exists in map. metaffi_function_path: "function=ContainsKey,class=*TestMap"
+	// metaffi_function_type: "method"
 	rpc contains_key(contains_key_params) returns (contains_key_return);
 
 }
@@ -33,17 +33,12 @@ message Void {}
 
 message div_params
 {
-	int64 x = 1; // openffi_type_alias: "int"
-	int64 y = 2; // openffi_type_alias: "int"
+	int64 x = 1; // metaffi_type_alias: "int"
+	int64 y = 2; // metaffi_type_alias: "int"
 }
 message div_return
 {
 	float z = 1;
-}
-
-message print_map_params
-{
-	map<string, string> m = 1;
 }
 
 message join_strings_params

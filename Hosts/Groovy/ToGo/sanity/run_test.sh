@@ -15,7 +15,7 @@ echo building host
 ./build_host.sh
 
 echo running tests
-groovy -cp ".:Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test
+groovy -cp ".:Test_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:$METAFFI_HOME/protobuf-java-3.15.2.jar" Main_test
 echo Tests ran successfully!
 
 echo Starting cleanup...
@@ -25,9 +25,9 @@ rm build_guest.sh
 rm go.mod
 rm Test.proto
 rm TestFuncs.go
-rm Test_OpenFFIGuest.so
+rm Test_MetaFFIGuest.so
 
 echo Delete host file
-rm Test_OpenFFIHost.jar
+rm Test_MetaFFIHost.jar
 
 echo Done Groovy to Go

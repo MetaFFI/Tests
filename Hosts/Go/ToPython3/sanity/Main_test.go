@@ -1,6 +1,8 @@
 package sanity
 
-import "testing"
+import (
+	"testing"
+)
 
 //--------------------------------------------------------------------
 func TestHelloWorld(t *testing.T){

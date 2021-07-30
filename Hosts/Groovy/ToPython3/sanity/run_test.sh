@@ -14,10 +14,10 @@ echo building host
 ./build_host.sh
 
 echo Compiling Test Code
-groovyc -cp ".:./..:Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test.groovy
+groovyc -cp ".:./..:Test_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:$METAFFI_HOME/protobuf-java-3.15.2.jar" Main_test.groovy
 
 echo running tests
-groovy -cp ".:Test_OpenFFIHost.jar:$OPENFFI_HOME/xllr.openjdk.bridge.jar:$OPENFFI_HOME/protobuf-java-3.15.2.jar" Main_test
+groovy -cp ".:Test_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:$METAFFI_HOME/protobuf-java-3.15.2.jar" Main_test
 echo Tests ran successfully!
 
 echo Starting cleanup...
@@ -26,10 +26,10 @@ echo Deleting guest files
 rm build_guest.sh
 rm Test.proto
 rm TestFuncs.py
-rm Test_OpenFFIGuest.py
+rm Test_MetaFFIGuest.py
 
 echo Delete host file
-rm Test_OpenFFIHost.jar
+rm Test_MetaFFIHost.jar
 rm -r sanity
 
 echo Done Groovy to Python3

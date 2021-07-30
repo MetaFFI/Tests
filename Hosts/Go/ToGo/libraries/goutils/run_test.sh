@@ -18,9 +18,9 @@ go test
 echo Deleting guest files
 rm build_guest.sh
 rm Test.proto
-rm Test_OpenFFIGuest.so
+rm Test_MetaFFIGuest.so
 
 echo Delete host file
-rm Test_OpenFFIHost.go
+rm Test_MetaFFIHost.go
 
 echo Done Go to Go

@@ -1,29 +1,29 @@
 syntax = "proto3";
 
-// openffi_target_language: "python3"
+// metaffi_target_language: "python3"
 
-// openffi_function_path: "module=TestFuncs"
+// metaffi_function_path: "module=TestFuncs"
 service Test
 {
-	rpc hello_world (Void) returns (Void); // prints hello_world. openffi_function_path: "function=hello_world"
-	rpc returns_an_error (Void) returns (Void); // always returns an error. openffi_function_path: "function=returns_an_error"
-	rpc div_integers (div_params) returns (div_return); // divides two integers. If dividing in 0, return an error. openffi_function_path: "function=div_integers"
-	rpc join_strings (join_strings_params) returns (join_strings_return); // joins the strings using a comma separator openffi_function_path: "function=join_strings"
+	rpc hello_world (Void) returns (Void); // prints hello_world. metaffi_function_path: "function=hello_world"
+	rpc returns_an_error (Void) returns (Void); // always returns an error. metaffi_function_path: "function=returns_an_error"
+	rpc div_integers (div_params) returns (div_return); // divides two integers. If dividing in 0, return an error. metaffi_function_path: "function=div_integers"
+	rpc join_strings (join_strings_params) returns (join_strings_return); // joins the strings using a comma separator metaffi_function_path: "function=join_strings"
 
-	// creates new map. openffi_function_path: "function=testmap"
-	// openffi_function_type: "constructor"
+	// creates new map. metaffi_function_path: "function=testmap"
+	// metaffi_function_type: "constructor"
 	rpc new_map(Void) returns (new_map_return);
 
-	// sets value. openffi_function_path: "function=set_key"
-	// openffi_function_type: "method"
+	// sets value. metaffi_function_path: "function=set_key"
+	// metaffi_function_type: "method"
 	rpc set_key(set_key_params) returns (Void);
 
-	// get value. openffi_function_path: "function=get_key"
-	// openffi_function_type: "method"
+	// get value. metaffi_function_path: "function=get_key"
+	// metaffi_function_type: "method"
 	rpc get_key(get_key_params) returns (get_key_return);
 
-	// verifies key exists in map. openffi_function_path: "function=contains_key"
-	// openffi_function_type: "method"
+	// verifies key exists in map. metaffi_function_path: "function=contains_key"
+	// metaffi_function_type: "method"
 	rpc contains_key(contains_key_params) returns (contains_key_return);
 
 }

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-echo openffi -c --idl Test.proto -g
-openffi -c --idl Test.proto -g
+echo metaffi -c --idl Test.proto -g
+metaffi -c --idl Test.proto -g
