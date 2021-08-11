@@ -1,0 +1,436 @@
+{
+	"idl_filename": "Test",
+	"idl_extension": ".json",
+	"idl_filename_with_extension": "Test.json",
+	"idl_full_path": "/github.com/MetaFFI/Tests/Guests/Go/sanity/Test.json",
+	"metaffi_guest_lib": "Test_MetaFFIGuest",
+	"target_language": "go",
+	"modules": [
+		{
+			"name": "Sanity",
+			"comment": "",
+			"tags": {},
+			"functions": [
+				{
+					"name": "HelloWorld",
+					"comment": "prints hello_world",
+					"tags": {},
+					"function_path": {
+						"entrypoint_function": "EntryPoint_HelloWorld",
+						"metaffi_guest_lib": "Test_MetaFFIGuest",
+						"module": "$PWD",
+						"package": "TestFuncs"
+					},
+					"parameters": [],
+					"return_values": []
+				},
+				{
+					"name": "ReturnsAnError",
+					"comment": "always returns an error",
+					"tags": {},
+					"function_path": {
+						"entrypoint_function": "EntryPoint_ReturnsAnError",
+						"metaffi_guest_lib": "Test_MetaFFIGuest",
+						"module": "$PWD",
+						"package": "TestFuncs"
+					},
+					"parameters": [],
+					"return_values": []
+				},
+				{
+					"name": "DivIntegers",
+					"comment": "divides two integers",
+					"tags": {},
+					"function_path": {
+						"entrypoint_function": "EntryPoint_DivIntegers",
+						"metaffi_guest_lib": "Test_MetaFFIGuest",
+						"module": "$PWD",
+						"package": "TestFuncs"
+					},
+					"parameters": [
+						{
+							"name": "x",
+							"type": "int64",
+							"type_alias": "int",
+							"comment": "",
+							"tags": {},
+							"dimensions": 0
+						},
+						{
+							"name": "y",
+							"type": "int64",
+							"type_alias": "int",
+							"comment": "",
+							"tags": {},
+							"dimensions": 0
+						}
+					],
+					"return_values": [
+						{
+							"name": "z",
+							"type": "float32",
+							"type_alias": "",
+							"comment": "",
+							"tags": {},
+							"dimensions": 0
+						}
+					]
+				},
+				{
+					"name": "JoinStrings",
+					"comment": "joins the strings using a comma separator",
+					"tags": {},
+					"function_path": {
+						"entrypoint_function": "EntryPoint_JoinStrings",
+						"metaffi_guest_lib": "Test_MetaFFIGuest",
+						"module": "$PWD",
+						"package": "TestFuncs"
+					},
+					"parameters": [
+						{
+							"name": "strings",
+							"type": "string8",
+							"type_alias": "",
+							"comment": "",
+							"tags": {},
+							"dimensions": 1
+						}
+					],
+					"return_values": [
+						{
+							"name": "result",
+							"type": "string8",
+							"type_alias": "",
+							"comment": "",
+							"tags": {},
+							"dimensions": 0
+						}
+					]
+				},
+				{
+					"name": "WaitABit",
+					"comment": "Wait a bit",
+					"tags": {},
+					"function_path": {
+						"entrypoint_function": "EntryPoint_WaitABit",
+						"metaffi_guest_lib": "Test_MetaFFIGuest",
+						"module": "$PWD",
+						"package": "TestFuncs"
+					},
+					"parameters": [
+						{
+							"name": "d",
+							"type": "int64",
+							"type_alias": "time.Duration",
+							"comment": "",
+							"tags": {},
+							"dimensions": 0
+						}
+					],
+					"return_values": [
+						{
+							"name": "err",
+							"type": "handle",
+							"type_alias": "",
+							"comment": "",
+							"tags": {},
+							"dimensions": 0
+						}
+					]
+				}
+			],
+			"classes": [
+				{
+					"name": "TestMap",
+					"comment": "Go map wrapper",
+					"tags": {},
+					"constructors": [
+						{
+							"name": "NewTestMap",
+							"comment": "",
+							"tags": {},
+							"function_path": {
+								"entrypoint_function": "EntryPoint_NewTestMap",
+								"metaffi_guest_lib": "Test_MetaFFIGuest",
+								"module": "$PWD",
+								"package": "TestFuncs"
+							},
+							"parameters": [],
+							"return_values": [
+								{
+									"name": "new_instance",
+									"type": "handle",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							]
+						}
+					],
+					"release": {
+						"name": "ReleaseTestMap",
+						"comment": "Releases object",
+						"tags": {},
+						"function_path": {
+							"entrypoint_function": "EntryPoint_ReleaseTestMap",
+							"metaffi_guest_lib": "Test_MetaFFIGuest",
+							"module": "$PWD",
+							"package": "TestFuncs"
+						},
+						"parameters": [
+							{
+								"name": "this_instance",
+								"type": "handle",
+								"type_alias": "",
+								"comment": "",
+								"tags": {},
+								"dimensions": 0
+							}
+						],
+						"return_values": []
+					},
+					"methods": [
+						{
+							"name": "Set",
+							"comment": "",
+							"tags": {
+								"receiver_pointer": "true"
+							},
+							"function_path": {
+								"entrypoint_class": "TestMap",
+								"entrypoint_function": "EntryPoint_Set",
+								"metaffi_guest_lib": "Test_MetaFFIGuest",
+								"module": "$PWD",
+								"package": "TestFuncs"
+							},
+							"parameters": [
+								{
+									"name": "this_instance",
+									"type": "handle",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								},
+								{
+									"name": "key",
+									"type": "string8",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								},
+								{
+									"name": "value",
+									"type": "any",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							],
+							"return_values": [],
+							"instance_required": true
+						},
+						{
+							"name": "Get",
+							"comment": "",
+							"tags": {
+								"receiver_pointer": "true"
+							},
+							"function_path": {
+								"entrypoint_class": "TestMap",
+								"entrypoint_function": "EntryPoint_Get",
+								"metaffi_guest_lib": "Test_MetaFFIGuest",
+								"module": "$PWD",
+								"package": "TestFuncs"
+							},
+							"parameters": [
+								{
+									"name": "this_instance",
+									"type": "handle",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								},
+								{
+									"name": "key",
+									"type": "string8",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							],
+							"return_values": [
+								{
+									"name": "value",
+									"type": "any",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							],
+							"instance_required": true
+						},
+						{
+							"name": "Contains",
+							"comment": "",
+							"tags": {
+								"receiver_pointer": "true"
+							},
+							"function_path": {
+								"entrypoint_class": "TestMap",
+								"entrypoint_function": "EntryPoint_Contains",
+								"metaffi_guest_lib": "Test_MetaFFIGuest",
+								"module": "$PWD",
+								"package": "TestFuncs"
+							},
+							"parameters": [
+								{
+									"name": "this_instance",
+									"type": "handle",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								},
+								{
+									"name": "key",
+									"type": "string8",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							],
+							"return_values": [
+								{
+									"name": "exists",
+									"type": "bool",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							],
+							"instance_required": true
+						}
+					],
+					"fields": [
+						{
+							"name": "Name",
+							"type": "string8",
+							"type_alias": "",
+							"comment": "",
+							"tags": {
+								"receiver_pointer": "true"
+							},
+							"dimensions": 0,
+							"getter": {
+								"name": "GetName",
+								"comment": "",
+								"tags": {},
+								"function_path": {
+									"entrypoint_function": "EntryPoint_GetName",
+									"metaffi_guest_lib": "Test_MetaFFIGuest"
+								},
+								"parameters": [
+									{
+										"name": "this_instance",
+										"type": "handle",
+										"type_alias": "",
+										"comment": "",
+										"tags": {},
+										"dimensions": 0
+									}
+								],
+								"return_values": [
+									{
+										"name": "Name",
+										"type": "string8",
+										"type_alias": "",
+										"comment": "",
+										"tags": {
+											"receiver_pointer": "true"
+										},
+										"dimensions": 0
+									}
+								],
+								"instance_required": true
+							},
+							"setter": {
+								"name": "SetName",
+								"comment": "",
+								"tags": {},
+								"function_path": {
+									"entrypoint_function": "EntryPoint_SetName",
+									"metaffi_guest_lib": "Test_MetaFFIGuest"
+								},
+								"parameters": [
+									{
+										"name": "this_instance",
+										"type": "handle",
+										"type_alias": "",
+										"comment": "",
+										"tags": {},
+										"dimensions": 0
+									},
+									{
+										"name": "Name",
+										"type": "string8",
+										"type_alias": "",
+										"comment": "",
+										"tags": {
+											"receiver_pointer": "true"
+										},
+										"dimensions": 0
+									}
+								],
+								"return_values": [],
+								"instance_required": true
+							}
+						}
+					]
+				}
+			],
+			"globals": [
+				{
+					"name": "FiveSeconds",
+					"type": "int64",
+					"type_alias": "time.Duration",
+					"comment": "",
+					"tags": {},
+					"dimensions": 0,
+					"getter": {
+						"name": "GetFiveSeconds",
+						"comment": "",
+						"tags": {},
+						"function_path": {
+							"entrypoint_function": "EntryPoint_GetFiveSeconds",
+							"metaffi_guest_lib": "Test_MetaFFIGuest"
+						},
+						"parameters": [],
+						"return_values": [
+							{
+								"name": "FiveSeconds",
+								"type": "int64",
+								"type_alias": "time.Duration",
+								"comment": "",
+								"tags": {},
+								"dimensions": 0
+							}
+						]
+					},
+					"setter": null
+				}
+			],
+			"external_resources": [
+				"time"
+			]
+		}
+	]
+}

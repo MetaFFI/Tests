@@ -1,0 +1,50 @@
+{
+	"idl_filename": "Test",
+	"idl_extension": ".json",
+	"idl_filename_with_extension": "Test.json",
+	"idl_full_path": "/github.com/MetaFFI/Tests/Guests/Go/sanity/Test.json",
+	"metaffi_guest_lib": "Test_MetaFFIGuest",
+	"modules": [
+		{
+			"name": "goutils",
+			"target_language": "go",
+			"comment": "",
+			"tags": {},
+			"functions": 
+			[
+				{
+					"name": "Initials",
+					"comment": "returns initials",
+					"tags": {},
+					"function_path": {
+						"entrypoint_function": "EntryPoint_Initials",
+						"metaffi_guest_lib": "Test_MetaFFIGuest",
+						"module": "github.com/Masterminds/goutils"
+					},
+					"parameters": 
+					[
+						{
+							"name": "input",
+							"type": "string8",
+							"type_alias": "",
+							"comment": "",
+							"tags": {},
+							"dimensions": 0
+						}
+					],
+					"return_values": 
+					[
+						{
+							"name": "res",
+							"type": "string8",
+							"type_alias": "",
+							"comment": "",
+							"tags": {},
+							"dimensions": 0
+						}
+					]
+				}
+			]
+		}
+	]
+}

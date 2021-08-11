@@ -1,10 +1,12 @@
 import unittest
 from Test_MetaFFIHost import *
+import collections
 
 class TestSanity(unittest.TestCase):
 
 	def test_hello_world(self):
 		HelloWorld()
+	
 
 	def test_returns_an_error(self):
 		try:
@@ -13,7 +15,7 @@ class TestSanity(unittest.TestCase):
 		except:
 			pass
 
-
+	
 	def test_div_integers(self):
 		res = DivIntegers(1, 2)
 		if res != 0.5:
@@ -25,7 +27,41 @@ class TestSanity(unittest.TestCase):
 		except:
 			pass
 
+	
 	def test_join_strings(self):
 		res = JoinStrings(['A','b','C'])
 		if res != 'A,b,C':
 			self.fail('Expected A,b,C. Got: '+res)
+
+	def test_wait_a_bit(self):
+		fivesec = GetFiveSeconds()
+		WaitABit(fivesec)
+
+	def test_test_map(self):
+		map = TestMap()
+
+		map.Set('x', 250)
+		if not map.Contains('x'):
+			self.fail('Map should contain x')
+
+		if map.Get('x') != 250:
+			self.fail('x should be 250')
+
+		map.Set('y', 'test')
+		if not map.Contains('y'):
+			self.fail('Map should contain y')
+
+		if map.Get('y') != 'test':
+			self.fail('y should be \'test\'')
+
+		deq = collections.deque()
+		deq.append(600)
+		map.Set('z', deq)
+		if not map.Contains('z'):
+			self.fail('Map should contain z')
+
+		mapped_deq = map.Get('z')
+		val = mapped_deq.pop()
+		if val != 600:
+			self.fail('mapped_deq should contain 600')
+		

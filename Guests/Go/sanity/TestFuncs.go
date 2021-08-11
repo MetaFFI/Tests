@@ -2,6 +2,7 @@ package TestFuncs
 
 import (
 	"strings"
+	"time"
 )
 
 func HelloWorld() {
@@ -25,23 +26,33 @@ func JoinStrings(arrs []string) string{
 	return strings.Join(arrs, ",")
 }
 
+const FiveSeconds = time.Second*5
+func WaitABit(d time.Duration) error{
+	time.Sleep(d)
+	return nil
+}
+
 type TestMap struct{
 	m map[string]interface{}
+	Name string
 }
 
 func NewTestMap() *TestMap{
-	return &TestMap{ m: make(map[string]interface{})}
+	return &TestMap{ 
+		m: make(map[string]interface{}),
+		Name: "TestMap Name",
+	}
 }
 
-func (this *TestMap) SetKey(k string, v interface{}){
+func (this *TestMap) Set(k string, v interface{}){
 	this.m[k] = v
 }
 
-func (this *TestMap) GetKey(k string) interface{}{
+func (this *TestMap) Get(k string) interface{}{
 	return this.m[k]
 }
 
-func (this *TestMap) ContainsKey(k string) bool{
+func (this *TestMap) Contains(k string) bool{
 	_, found := this.m[k]
 	return found
 }
