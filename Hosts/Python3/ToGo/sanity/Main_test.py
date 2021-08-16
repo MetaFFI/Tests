@@ -64,4 +64,11 @@ class TestSanity(unittest.TestCase):
 		val = mapped_deq.pop()
 		if val != 600:
 			self.fail('mapped_deq should contain 600')
+
+		map.SetName('MyName')
+		newname = map.GetName()
+		if newname != 'MyName':
+			self.fail('TestMap.Name should be MyName and it is '+newname)
+		
+		
 		

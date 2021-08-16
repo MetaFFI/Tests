@@ -1,3 +1,4 @@
+import time
 
 def hello_world():
     print('Hello World, from Python3')
@@ -15,18 +16,23 @@ def join_strings(arr):
 	res = ','.join(arr)
 	return res
 
+five_seconds = 5
+def wait_a_bit(secs):
+	time.sleep(secs)
+	return None
 
 class testmap:
+	name: str
 	curdict: dict
 
 	def __init__(self):
 		self.curdict = dict()
 
-	def set_key(self, k, v):
+	def set(self, k, v):
 		self.curdict[k] = v
 
-	def get_key(self, k):
+	def get(self, k):
 		return self.curdict[k]
 
-	def contains_key(self, k):
+	def contains(self, k):
 		return self.curdict[k] is not None
