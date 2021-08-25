@@ -1,4 +1,4 @@
-import openffi.*;
+import metaffi.*;
 
 public class Main_test
 {

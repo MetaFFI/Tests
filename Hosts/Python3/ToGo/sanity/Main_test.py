@@ -1,5 +1,5 @@
 import unittest
-from Test_MetaFFIHost import *
+from TestFuncs_MetaFFIHost import *
 import collections
 
 class TestSanity(unittest.TestCase):

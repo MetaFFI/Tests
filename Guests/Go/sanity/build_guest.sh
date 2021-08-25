@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-echo metaffi -c --idl Test.json -g
-metaffi -c --idl Test.json -g
+echo metaffi -c --idl TestFuncs.go -g
+metaffi -c --idl TestFuncs.go -g
