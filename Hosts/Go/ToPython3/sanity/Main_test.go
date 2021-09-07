@@ -6,14 +6,14 @@ import (
 
 //--------------------------------------------------------------------
 func TestHelloWorld(t *testing.T){
-	err := HelloWorld()
+	_, err := HelloWorld()
 	if err != nil{
 		t.Fatal(err)
 	}
 }
 //--------------------------------------------------------------------
 func TestReturnsAnError(t *testing.T){
-	err := ReturnsAnError()
+	_, err := ReturnsAnError()
 	if err == nil{
 		t.Fatal("Error expected")
 	}
@@ -48,7 +48,7 @@ func TestJoinStrings(t *testing.T){
 //--------------------------------------------------------------------
 func TestWaitABit(t *testing.T){
 
-	fsec, err := GetFiveSeconds()
+	fsec, err := GetfiveSeconds()
 	if err != nil{
 		t.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func TestTestMap(t *testing.T){
 		t.Fatal(err)
 	}
 
-	err = m.Set("one", 1)
+	_, err = m.Set("one", 1)
 	if err != nil{
 		t.Fatal(err)
 	}
@@ -84,12 +84,12 @@ func TestTestMap(t *testing.T){
 		t.Fatalf("Expected one=1. one=%v", one)
 	}
 
-	err = m.SetName("TheMap!")
+	err = m.Setname("TheMap!")
 	if err != nil{
 		t.Fatal(err)
 	}
 
-	name, err := m.GetName()
+	name, err := m.Getname()
 	if err != nil{
 		t.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func TestTestMap(t *testing.T){
 
 	u1 := User{ID:"TheUser!"}
 	
-	err = m.Set("user", u1)
+	_, err = m.Set("user", u1)
 	if err != nil{
 		t.Fatal(err)
 	}
