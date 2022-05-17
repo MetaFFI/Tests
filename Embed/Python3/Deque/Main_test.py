@@ -1,6 +1,7 @@
 import unittest
 from TestFuncs_MetaFFIHost import *
 import collections
+from datetime import datetime
 
 
 """metaffi-block: name=TestFuncs.go
@@ -11,99 +12,48 @@ import (
 	"github.com/edwingeng/deque"
 )
 
-type GoDeque struct{
-	d *deque.Deque
+func HelloWorld() {
+	println("Hello World, From Go!")
 }
 
-func NewTestMap() *GoDeque{
+type GoDeque struct{
+	d deque.Deque
+	Name string
+}
+
+func NewGoDeque() *GoDeque{
 	return &GoDeque{ 
-		d: NewDeque(),
+		d: deque.NewDeque(),
 	}
 }
 
-func (this *TestMap) Push(k string, v interface{}){
-	this.m[k] = v
+func (this *GoDeque) Push(v interface{}){
+	this.d.PushBack(v)
 }
 
-func (this *TestMap) Get(k string) interface{}{
-	return this.m[k]
+func (this *GoDeque) Pop() interface{}{
+	return this.d.PopFront()
 }
-
-func (this *TestMap) Contains(k string) bool{
-	_, found := this.m[k]
-	return found
-}
-
 metaffi-end"""
 
 
-class TestSanity(unittest.TestCase):
+if __name__ == '__main__':
+	HelloWorld()
 
-	def test_hello_world(self):
-		HelloWorld()
-	
+	d = GoDeque()
+	d.Push(250)
+	d.Push(['test', 'me'])
 
-	def test_returns_an_error(self):
-		try:
-			ReturnsAnError()
-			self.fail('Test should have failed')
-		except:
-			pass
+	deq = collections.deque()
+	deq.append(600)
+	d.Push(deq)
 
-	
-	def test_div_integers(self):
-		res = DivIntegers(1, 2)
-		if res != 0.5:
-			self.fail('Expected 0.5, got: '+str(res))
+	print(d.Pop())
+	print(d.Pop())
+	print(d.Pop())
 
-		try:
-			DivIntegers(1, 0)
-			self.fail('Expected an error - divisor is 0')
-		except:
-			pass
+	d.SetName('GoDeque')
+	print(d.GetName())
 
-	
-	def test_join_strings(self):
-		res = JoinStrings(['A','b','C'])
-		if res != 'A,b,C':
-			self.fail('Expected A,b,C. Got: '+res)
 
-	def test_wait_a_bit(self):
-		fivesec = GetFiveSeconds()
-		WaitABit(fivesec)
-
-	def test_test_map(self):
-		map = TestMap()
-
-		map.Set('x', 250)
-		if not map.Contains('x'):
-			self.fail('Map should contain x')
-
-		if map.Get('x') != 250:
-			self.fail('x should be 250')
-
-		map.Set('y', 'test')
-		if not map.Contains('y'):
-			self.fail('Map should contain y')
-
-		if map.Get('y') != 'test':
-			self.fail('y should be \'test\'')
-
-		deq = collections.deque()
-		deq.append(600)
-		map.Set('z', deq)
-		if not map.Contains('z'):
-			self.fail('Map should contain z')
-
-		mapped_deq = map.Get('z')
-		val = mapped_deq.pop()
-		if val != 600:
-			self.fail('mapped_deq should contain 600')
-
-		map.SetName('MyName')
-		newname = map.GetName()
-		if newname != 'MyName':
-			self.fail('TestMap.Name should be MyName and it is '+newname)
-		
-		
 		
