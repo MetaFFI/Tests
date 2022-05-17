@@ -2,11 +2,8 @@
 
 set -e
 
-echo building guest
-./build_guest.sh
-
-echo building host
-./build_host.sh
+echo compile metaffi
+./build.sh
 
 echo running tests
 python3 -m unittest Main_test.TestSanity
