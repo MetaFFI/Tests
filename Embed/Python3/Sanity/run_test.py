@@ -8,11 +8,10 @@ def build(build_metaffi: Callable[[str, Optional[str], str, Optional[str]], None
 
 
 def execute(exec_cmd: Callable[[str], None]):
-	exec_cmd('python3 -m unittest Main_test.TestGoDeque')
+	exec_cmd('python3 -m unittest Main_test.TestSanity')
 	
 	
 def cleanup():
 	os.remove('TestFuncs_MetaFFIGuest.so')
 	shutil.rmtree('__pycache__')
 	os.remove('TestFuncs_MetaFFIHost.py')
-	os.remove('go.sum')
