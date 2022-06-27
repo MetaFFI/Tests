@@ -9,10 +9,14 @@ add_test(NAME embed_go_to_python3
 		COMMAND python3 run_test.py ./Embed/Go/ToPython3
 		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
-add_test(NAME embed_python_to_go_deque
+add_test(NAME embed_python3_to_go_deque
 		COMMAND python3 run_test.py ./Embed/Python3/Deque
 		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
-add_test(NAME embed_python_to_go_sanity
+add_test(NAME embed_python3_to_go_sanity
 		COMMAND python3 run_test.py ./Embed/Python3/Sanity
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+add_test(NAME go_to_python3_sanity
+		COMMAND python3 run_test.py ./Hosts/Go/ToPython3/sanity
 		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})

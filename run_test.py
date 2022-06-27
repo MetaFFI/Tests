@@ -34,10 +34,13 @@ def usage():
 	print('usage: run_test.py [path to test] - supports wildcards')
 	exit(1)
 
+
 def execute_paths(path: str):
 	glob_matches = glob(path + '/run_test.py', recursive=True)
 	if len(glob_matches) == 0:
 		raise RuntimeError(f'No test were found in {path}')
+
+	tests_root_path = os.getcwd()
 
 	for match in glob_matches:
 		print('executing ' + match)
@@ -55,14 +58,14 @@ def execute_paths(path: str):
 			test_module = importlib.import_module(module_path)
 
 			print('compile metaffi')
-			test_module.build(build_metaffi)
+			test_module.build(tests_root_path, build_metaffi)
 
 			print('Running Tests')
-			test_module.execute(exec_cmd)
+			test_module.execute(tests_root_path, exec_cmd)
 			print('Tests ran successfully!')
 
 			print('Starting cleanup...')
-			test_module.cleanup()
+			test_module.cleanup(tests_root_path)
 		finally:
 			os.chdir(cur_dir)
 
