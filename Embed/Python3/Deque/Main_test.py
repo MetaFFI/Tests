@@ -12,10 +12,6 @@ import (
 	"github.com/edwingeng/deque"
 )
 
-func HelloWorld() {
-	println("Hello World, From Go!")
-}
-
 type GoDeque struct{
 	d deque.Deque
 	Name string
@@ -37,23 +33,27 @@ func (this *GoDeque) Pop() interface{}{
 metaffi-end"""
 
 
-if __name__ == '__main__':
-	HelloWorld()
+class TestGoDeque(unittest.TestCase):
+	# TODO - Remove HelloWorld function!
 
-	d = GoDeque()
-	d.Push(250)
-	d.Push(['test', 'me'])
+	def test_go_deque(self):
+		d = GoDeque()
 
-	deq = collections.deque()
-	deq.append(600)
-	d.Push(deq)
+		d.Push(250)
+		d.Push(['test', 'me'])
 
-	print(d.Pop())
-	print(d.Pop())
-	print(d.Pop())
+		deq = collections.deque()
+		deq.append(600)
+		d.Push(deq)
 
-	d.SetName('GoDeque')
-	print(d.GetName())
+		self.assertEqual(d.Pop(), 250)
+		self.assertEqual(d.Pop(), ['test', 'me'])
+		self.assertEqual(d.Pop(), deq)
+
+		d.SetName('GoDeque')
+		self.assertEqual(d.GetName(), 'GoDeque')
+
+
 
 
 		
