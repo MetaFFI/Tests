@@ -20,3 +20,7 @@ add_test(NAME embed_python3_to_go_sanity
 add_test(NAME go_to_python3_sanity
 		COMMAND python3 run_test.py ./Hosts/Go/ToPython3/sanity
 		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+add_test(NAME go_to_python3_libraries_deque
+		COMMAND python3 run_test.py ./Hosts/Go/ToPython3/libraries/deque
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
