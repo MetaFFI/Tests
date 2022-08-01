@@ -58,7 +58,7 @@ def execute_paths(path: str):
 			test_module = importlib.import_module(module_path)
 
 			print('build metaffi stubs')
-			test_module.build(tests_root_path, build_metaffi)
+			test_module.build(tests_root_path, build_metaffi, exec_cmd)
 
 			print('Running Tests')
 			test_module.execute(tests_root_path, exec_cmd)

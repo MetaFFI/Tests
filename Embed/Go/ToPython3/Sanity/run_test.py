@@ -3,7 +3,7 @@ import shutil
 from typing import Callable, Optional
 
 
-def build(tests_root_path: str, build_metaffi: Callable[[str, Optional[str], str, Optional[str]], None]):
+def build(tests_root_path: str, build_metaffi: Callable[[str, Optional[str], str, Optional[str]], None], exec_cmd: Callable[[str], None]):
 	build_metaffi('Main_test.go', 'TestFuncs.py', 'go', 'package=sanity')
 
 

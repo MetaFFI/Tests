@@ -38,18 +38,14 @@ class TestGoDeque(unittest.TestCase):
 
 	def test_go_deque(self):
 		d = GoDeque()
-
 		d.Push(250)
 		d.Push(['test', 'me'])
-
 		deq = collections.deque()
 		deq.append(600)
 		d.Push(deq)
-
 		self.assertEqual(d.Pop(), 250)
 		self.assertEqual(d.Pop(), ['test', 'me'])
 		self.assertEqual(d.Pop(), deq)
-
 		d.SetName('GoDeque')
 		self.assertEqual(d.GetName(), 'GoDeque')
 

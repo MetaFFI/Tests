@@ -1,0 +1,136 @@
+{
+	"idl_filename": "python_string_utils",
+	"idl_extension": ".py",
+	"idl_filename_with_extension": "python_string_utils.py",
+	"idl_full_path": "/mnt/c/src/github.com/MetaFFI/Tests/Guests/Python3/libraries/python-string-utils/python_string_utils.py",
+	"metaffi_guest_lib": "python_string_utils_MetaFFIGuest",
+	"target_language": "python3",
+	"modules": [
+		{
+			"name": "string_utils",
+			"comment": "",
+			"tags": {},
+			"functions": [],
+			"classes": [
+				{
+					"name": "deque",
+					"comment": "",
+					"tags": {},
+					"constructors": [
+						{
+							"name": "deque",
+							"comment": "Default Constructor",
+							"tags": {},
+							"function_path": {
+								"entrypoint_function": "EntryPoint_deque_deque",
+								"metaffi_guest_lib": "deque_MetaFFIGuest",
+								"module": "collections"
+							},
+							"parameters": [],
+							"return_values": [
+								{
+									"name": "ret_0",
+									"type": "handle",
+									"type_alias": "deque",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							]
+						}
+					],
+					"release": {
+						"name": "Releasedeque",
+						"comment": "Releases object",
+						"tags": {},
+						"function_path": {
+							"entrypoint_function": "EntryPoint_deque_Releasedeque",
+							"metaffi_guest_lib": "deque_MetaFFIGuest",
+							"module": "collections"
+						},
+						"parameters": [
+							{
+								"name": "this_instance",
+								"type": "handle",
+								"type_alias": "",
+								"comment": "",
+								"tags": {},
+								"dimensions": 0
+							}
+						],
+						"return_values": [],
+						"instance_required": true
+					},
+					"methods": [
+						{
+							"name": "append",
+							"comment": "",
+							"tags": {},
+							"function_path": {
+								"entrypoint_class": "deque",
+								"entrypoint_function": "EntryPoint_deque_append",
+								"metaffi_guest_lib": "deque_MetaFFIGuest",
+								"module": "collections"
+							},
+							"parameters": [
+								{
+									"name": "this_instance",
+									"type": "handle",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								},
+								{
+									"name": "item",
+									"type": "any",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							],
+							"return_values": [],
+							"instance_required": true
+						},
+						{
+							"name": "pop",
+							"comment": "",
+							"tags": {},
+							"function_path": {
+								"entrypoint_class": "deque",
+								"entrypoint_function": "EntryPoint_deque_pop",
+								"metaffi_guest_lib": "deque_MetaFFIGuest",
+								"module": "collections"
+							},
+							"parameters": [
+								{
+									"name": "this_instance",
+									"type": "handle",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							],
+							"return_values": [
+								{
+									"name": "ret_0",
+									"type": "any",
+									"type_alias": "",
+									"comment": "",
+									"tags": {},
+									"dimensions": 0
+								}
+							],
+							"instance_required": true
+						}
+					],
+					"fields": []
+				}
+			],
+			"globals": [],
+			"external_resources": []
+		}
+	]
+}
