@@ -19,7 +19,6 @@ def cleanup(tests_root_path: str):
 	os.remove('TestFuncs_MetaFFIGuest.so')
 	shutil.rmtree('__pycache__')
 	os.remove('TestFuncs_MetaFFIHost.py')
-	os.remove('go.sum')
 	os.remove('GoDequeDirect.so')
 	os.remove('GoDequeDirect/GoDequeDirect.so')
 	os.remove('GoDequeDirect/GoDequeDirect.h')
