@@ -65,7 +65,7 @@ func TestWaitABit(t *testing.T){
 //--------------------------------------------------------------------
 func TestTestMap(t *testing.T){
 
-	m, err := Testmap()
+	m, err := NewTestmap()
 	if err != nil{
 		t.Fatal(err)
 	}

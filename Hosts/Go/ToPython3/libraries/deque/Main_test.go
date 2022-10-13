@@ -7,12 +7,12 @@ import (
 
 func TestDeque(t *testing.T){
 
-	dq, err := Deque()
+	dq, err := NewDeque()
 	if err != nil{
 		t.Fatalf("Failed to create Deque: %v", err)
 	}
 
-	innerDeque, err := Deque()
+	innerDeque, err := NewDeque()
 	if err != nil{
         t.Fatalf("Failed to create inner Deque: %v", err)
     }
