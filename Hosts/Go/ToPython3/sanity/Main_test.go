@@ -6,14 +6,14 @@ import (
 
 //--------------------------------------------------------------------
 func TestHelloWorld(t *testing.T){
-	_, err := HelloWorld()
+	err := HelloWorld()
 	if err != nil{
 		t.Fatal(err)
 	}
 }
 //--------------------------------------------------------------------
 func TestReturnsAnError(t *testing.T){
-	_, err := ReturnsAnError()
+	err := ReturnsAnError()
 	if err == nil{
 		t.Fatal("Error expected")
 	}

@@ -1,15 +1,15 @@
 package sanity;
 
-import openffi.*;
+import metaffi_host.*;
 
 public class Main_test
 {
-	private static Test t = null;
+	private static metaffi_host.TestFuncs t = null;
 	public static void main(String[] args)
 	{
 		try
 		{
-			t = new Test();
+			t = new metaffi_host.TestFuncs();
 
 			testHelloWorld();
 			testReturnsAnError();
@@ -49,7 +49,7 @@ public class Main_test
 
 	private static void testDivIntegers() throws Exception
 	{
-		float res = t.div_integers(1, 2);
+		double res = t.div_integers(1, 2);
         if(res != 0.5)
         {
             System.out.println("Expected 0.5, got: "+res);

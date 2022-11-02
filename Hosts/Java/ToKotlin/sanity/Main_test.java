@@ -47,7 +47,7 @@ public class Main_test
 
 	private static void testDivIntegers() throws Exception
 	{
-		float res = t.divIntegers(1, 2);
+		double res = t.divIntegers(1, 2);
         if(res != 0.5)
         {
             System.out.println("Expected 0.5, got: "+res);

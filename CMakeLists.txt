@@ -29,7 +29,11 @@ add_test(NAME go_to_python3_libraries_deque
 		COMMAND python3 run_test.py ./Hosts/Go/ToPython3/libraries/deque
 		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
-#TODO: To fix - place C implementations in a different file (cdt_capi_loader.go)
+#TODO: This test contains multiple python guests (and multiple go hosts) which leads to multiple definitions. This should be fixed
 #add_test(NAME go_to_python3_libraries_python-string-utils
 #		COMMAND python3 run_test.py ./Hosts/Go/ToPython3/libraries/python-string-utils
 #		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+add_test(NAME java_to_python3_sanity
+		COMMAND python3 run_test.py ./Hosts/Java/ToPython3/sanity
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
