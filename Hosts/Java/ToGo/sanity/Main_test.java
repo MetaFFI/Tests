@@ -1,15 +1,15 @@
 package sanity;
 
-import openffi.*;
+import metaffi_host.*;
 
 public class Main_test
 {
-	private static Test t = null;
+	private static metaffi_host.go t = null;
 	public static void main(String[] args)
 	{
 		try
 		{
-			t = new Test();
+			t = new metaffi_host.go();
 
 			testHelloWorld();
 			testReturnsAnError();
