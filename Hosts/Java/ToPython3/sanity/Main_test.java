@@ -15,6 +15,7 @@ public class Main_test
 			testReturnsAnError();
 			testDivIntegers();
 			testJoinStrings();
+			testTestMap();
 		}
 		catch(Exception e)
 		{
@@ -81,4 +82,23 @@ public class Main_test
     	    System.exit(1);
     	}
 	}
+
+	private static void testTestMap() throws Exception
+    {
+        var testmap = new metaffi_host.testmap();
+        testmap.set("k1", "v1");
+        Object v1 = testmap.get("k1");
+        if(!(v1 instanceof String))
+        {
+            System.out.println("Expected returned type String. Got: "+v1.getClass().getSimpleName());
+            System.exit(1);
+        }
+
+		String v1str = (String)v1;
+        if(!"v1".equals(v1str))
+        {
+            System.out.println("Expected returned String \"v1\". Got: "+v1str);
+            System.exit(1);
+        }
+    }
 }
