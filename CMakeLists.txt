@@ -37,10 +37,13 @@ add_test(NAME go_to_python3_libraries_deque
 #		COMMAND python3 run_test.py ./Hosts/Go/ToPython3/libraries/python-string-utils
 #		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
-#add_test(NAME go_to_java_sanity
-#		COMMAND python3 run_test.py ./Hosts/Go/ToJava/sanity
-#		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+add_test(NAME go_to_java_sanity # TODO: Add test map in Java
+		COMMAND python3 run_test.py ./Hosts/Go/ToJava/sanity
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
+add_test(NAME python3_to_java_sanity
+		COMMAND python3 run_test.py ./Hosts/Python3/ToJava/sanity
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 # from python3
 
