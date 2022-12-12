@@ -23,7 +23,7 @@ def build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_optio
 	cmd += f'-g -h {host_lang} '
 
 	if host_options is not None:
-		cmd += f'--host-options "{host_options}" '
+		cmd += f'--host-options "{host_options}" --print-idl'
 
 	#cmd += '--print-idl'
 

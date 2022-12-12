@@ -24,9 +24,8 @@ def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
 
 	
 def cleanup(tests_root_path: str):
+	shutil.rmtree('__pycache__')
+	shutil.rmtree('manipulation')
+	shutil.rmtree('validation')
 	os.remove('manipulation_MetaFFIGuest.py')
 	os.remove('validation_MetaFFIGuest.py')
-	shutil.rmtree('__pycache__')
-	os.remove('manipulation_MetaFFIHost.go')
-	os.remove('validation_MetaFFIHost.go')
-	os.remove('go.sum')

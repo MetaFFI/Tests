@@ -26,4 +26,11 @@ public class TestFuncs
 	{
 		return String.join(",", arr);
 	}
+
+	public static final int fiveSeconds = 5;
+	public static void waitABit(int seconds) throws InterruptedException
+	{
+		System.out.printf("Sleeping for %d seconds\n", seconds);
+		Thread.sleep(seconds * 1000);
+	}
 }

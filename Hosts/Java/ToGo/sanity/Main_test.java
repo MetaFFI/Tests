@@ -15,6 +15,7 @@ public class Main_test
 			testReturnsAnError();
 			testDivIntegers();
 			testJoinStrings();
+			testWaitABit();
 		}
 		catch(Exception e)
 		{
@@ -81,4 +82,30 @@ public class Main_test
     	    System.exit(1);
     	}
 	}
+
+	private static void testWaitABit() throws Exception
+	{
+		t.WaitABit(t.GetFiveSeconds());
+	}
+
+	private static void testTestMap() throws Exception
+    {
+        metaffi_host.TestMap m = new metaffi_host.TestMap();
+        m.Set("one", 1);
+
+        int one = (int)m.Get("one");
+        if(one != 1)
+        {
+            System.out.printf("Expected one=1. one=%d\n", one);
+            System.exit(1);
+        }
+
+        m.SetName("TheMap!");
+        String name = m.GetName();
+        if(!name.equals("TheMap!"))
+        {
+            System.out.printf("Expected name=TheMap!. name=%s\n", name);
+            System.exit(1);
+        }
+    }
 }

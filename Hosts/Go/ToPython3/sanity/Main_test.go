@@ -2,6 +2,7 @@ package sanity
 
 import (
 	"testing"
+	. "GoToPython3/testfuncs"
 )
 
 //--------------------------------------------------------------------

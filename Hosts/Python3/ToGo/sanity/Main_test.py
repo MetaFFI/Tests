@@ -38,7 +38,7 @@ class TestSanity(unittest.TestCase):
 		WaitABit(fivesec)
 
 	def test_test_map(self):
-		map = NewTestMap()
+		map = TestMap()
 
 		map.Set('x', 250)
 		if not map.Contains('x'):

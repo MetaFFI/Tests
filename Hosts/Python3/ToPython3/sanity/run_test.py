@@ -6,16 +6,15 @@ from typing import Callable, Optional
 def build(tests_root_path: str, build_metaffi: Callable[[str, Optional[str], str, Optional[str]], None], exec_cmd: Callable[[str], None]):
 
 	shutil.copyfile(tests_root_path+'/Guests/Python3/sanity/TestFuncs.py', 'TestFuncs.py')
-	build_metaffi('TestFuncs.py', None, 'go', 'package=sanity')
+	build_metaffi('TestFuncs.py', None, 'python3', None)
 
 
 def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
-	exec_cmd('go get -u')
-	exec_cmd('go test')
+	exec_cmd('python3 -m unittest Main_test.TestSanity')
 	
 	
 def cleanup(tests_root_path: str):
-	os.remove('TestFuncs.py')
-	os.remove('TestFuncs_MetaFFIGuest.py')
+	os.remove('TestFuncs.java')
+	os.remove('TestFuncs_MetaFFIGuest.so')
 	shutil.rmtree('__pycache__')
-	shutil.rmtree('testfuncs')
+	os.remove('TestFuncs_MetaFFIHost.py')

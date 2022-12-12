@@ -78,26 +78,33 @@ public class Main_test
 		String res = t.join_strings(new String[]{"A","b","C"});
     	if(!res.equals("A,b,C"))
     	{
-    	    System.out.println("Expected A,b,C. Got: "+res);
+    	    System.out.println("testJoinStrings Failed - Expected A,b,C. Got: \""+res+"\"");
     	    System.exit(1);
     	}
 	}
 
+	private static void testWaitABit() throws Exception
+    {
+        t.wait_a_bit(t.Getfive_seconds());
+    }
+
 	private static void testTestMap() throws Exception
     {
-        var testmap = new metaffi_host.testmap();
-        testmap.set("k1", "v1");
-        Object v1 = testmap.get("k1");
-        if(!(v1 instanceof String))
+        metaffi_host.testmap m = new metaffi_host.testmap();
+        m.set("one", 1);
+
+        long one = (long)m.get("one");
+        if(one != 1)
         {
-            System.out.println("Expected returned type String. Got: "+v1.getClass().getSimpleName());
+            System.out.printf("Expected one=1. one=%d\n", one);
             System.exit(1);
         }
 
-		String v1str = (String)v1;
-        if(!"v1".equals(v1str))
+        m.Setname("TheMap!");
+        String name = m.Getname();
+        if(!name.equals("TheMap!"))
         {
-            System.out.println("Expected returned String \"v1\". Got: "+v1str);
+            System.out.printf("Expected name=TheMap!. name=%s\n", name);
             System.exit(1);
         }
     }

@@ -19,5 +19,4 @@ def cleanup(tests_root_path: str):
 	os.remove('deque.json')
 	os.remove('deque_MetaFFIGuest.py')
 	shutil.rmtree('__pycache__')
-	os.remove('deque_MetaFFIHost.go')
-	os.remove('go.sum')
+	shutil.rmtree('deque')

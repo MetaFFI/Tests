@@ -2,6 +2,7 @@ package sanity
 
 import (
 	"testing"
+	. "sanity/testfuncs"
 )
 
 /*metaffi-block: name=TestFuncs.py

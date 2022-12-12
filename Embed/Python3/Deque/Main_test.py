@@ -34,7 +34,6 @@ metaffi-end"""
 
 
 class TestGoDeque(unittest.TestCase):
-	# TODO - Remove HelloWorld function!
 
 	def test_go_deque(self):
 		d = GoDeque()

@@ -16,5 +16,6 @@ def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
 def cleanup(tests_root_path: str):
 	os.remove('TestFuncs.java')
 	os.remove('TestFuncs_MetaFFIGuest.jar')
+	os.remove('TestFuncs_MetaFFIGuest.so')
 	shutil.rmtree('__pycache__')
 	os.remove('TestFuncs_MetaFFIHost.py')

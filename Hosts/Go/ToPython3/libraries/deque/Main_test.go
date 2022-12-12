@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"testing"
+	. "test/deque"
 )
 
 func TestDeque(t *testing.T){
@@ -94,7 +95,7 @@ func TestDeque(t *testing.T){
     if err != nil{
         t.Fatalf("Failed to Pop: %v", err)
     }
-    x, err = (poppedInnerDeque.(*deque)).Pop()
+    x, err = (poppedInnerDeque.(*Deque)).Pop()
     if err != nil{
         t.Fatalf("Failed to Pop: %v", err)
     }

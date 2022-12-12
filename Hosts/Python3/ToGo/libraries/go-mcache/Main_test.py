@@ -6,12 +6,13 @@ class TestSanity(unittest.TestCase):
 
 	def test_mcache(self):
 
-		INFINITY = 87660*60*60*1000*1000*1000
+		INFINITY = GetTTL_FOREVER()
 
-		mcache = New()
-		print(mcache.handle)
-		Set(mcache, 'integer', 101, INFINITY)
-		x, found = Get(mcache, 'integer')
+		mcache = CacheDriver()
+		mcache.Set('integer', 101, INFINITY)
+		l = mcache.Len()
+		print('length: {}'.format(l))
+		x, found = mcache.Get('integer')
 
 		if x != 101:
 			self.fail("x expected to be 101, while it is"+str(x))

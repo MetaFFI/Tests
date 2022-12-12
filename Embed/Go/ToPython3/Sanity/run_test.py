@@ -16,5 +16,4 @@ def cleanup(tests_root_path: str):
 	os.remove('TestFuncs.py')
 	os.remove('TestFuncs_MetaFFIGuest.py')
 	shutil.rmtree('__pycache__')
-	os.remove('TestFuncs_MetaFFIHost.go')
-	os.remove('go.sum')
+	shutil.rmtree('testfuncs')
