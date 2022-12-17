@@ -15,7 +15,7 @@ def exec_cmd(cmd: str):
 
 
 def build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_options: Optional[str] = None):
-	cmd = f'metaffi -c --idl {idl} '
+	cmd = f'metaffi -c --print-idl --idl {idl} '
 
 	if idl_block is not None:
 		cmd += f'-n {idl_block} '
@@ -23,7 +23,7 @@ def build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_optio
 	cmd += f'-g -h {host_lang} '
 
 	if host_options is not None:
-		cmd += f'--host-options "{host_options}" --print-idl'
+		cmd += f'--host-options "{host_options}"'
 
 	#cmd += '--print-idl'
 
