@@ -10,7 +10,6 @@ def build(tests_root_path: str, build_metaffi: Callable[[str, Optional[str], str
 
 
 def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
-	exec_cmd('go get -u')
 	exec_cmd('go test')
 	
 	

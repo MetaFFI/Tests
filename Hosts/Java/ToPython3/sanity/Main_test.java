@@ -9,6 +9,7 @@ public class Main_test
 	{
 		try
 		{
+			metaffi_host.TestFuncs.load("TestFuncs_MetaFFIGuest");
 			t = new metaffi_host.TestFuncs();
 
 			testHelloWorld();

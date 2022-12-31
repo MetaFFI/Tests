@@ -1,10 +1,11 @@
 package sanity
 
 import "testing"
-import . "GoToJava/testfuncs"
-import . "GoToJava/testmap"
+import tf "GoToJava/testfuncs"
+import tm "GoToJava/testmap"
 import "fmt"
 import "runtime"
+import "os"
 
 func trace(s string) {
     pc := make([]uintptr, 10)  // at least 1 entry needed
@@ -14,10 +15,30 @@ func trace(s string) {
     fmt.Printf("+++ (%v) %s:%d %s\n", s, file, line, f.Name())
 }
 
+func getDynamicLibSuffix() string{
+	switch runtime.GOOS{
+		case "windows": return ".dll"
+		case "darwin": return ".dylib"
+		default: // We might need to make this more specific in the future
+			return ".so"
+	}
+}
+
+func TestMain(m *testing.M) {
+	p, err := os.Getwd()
+	if err != nil{
+		panic(err)
+	}
+
+	tf.Load(fmt.Sprintf("%v/TestFuncs_MetaFFIGuest%v;%v/TestFuncs_MetaFFIGuest.jar", p, getDynamicLibSuffix(), p))
+	tm.Load(fmt.Sprintf("%v/TestMap_MetaFFIGuest%v;%v/TestMap_MetaFFIGuest.jar", p, getDynamicLibSuffix(), p))
+    exitVal := m.Run()
+    os.Exit(exitVal)
+}
 //--------------------------------------------------------------------
 func TestHelloWorld(t *testing.T){
 
-	err := TestFuncs_HelloWorld()
+	err := tf.TestFuncs_HelloWorld()
 	if err != nil{
 		t.Fatal(err)
 	}
@@ -25,7 +46,7 @@ func TestHelloWorld(t *testing.T){
 //--------------------------------------------------------------------
 func TestReturnsAnError(t *testing.T){
 
-	err := TestFuncs_ReturnsAnError()
+	err := tf.TestFuncs_ReturnsAnError()
 	if err == nil{
 		t.Fatal("Error expected")
 	}
@@ -33,7 +54,7 @@ func TestReturnsAnError(t *testing.T){
 //--------------------------------------------------------------------
 func TestDivIntegers(t *testing.T){
 
-	res, err := TestFuncs_DivIntegers(1, 2)
+	res, err := tf.TestFuncs_DivIntegers(1, 2)
 	if err != nil{
 		t.Fatal(err)
 	}
@@ -42,7 +63,7 @@ func TestDivIntegers(t *testing.T){
 		t.Fatalf("Expected 0.5, got: %v", res)
 	}
 
-	res, err = TestFuncs_DivIntegers(1, 0)
+	res, err = tf.TestFuncs_DivIntegers(1, 0)
 	if err == nil{
 		t.Fatal("Expected an error - divisor is 0")
 	}
@@ -50,7 +71,7 @@ func TestDivIntegers(t *testing.T){
 //--------------------------------------------------------------------
 func TestJoinStrings(t *testing.T){
 
-	res, err := TestFuncs_JoinStrings([]string{"A", "b", "C"})
+	res, err := tf.TestFuncs_JoinStrings([]string{"A", "b", "C"})
 	if err != nil{
 		t.Fatal(err)
 	}
@@ -62,12 +83,12 @@ func TestJoinStrings(t *testing.T){
 //--------------------------------------------------------------------
 func TestWaitABit(t *testing.T){
 
-	fsec, err := TestFuncs_GetfiveSeconds()
+	fsec, err := tf.TestFuncs_GetfiveSeconds()
 	if err != nil{
 		t.Fatal(err)
 	}
 
-	mffiError := TestFuncs_WaitABit(fsec)
+	mffiError := tf.TestFuncs_WaitABit(fsec)
 	if mffiError != nil{
 		t.Fatal(mffiError)
 	}
@@ -77,7 +98,7 @@ func TestWaitABit(t *testing.T){
 
 func TestTestMap(t *testing.T){
 
-	m, err := NewTestMap()
+	m, err := tm.NewTestMap()
 	if err != nil{
 		t.Fatal(err)
 	}

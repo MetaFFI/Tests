@@ -2,6 +2,7 @@ import unittest
 from TestFuncs_MetaFFIHost import *
 import collections
 
+load('TestFuncs_MetaFFIGuest')
 class TestSanity(unittest.TestCase):
 
 	def test_hello_world(self):

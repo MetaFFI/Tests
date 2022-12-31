@@ -20,7 +20,7 @@ class GoString(ctypes.Structure):
 class TestCallPerformance(unittest.TestCase):
 
 	def test_call_performance(self):
-
+		load("TestFuncs_MetaFFIGuest")
 		call_times = 1000000
 
 		guestso = None

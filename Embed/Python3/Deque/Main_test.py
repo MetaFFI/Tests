@@ -36,7 +36,11 @@ metaffi-end"""
 class TestGoDeque(unittest.TestCase):
 
 	def test_go_deque(self):
+		print('1')
+		load('TestFuncs_MetaFFIGuest')
+		print('2')
 		d = GoDeque()
+		print('3')
 		d.Push(250)
 		d.Push(['test', 'me'])
 		deq = collections.deque()

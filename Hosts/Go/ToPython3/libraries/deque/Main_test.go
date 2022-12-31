@@ -4,7 +4,14 @@ import (
 	"fmt"
 	"testing"
 	. "test/deque"
+	"os"
 )
+
+func TestMain(m *testing.M) {
+	Load("deque_MetaFFIGuest")
+    exitVal := m.Run()
+    os.Exit(exitVal)
+}
 
 func TestDeque(t *testing.T){
 

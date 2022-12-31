@@ -2,6 +2,7 @@ import unittest
 import time
 from mcache_MetaFFIHost import *
 
+load('mcache_MetaFFIGuest')
 class TestSanity(unittest.TestCase):
 
 	def test_mcache(self):

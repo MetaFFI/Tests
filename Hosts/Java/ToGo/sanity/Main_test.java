@@ -9,6 +9,8 @@ public class Main_test
 	{
 		try
 		{
+
+			metaffi_host.go.load("TestFuncs_MetaFFIGuest");
 			t = new metaffi_host.go();
 
 			testHelloWorld();

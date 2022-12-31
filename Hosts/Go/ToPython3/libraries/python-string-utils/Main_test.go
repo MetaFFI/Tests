@@ -8,6 +8,10 @@ import (
 )
 
 func TestMain(t *testing.T){
+
+	manipulation.Load("manipulation_MetaFFIGuest")
+    validation.Load("validation_MetaFFIGuest")
+
 	isJson, err := validation.IsJson("[1, 2, 3")
 	if err != nil{ t.Fatal(err) }
 	fmt.Printf("[1, 2, 3? %v\n", isJson)

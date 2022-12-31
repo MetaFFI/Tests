@@ -66,29 +66,25 @@ func (this *TestMap) Contains(k string) bool{
 
 metaffi-end"""
 
+load("TestFuncs_MetaFFIGuest")
+
 
 class TestSanity(unittest.TestCase):
 
 	def test_hello_world(self):
-		print('Before hello world')
 		HelloWorld()
-		print('After hello world')
 	
 
 	def test_returns_an_error(self):
 		try:
-			print('before return an error')
 			ReturnsAnError()
 			self.fail('Test should have failed')
 		except:
-			print('after return an error')
 			pass
 
 
 	def test_div_integers(self):
-		print('Before div integer 1')
 		res = DivIntegers(1, 2)
-		print('After div integer 1')
 		if res != 0.5:
 			self.fail('Expected 0.5, got: '+str(res))
 
@@ -102,39 +98,27 @@ class TestSanity(unittest.TestCase):
 
 
 	def test_join_strings(self):
-		print('Before join strings')
 		res = JoinStrings(['A','b','C'])
 		if res != 'A,b,C':
 			self.fail('Expected A,b,C. Got: '+res)
-		print('After join strings')
 
 	def test_wait_a_bit(self):
-		print('before sleep')
 		fivesec = GetFiveSeconds()
 		WaitABit(fivesec)
-		print('after sleep')
 
 	def test_test_map(self):
-		print('before map cstr')
 		map = TestMap()
-		print('after map cstr')
 
-		print('before map set')
 		map.Set('x', 250)
 		if not map.Contains('x'):
 			self.fail('Map should contain x')
-		print('after map set')
 
-		print('before map get')
 		if map.Get('x') != 250:
 			self.fail('x should be 250')
-		print('after map get')
 
-		print('before map set 2')
 		map.Set('y', 'test')
 		if not map.Contains('y'):
 			self.fail('Map should contain y')
-		print('after map set 2')
 
 		if map.Get('y') != 'test':
 			self.fail('y should be \'test\'')
@@ -150,16 +134,12 @@ class TestSanity(unittest.TestCase):
 		if val != 600:
 			self.fail('mapped_deq should contain 600')
 
-		print('before set name')
 		map.SetName('MyName')
 		newname = map.GetName()
 		if newname != 'MyName':
 			self.fail('TestMap.Name should be MyName and it is '+newname)
-		print('after set name')
 
-		print('before del')
 		del map
-		print('after del')
 
 
 

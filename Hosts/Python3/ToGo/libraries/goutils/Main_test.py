@@ -1,6 +1,7 @@
 import unittest
 from stringutils_MetaFFIHost import *
 
+load('stringutils_MetaFFIGuest')
 class TestSanity(unittest.TestCase):
 
 	def test_diff(self):

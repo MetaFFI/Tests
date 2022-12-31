@@ -1,6 +1,9 @@
 import unittest
 from TestFuncs_MetaFFIHost import *
+import pathlib
 
+filepath = pathlib.Path(__file__).resolve().parent
+load('TestFuncs_MetaFFIGuest.so;{}/TestFuncs_MetaFFIGuest.jar'.format(filepath))
 class TestSanity(unittest.TestCase):
 
 	def test_hello_world(self):

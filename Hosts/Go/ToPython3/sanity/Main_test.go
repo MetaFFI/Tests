@@ -3,8 +3,15 @@ package sanity
 import (
 	"testing"
 	. "GoToPython3/testfuncs"
+	"os"
 )
 
+//--------------------------------------------------------------------
+func TestMain(m *testing.M) {
+	Load("TestFuncs_MetaFFIGuest")
+    exitVal := m.Run()
+    os.Exit(exitVal)
+}
 //--------------------------------------------------------------------
 func TestHelloWorld(t *testing.T){
 	err := HelloWorld()

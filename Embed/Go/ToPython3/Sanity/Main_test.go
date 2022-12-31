@@ -3,6 +3,7 @@ package sanity
 import (
 	"testing"
 	. "sanity/testfuncs"
+	"os"
 )
 
 /*metaffi-block: name=TestFuncs.py
@@ -48,6 +49,12 @@ class testmap:
 
 metaffi-end*/
 
+//--------------------------------------------------------------------
+func TestMain(m *testing.M) {
+	Load("TestFuncs_MetaFFIGuest")
+    exitVal := m.Run()
+    os.Exit(exitVal)
+}
 //--------------------------------------------------------------------
 func TestHelloWorld(t *testing.T){
 	_, err := HelloWorld()
