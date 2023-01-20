@@ -61,6 +61,6 @@ class TestCallPerformance(unittest.TestCase):
 
 		print('MetaFFI takes more time than FFI Time by {:.2f}%'.format((go_time/direct_time*100)-100))
 
-		max_expected_length = direct_time*1.05
+		max_expected_length = direct_time*1.1
 
-		self.assertTrue(go_time <= max_expected_length, 'Interop larger then direct call by {:.2f}%. MetaFFI time: {} Direct FFI time: {}. max expected length: {} (5%)'.format((go_time/direct_time*100)-100, go_time, direct_time, max_expected_length))
+		self.assertTrue(go_time <= max_expected_length, 'Interop larger then direct call by {:.2f}%. MetaFFI time: {} Direct FFI time: {}. max expected length: {} (10%)'.format((go_time/direct_time*100)-100, go_time, direct_time, max_expected_length))

@@ -2,13 +2,12 @@ import os
 import platform
 import shutil
 from typing import Callable, Optional
-import sysconfig
+import site
 from platform import python_version
 
 # build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_options: Optional[str] = None)
 def build(tests_root_path: str, build_metaffi: Callable[[str, Optional[str], str, Optional[str]], None], exec_cmd: Callable[[str], None]):
-	sitepack_path = sysconfig.get_path('purelib')
-	sitepack_path = sitepack_path.replace('/usr', sysconfig.get_config_var('userbase'))
+	sitepack_path = site.getusersitepackages()
 
 	manipulations_file = sitepack_path+'/string_utils/manipulation.py'
 	validations_file = sitepack_path+'/string_utils/validation.py'
