@@ -11,6 +11,7 @@ public class TestFuncs
 
 	public static void returnsAnError() throws Exception
 	{
+		System.out.println("Going to throw exception");
 		throw new Exception("Returning an error");
 	}
 

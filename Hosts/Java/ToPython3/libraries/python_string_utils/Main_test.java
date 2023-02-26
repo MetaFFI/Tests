@@ -17,5 +17,8 @@ public class Main_test
         String stripped = pyman.strip_html("\"test: <a href=\"foo/bar\">click here</a>\"", true);
         System.out.println("Before: \"test: <a href=\"foo/bar\">click here</a>\"");
         System.out.println("After: "+stripped+"\n");
+
+        metaffi_host.validation.free();
+        metaffi_host.manipulation.free();
 	}
 }

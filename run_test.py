@@ -3,7 +3,7 @@ import sys
 from glob import glob
 import os
 import importlib
-import shutil
+import distutils.ccompiler
 import pathlib
 from typing import Optional
 
@@ -28,6 +28,10 @@ def build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_optio
 	#cmd += '--print-idl'
 
 	exec_cmd(cmd)
+
+
+def get_dylib_ext():
+	return distutils.ccompiler.new_compiler().shared_lib_extension
 
 
 def usage():
@@ -65,7 +69,7 @@ def execute_paths(path: str):
 			print('Tests ran successfully!')
 
 			print('Starting cleanup...')
-			test_module.cleanup(tests_root_path)
+			test_module.cleanup(tests_root_path, get_dylib_ext())
 		finally:
 			os.chdir(cur_dir)
 

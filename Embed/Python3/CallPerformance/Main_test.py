@@ -2,6 +2,7 @@ import unittest
 from TestFuncs_MetaFFIHost import *
 from datetime import datetime
 import ctypes
+from pathlib import Path
 
 """metaffi-block: name=TestFuncs.go
 
@@ -39,8 +40,7 @@ class TestCallPerformance(unittest.TestCase):
 		#
 		godequedirect = None
 		if 'Windows' in platform.system():
-			os.environ['path'] += ';' + os.path.join(os.path.abspath('.'))
-			godequedirect = windll.LoadLibrary('GoDequeDirect.dll')
+			godequedirect = windll.LoadLibrary('{}/GoDequeDirect.dll'.format(Path().absolute()))
 		else:
 			godequedirect = CDLL(os.path.join(os.path.abspath('.'), 'GoDequeDirect.so'))
 

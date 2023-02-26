@@ -4,14 +4,12 @@ import metaffi_host.*;
 
 public class Main_test
 {
-	private static metaffi_host.go t = null;
 	public static void main(String[] args)
 	{
 		try
 		{
 
 			metaffi_host.go.load("TestFuncs_MetaFFIGuest");
-			t = new metaffi_host.go();
 
 			testHelloWorld();
 			testReturnsAnError();
@@ -25,18 +23,24 @@ public class Main_test
 			e.printStackTrace();
 			System.exit(1);
 		}
+		finally
+		{
+			metaffi_host.go.free();
+		}
+
 	}
 
 	private static void testHelloWorld() throws Exception
 	{
-		t.HelloWorld();
+		metaffi_host.go.HelloWorld();
 	}
 
 	private static void testReturnsAnError() throws Exception
 	{
 		try
 		{
-			t.ReturnsAnError();
+			System.out.println("Calling testReturnsAnError");
+			metaffi_host.go.ReturnsAnError();
 			System.out.println("Test should have failed");
 			System.exit(1);
 		}
@@ -52,7 +56,7 @@ public class Main_test
 
 	private static void testDivIntegers() throws Exception
 	{
-		float res = t.DivIntegers(1, 2);
+		float res = metaffi_host.go.DivIntegers(1, 2);
         if(res != 0.5)
         {
             System.out.println("Expected 0.5, got: "+res);
@@ -61,7 +65,7 @@ public class Main_test
 
         try
         {
-            t.DivIntegers(1, 0);
+            metaffi_host.go.DivIntegers(1, 0);
             System.out.println("Expected an error - divisor is 0");
             System.exit(1);
         }
@@ -77,7 +81,7 @@ public class Main_test
 
 	private static void testJoinStrings() throws Exception
 	{
-		String res = t.JoinStrings(new String[]{"A","b","C"});
+		String res = metaffi_host.go.JoinStrings(new String[]{"A","b","C"});
     	if(!res.equals("A,b,C"))
     	{
     	    System.out.println("Expected A,b,C. Got: "+res);
@@ -87,7 +91,7 @@ public class Main_test
 
 	private static void testWaitABit() throws Exception
 	{
-		t.WaitABit(t.GetFiveSeconds());
+		metaffi_host.go.WaitABit(metaffi_host.go.GetFiveSeconds());
 	}
 
 	private static void testTestMap() throws Exception

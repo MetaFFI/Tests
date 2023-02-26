@@ -10,11 +10,12 @@ def build(tests_root_path: str, build_metaffi: Callable[[str, Optional[str], str
 
 
 def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
-	exec_cmd('javac -cp ".:./..:TestFuncs_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:" Main_test.java')
-	exec_cmd('java -cp ".:./..:TestFuncs_MetaFFIHost.jar:$METAFFI_HOME/xllr.openjdk.bridge.jar:" sanity.Main_test')
+	metaffi_home = os.getenv("METAFFI_HOME")
+	exec_cmd('javac -cp ".{0}./..{0}TestFuncs_MetaFFIHost.jar{0}{1}/xllr.openjdk.bridge.jar" Main_test.java'.format(os.pathsep, metaffi_home))
+	exec_cmd('java -cp ".{0}./..{0}TestFuncs_MetaFFIHost.jar{0}{1}/xllr.openjdk.bridge.jar" sanity.Main_test'.format(os.pathsep, metaffi_home))
 	
 	
-def cleanup(tests_root_path: str):
+def cleanup(tests_root_path: str, dylib_ext: str):
 	os.remove('TestFuncs.py')
 	os.remove('TestFuncs_MetaFFIGuest.py')
 	shutil.rmtree('__pycache__')

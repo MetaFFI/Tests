@@ -4,14 +4,11 @@ import metaffi_host.*;
 
 public class Main_test
 {
-	private static metaffi_host.TestFuncs t = null;
 	public static void main(String[] args)
 	{
 		try
 		{
-			metaffi_host.TestFuncs.load("TestFuncs_MetaFFIGuest");
-			t = new metaffi_host.TestFuncs();
-
+ 			metaffi_host.TestFuncs.load("TestFuncs_MetaFFIGuest");
 			testHelloWorld();
 			testReturnsAnError();
 			testDivIntegers();
@@ -24,18 +21,22 @@ public class Main_test
 			e.printStackTrace();
 			System.exit(1);
 		}
+		finally
+		{
+			metaffi_host.TestFuncs.free();
+		}
 	}
 
 	private static void testHelloWorld() throws Exception
 	{
-		t.hello_world();
+		metaffi_host.TestFuncs.hello_world();
 	}
 
 	private static void testReturnsAnError() throws Exception
 	{
 		try
 		{
-			t.returns_an_error();
+			metaffi_host.TestFuncs.returns_an_error();
 			System.out.println("Test should have failed");
 			System.exit(1);
 		}
@@ -51,7 +52,7 @@ public class Main_test
 
 	private static void testDivIntegers() throws Exception
 	{
-		double res = t.div_integers(1, 2);
+		double res = metaffi_host.TestFuncs.div_integers(1, 2);
         if(res != 0.5)
         {
             System.out.println("Expected 0.5, got: "+res);
@@ -60,7 +61,7 @@ public class Main_test
 
         try
         {
-            t.div_integers(1, 0);
+            metaffi_host.TestFuncs.div_integers(1, 0);
             System.out.println("Expected an error - divisor is 0");
             System.exit(1);
         }
@@ -76,7 +77,7 @@ public class Main_test
 
 	private static void testJoinStrings() throws Exception
 	{
-		String res = t.join_strings(new String[]{"A","b","C"});
+		String res = metaffi_host.TestFuncs.join_strings(new String[]{"A","b","C"});
     	if(!res.equals("A,b,C"))
     	{
     	    System.out.println("testJoinStrings Failed - Expected A,b,C. Got: \""+res+"\"");
@@ -86,7 +87,7 @@ public class Main_test
 
 	private static void testWaitABit() throws Exception
     {
-        t.wait_a_bit(t.Getfive_seconds());
+        metaffi_host.TestFuncs.wait_a_bit(metaffi_host.TestFuncs.Getfive_seconds());
     }
 
 	private static void testTestMap() throws Exception

@@ -13,7 +13,7 @@ def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
 	exec_cmd('go test')
 	
 	
-def cleanup(tests_root_path: str):
+def cleanup(tests_root_path: str, dylib_ext: str):
 	os.remove('TestFuncs.py')
 	os.remove('TestFuncs_MetaFFIGuest.py')
 	shutil.rmtree('__pycache__')

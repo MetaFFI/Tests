@@ -1,4 +1,4 @@
-//go:build !windows
+//go:build windows
 
 package sanity
 
@@ -29,6 +29,7 @@ func getDynamicLibSuffix() string {
 }
 
 func TestMain(m *testing.M) {
+	runtime.TestingWER = true
 	p, err := os.Getwd()
 	if err != nil {
 		panic(err)

@@ -11,7 +11,7 @@ def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
 	exec_cmd('python3 -m unittest Main_test.TestGoDeque')
 	
 	
-def cleanup(tests_root_path: str):
-	os.remove('TestFuncs_MetaFFIGuest.so')
+def cleanup(tests_root_path: str, dylib_ext: str):
+	os.remove('TestFuncs_MetaFFIGuest'+dylib_ext)
 	shutil.rmtree('__pycache__')
 	os.remove('TestFuncs_MetaFFIHost.py')

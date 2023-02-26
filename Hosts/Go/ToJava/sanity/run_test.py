@@ -15,12 +15,12 @@ def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
 	exec_cmd('go test')
 	
 	
-def cleanup(tests_root_path: str):
+def cleanup(tests_root_path: str, dylib_ext: str):
 	os.remove('TestFuncs.java')
 	os.remove('TestMap.java')
 	os.remove('TestFuncs_MetaFFIGuest.jar')
-	os.remove('TestFuncs_MetaFFIGuest.so')
+	os.remove('TestFuncs_MetaFFIGuest'+dylib_ext)
 	os.remove('TestMap_MetaFFIGuest.jar')
-	os.remove('TestMap_MetaFFIGuest.so')
+	os.remove('TestMap_MetaFFIGuest'+dylib_ext)
 	shutil.rmtree('testfuncs')
 	shutil.rmtree('testmap')
