@@ -24,6 +24,7 @@ public class Main_test
 		finally
 		{
 			metaffi_host.TestFuncs.free();
+			System.exit(0);
 		}
 	}
 

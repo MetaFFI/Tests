@@ -11,6 +11,7 @@ func TestMain(t *testing.T){
 
 	manipulation.Load("manipulation_MetaFFIGuest")
     validation.Load("validation_MetaFFIGuest")
+	defer manipulation.Free()
 
 	isJson, err := validation.IsJson("[1, 2, 3")
 	if err != nil{ t.Fatal(err) }

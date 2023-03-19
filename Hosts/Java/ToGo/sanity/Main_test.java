@@ -6,26 +6,31 @@ public class Main_test
 {
 	public static void main(String[] args)
 	{
+		int errorCode = 0;
+
 		try
 		{
 
 			metaffi_host.go.load("TestFuncs_MetaFFIGuest");
 
+			System.out.println("Calling HelloWorld");
 			testHelloWorld();
+			System.out.println("Calling ReturnsAnError");
 			testReturnsAnError();
+			System.out.println("Calling DivIntegers");
 			testDivIntegers();
+			System.out.println("Calling JoinStrings");
 			testJoinStrings();
+			System.out.println("Calling WaitABit");
 			testWaitABit();
+			System.out.println("Calling TestMap");
+			testTestMap();
+			System.out.println("Done Tests");
 		}
 		catch(Exception e)
 		{
 			System.out.println("Unexpected exception has occurred during tests");
 			e.printStackTrace();
-			System.exit(1);
-		}
-		finally
-		{
-			metaffi_host.go.free();
 		}
 
 	}

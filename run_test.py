@@ -15,7 +15,7 @@ def exec_cmd(cmd: str):
 
 
 def build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_options: Optional[str] = None):
-	cmd = f'metaffi -c --print-idl --idl {idl} '
+	cmd = f'metaffi -c --idl {idl} '
 
 	if idl_block is not None:
 		cmd += f'-n {idl_block} '
@@ -24,8 +24,6 @@ def build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_optio
 
 	if host_options is not None:
 		cmd += f'--host-options "{host_options}"'
-
-	#cmd += '--print-idl'
 
 	exec_cmd(cmd)
 
@@ -39,7 +37,9 @@ def usage():
 	exit(1)
 
 
-def execute_paths(path: str):
+def execute_path(path: str):
+	print('given path: '+path)
+
 	glob_matches = glob(path + '/run_test.py', recursive=True)
 	if len(glob_matches) == 0:
 		raise RuntimeError(f'No test were found in {path}')
@@ -79,8 +79,10 @@ def main():
 		usage()
 
 	try:
-		execute_paths(sys.argv[1])
+		execute_path(sys.argv[1])
+		exit(0)
 	except Exception as e:
+		print('Exception running test:')
 		print(e)
 		exit(2)
 
