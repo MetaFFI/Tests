@@ -2,12 +2,25 @@ import os
 import shutil
 from typing import Callable, Optional
 import sysconfig
+import platform
 
 # build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_options: Optional[str] = None)
 def build(tests_root_path: str, build_metaffi: Callable[[str, Optional[str], str, Optional[str]], None], exec_cmd: Callable[[str], None]):
 
-	sitepack_path = sysconfig.get_path('purelib')
-	sitepack_path = sitepack_path.replace('/usr', sysconfig.get_config_var('userbase'))
+	if platform.system()=='Windows':
+		sitepack_path = sysconfig.get_path('purelib')
+	else:
+		sitepack_path = sysconfig.get_path('purelib')
+		sitepack_path = sitepack_path.replace('/usr', sysconfig.get_config_var('userbase'))
+		sitepack_path = sitepack_path.replace('dist-packages', 'site-packages')
+
+		if not os.path.exists(sitepack_path):
+			sitepack_path = sitepack_path.replace('/usr/local', sysconfig.get_config_var('userbase'))
+			sitepack_path = sitepack_path.replace('.local/local', '.local')
+
+
+	if not os.path.exists(sitepack_path):
+		raise ValueError('"{}" path doesnt exist! Cannot find string_utils directory.'.format(sitepack_path))
 
 	manipulations_file = sitepack_path+'/string_utils/manipulation.py'
 	validations_file = sitepack_path+'/string_utils/validation.py'
