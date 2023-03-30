@@ -14,7 +14,7 @@ func TestMain(m *testing.M) {
 	fmt.Println("Start running")
 	exitVal := m.Run()
 	fmt.Println("Done running - going to free runtime")
-	Free()
+	//Free()
 	fmt.Println("Freed runtime")
 	os.Exit(exitVal)
 }

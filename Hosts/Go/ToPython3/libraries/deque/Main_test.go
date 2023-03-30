@@ -13,7 +13,7 @@ func TestMain(m *testing.M) {
 	fmt.Printf("Before running tests\n")
 	exitVal := m.Run()
 	fmt.Printf("After running tests, before freeing runtime\n")
-	Free()
+	//Free()
 	fmt.Printf("After freeing runtime\n")
 	os.Exit(exitVal)
 }

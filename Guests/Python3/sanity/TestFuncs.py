@@ -5,10 +5,12 @@ def hello_world()->None:
 
 
 def returns_an_error()->None:
+	print('going to throw exception')
 	raise Exception('Error')
 
 
 def div_integers(x:int, y:int)->float:
+	print('dividing {}/{}'.format(x, y))
 	return x/ y
 
 
