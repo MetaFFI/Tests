@@ -14,11 +14,11 @@ def exec_cmd(cmd: str):
 		raise RuntimeError(f'Execution Failed: "{cmd}"')
 
 
-def build_metaffi(idl: str, idl_block: Optional[str], host_lang: str, host_options: Optional[str] = None):
+def build_metaffi(idl: str, idl_plugin: Optional[str], host_lang: str, host_options: Optional[str] = None):
 	cmd = f'metaffi -c --idl {idl} '
 
-	if idl_block is not None:
-		cmd += f'-n {idl_block} '
+	if idl_plugin is not None:
+		cmd += f'--idl-plugin {idl_plugin} '
 
 	cmd += f'-g -h {host_lang} '
 
