@@ -3,7 +3,7 @@
 set -e
 
 python3 run_test.py ./Hosts/Go/ToPython3/sanity
-python3 run_test.py ./Hosts/Go/ToPython3/libraries/deque
+python3 run_test.py ./Hosts/Go/ToPython3/libraries/collections
 python3 run_test.py ./Hosts/Go/ToPython3/libraries/python-string-utils
 python3 run_test.py ./Hosts/Go/ToJava/sanity
 python3 run_test.py ./Hosts/Python3/ToGo/sanity

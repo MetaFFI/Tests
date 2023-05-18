@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
-	. "test/deque"
+	. "test/collections"
 	"testing"
 )
 
 func TestMain(m *testing.M) {
 	fmt.Printf("Before loading deque\n")
-	Load("deque_MetaFFIGuest")
+	Load("collections_MetaFFIGuest")
 	fmt.Printf("Before running tests\n")
 	exitVal := m.Run()
 	fmt.Printf("After running tests, before freeing runtime\n")

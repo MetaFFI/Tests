@@ -6,7 +6,7 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 @echo on
 
-python3 run_test.py ./Hosts/Go/ToPython3/libraries/deque
+python3 run_test.py ./Hosts/Go/ToPython3/libraries/collections
 @echo off
 IF %ERRORLEVEL% NEQ 0 (
 	echo %ERRORLEVEL%

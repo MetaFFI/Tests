@@ -4,8 +4,10 @@ import os
 
 def main():
 	try:
+		# change the code here to look for all test python scripts and run them automatically
+		# to deprecate all those scripts.
 		run_test.execute_path('./Hosts/Go/ToPython3/sanity')
-		run_test.execute_path('./Hosts/Go/ToPython3/libraries/deque')
+		run_test.execute_path('./Hosts/Go/ToPython3/libraries/collections')
 		run_test.execute_path('./Hosts/Go/ToPython3/libraries/python-string-utils')
 		run_test.execute_path('./Hosts/Go/ToJava/sanity')
 		run_test.execute_path('./Hosts/Python3/ToGo/sanity')
