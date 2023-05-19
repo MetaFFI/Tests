@@ -12,3 +12,4 @@ python3 run_test.py ./Hosts/Python3/ToJava/sanity
 python3 run_test.py ./Hosts/Java/ToPython3/sanity
 python3 run_test.py ./Hosts/Java/ToGo/sanity
 python3 run_test.py ./Hosts/Java/ToPython3/libraries/python_string_utils
+python3 run_test.py ./Hosts/Java/ToPython3/libraries/collections
