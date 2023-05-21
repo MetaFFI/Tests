@@ -9,6 +9,7 @@ def main():
 		run_test.execute_path('./Hosts/Go/ToPython3/sanity')
 		run_test.execute_path('./Hosts/Go/ToPython3/libraries/collections')
 		run_test.execute_path('./Hosts/Go/ToPython3/libraries/python-string-utils')
+		run_test.execute_path('./Hosts/Go/ToPython3/libraries/builtins')
 		run_test.execute_path('./Hosts/Go/ToJava/sanity')
 		run_test.execute_path('./Hosts/Python3/ToGo/sanity')
 		run_test.execute_path('./Hosts/Python3/ToGo/libraries/go-mcache')
@@ -16,6 +17,8 @@ def main():
 		run_test.execute_path('./Hosts/Java/ToPython3/sanity')
 		run_test.execute_path('./Hosts/Java/ToGo/sanity')
 		run_test.execute_path('./Hosts/Java/ToPython3/libraries/python_string_utils')
+		run_test.execute_path('./Hosts/Java/ToPython3/libraries/collections')
+		run_test.execute_path('./Hosts/Java/ToPython3/libraries/builtins')
 	except Exception as e:
 		print('Exception running test:')
 		print(e)

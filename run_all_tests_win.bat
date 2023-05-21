@@ -14,6 +14,14 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 @echo on
 
+python3 run_test.py ./Hosts/Go/ToPython3/libraries/builtins
+@echo off
+IF %ERRORLEVEL% NEQ 0 (
+	echo %ERRORLEVEL%
+    exit /b %ERRORLEVEL%
+)
+@echo on
+
 python3 run_test.py ./Hosts/Go/ToPython3/libraries/python-string-utils
 @echo off
 IF %ERRORLEVEL% NEQ 0 (
@@ -79,6 +87,14 @@ IF %ERRORLEVEL% NEQ 0 (
 @echo on
 
 python3 run_test.py ./Hosts/Java/ToPython3/libraries/collections
+@echo off
+IF %ERRORLEVEL% NEQ 0 (
+	echo %ERRORLEVEL%
+    exit /b %ERRORLEVEL%
+)
+@echo on
+
+python3 run_test.py ./Hosts/Java/ToPython3/libraries/builtins
 @echo off
 IF %ERRORLEVEL% NEQ 0 (
 	echo %ERRORLEVEL%

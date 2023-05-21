@@ -8,13 +8,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	fmt.Printf("Before loading deque\n")
+
 	Load("collections_MetaFFIGuest")
-	fmt.Printf("Before running tests\n")
+
 	exitVal := m.Run()
-	fmt.Printf("After running tests, before freeing runtime\n")
-	//Free()
-	fmt.Printf("After freeing runtime\n")
+
 	os.Exit(exitVal)
 }
 
