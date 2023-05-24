@@ -27,7 +27,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("Failed to create inner Dict: %v", err)
 	}
 
-	err = innerDict.Setitem("InnerInteger", 100)
+	err = innerDict.Underscore_Setitem__("InnerInteger", 100)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
@@ -40,37 +40,37 @@ func TestDict(t *testing.T) {
 	user := User{Name: "Tom"}
 
 	// deque
-	err = dq.Setitem("User", user)
+	err = dq.Underscore_Setitem__("User", user)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.Setitem("inner", innerDict)
+	err = dq.Underscore_Setitem__("inner", innerDict)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.Setitem("Integer", 2)
+	err = dq.Underscore_Setitem__("Integer", 2)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.Setitem("String", "two")
+	err = dq.Underscore_Setitem__("String", "two")
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.Setitem("Float", 3.5)
+	err = dq.Underscore_Setitem__("Float", 3.5)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.Setitem("Array", arrayOfInts)
+	err = dq.Underscore_Setitem__("Array", arrayOfInts)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	x, err := dq.Getitem("Array")
+	x, err := dq.Underscore_Getitem__("Array")
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
@@ -85,7 +85,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x[0] != 3")
 	}
 
-	x, err = dq.Getitem("Float")
+	x, err = dq.Underscore_Getitem__("Float")
 	fmt.Printf("%v\n", x)
 	if err != nil {
 		t.Fatalf("Failed to GetItem Float: %v", err)
@@ -94,7 +94,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != 3.5")
 	}
 
-	x, err = dq.Getitem("String")
+	x, err = dq.Underscore_Getitem__("String")
 	if err != nil {
 		t.Fatalf("Failed to GetItem String: %v", err)
 	}
@@ -103,7 +103,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != two")
 	}
 
-	x, err = dq.Getitem("Integer")
+	x, err = dq.Underscore_Getitem__("Integer")
 	if err != nil {
 		t.Fatalf("Failed to GetItem Integer: %v", err)
 	}
@@ -112,11 +112,11 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != 2")
 	}
 
-	poppedInnerDict, err := dq.Getitem("inner")
+	poppedInnerDict, err := dq.Underscore_Getitem__("inner")
 	if err != nil {
 		t.Fatalf("Failed to GetItem inner: %v", err)
 	}
-	x, err = (poppedInnerDict.(*Dict)).Getitem("InnerInteger")
+	x, err = (poppedInnerDict.(*Dict)).Underscore_Getitem__("InnerInteger")
 	if err != nil {
 		t.Fatalf("Failed to GetItem InnerInteger: %v", err)
 	}
@@ -125,7 +125,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("inner dict x != 100. x=%v", x.(int64))
 	}
 
-	x, err = dq.Getitem("User")
+	x, err = dq.Underscore_Getitem__("User")
 	if err != nil {
 		t.Fatalf("Failed to Pop: %v", err)
 	}
