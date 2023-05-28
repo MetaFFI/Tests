@@ -18,12 +18,22 @@ func TestMain(m *testing.M) {
 
 func TestDeque(t *testing.T) {
 
-	dq, err := NewDeque()
+	list1, err := NewUserList(nil)
+	if err != nil {
+        t.Fatalf("%v", err)
+    }
+
+	dq, err := NewDeque(list1.GetHandle(), nil)
 	if err != nil {
 		t.Fatalf("Failed to create Deque: %v", err)
 	}
 
-	innerDeque, err := NewDeque()
+	list2, err := NewUserList(nil)
+	if err != nil {
+        t.Fatalf("%v", err)
+    }
+
+	innerDeque, err := NewDeque(list2.GetHandle(), nil)
 	if err != nil {
 		t.Fatalf("Failed to create inner Deque: %v", err)
 	}
@@ -75,10 +85,13 @@ func TestDeque(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to Pop: %v", err)
 	}
+
 	fmt.Printf("%v\n", x)
+
 	if x.([]int64)[0] != 1 {
 		t.Fatalf("x[0] != 1")
 	}
+
 	if x.([]int64)[1] != 2 {
 		t.Fatalf("x[0] != 2")
 	}
