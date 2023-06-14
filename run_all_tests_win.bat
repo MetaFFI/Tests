@@ -30,6 +30,14 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 @echo on
 
+python3 run_test.py ./Hosts/Go/ToPython3/libraries/pandas
+@echo off
+IF %ERRORLEVEL% NEQ 0 (
+	echo %ERRORLEVEL%
+    exit /b %ERRORLEVEL%
+)
+@echo on
+
 python3 run_test.py ./Hosts/Go/ToJava/sanity
 @echo off
 IF %ERRORLEVEL% NEQ 0 (
