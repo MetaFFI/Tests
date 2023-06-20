@@ -5,6 +5,7 @@ import (
 	"os"
 	. "test/builtins"
 	"testing"
+	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 )
 
 func TestMain(m *testing.M) {
@@ -17,12 +18,12 @@ func TestMain(m *testing.M) {
 
 func TestDict(t *testing.T) {
 
-	dq, err := NewDict()
+	pydict, err := NewDict1()
 	if err != nil {
 		t.Fatalf("Failed to create Dict: %v", err)
 	}
 
-	innerDict, err := NewDict()
+	innerDict, err := NewDict1()
 	if err != nil {
 		t.Fatalf("Failed to create inner Dict: %v", err)
 	}
@@ -40,52 +41,77 @@ func TestDict(t *testing.T) {
 	user := User{Name: "Tom"}
 
 	// deque
-	err = dq.U_Setitem__("User", user)
+	err = pydict.U_Setitem__("User", user)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.U_Setitem__("inner", innerDict)
+	err = pydict.U_Setitem__("inner", innerDict)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.U_Setitem__("Integer", 2)
+	err = pydict.U_Setitem__("Integer", 2)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.U_Setitem__("String", "two")
+	err = pydict.U_Setitem__("String", "two")
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.U_Setitem__("Float", 3.5)
+	err = pydict.U_Setitem__("Float", 3.5)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = dq.U_Setitem__("Array", arrayOfInts)
+	err = pydict.U_Setitem__("Array", arrayOfInts)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	x, err := dq.U_Getitem__("Array")
+	// Notice, in this scenario, array returns as handle to Python list.
+	// as python doesn't have an array, but a "list", which can contain anything, not just int64[]
+	// TODO: this should be fixed by supporting array of "any".
+	x, err := pydict.U_Getitem__("Array")
 	if err != nil {
-		t.Fatalf("Failed to Setitem: %v", err)
+		t.Fatalf("Failed to GetItem from dictionary: %v", err)
 	}
-	fmt.Printf("%v\n", x)
-	if x.([]int64)[0] != 1 {
+
+	l := List{}
+	l.SetHandle(x.(metaffi.Handle))
+	v, err := l.U_Getitem__(0)
+	if err != nil {
+        t.Fatalf("Failed to GetItem from List: %v", err)
+    }
+
+	fmt.Printf("%v\n", v)
+	if v.(int64) != 1 {
 		t.Fatalf("x[0] != 1")
 	}
-	if x.([]int64)[1] != 2 {
-		t.Fatalf("x[0] != 2")
-	}
-	if x.([]int64)[2] != 3 {
-		t.Fatalf("x[0] != 3")
+
+	v, err = l.U_Getitem__(1)
+    if err != nil {
+        t.Fatalf("Failed to GetItem from List: %v", err)
+    }
+
+    fmt.Printf("%v\n", v)
+    if v.(int64) != 2 {
+        t.Fatalf("x[1] != 2")
+    }
+
+	v, err = l.U_Getitem__(2)
+	if err != nil {
+        t.Fatalf("Failed to GetItem from List: %v", err)
+    }
+
+	fmt.Printf("%v\n", v)
+	if v.(int64) != 3 {
+		t.Fatalf("x[2] != 3")
 	}
 
-	x, err = dq.U_Getitem__("Float")
+	x, err = pydict.U_Getitem__("Float")
 	fmt.Printf("%v\n", x)
 	if err != nil {
 		t.Fatalf("Failed to GetItem Float: %v", err)
@@ -94,7 +120,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != 3.5")
 	}
 
-	x, err = dq.U_Getitem__("String")
+	x, err = pydict.U_Getitem__("String")
 	if err != nil {
 		t.Fatalf("Failed to GetItem String: %v", err)
 	}
@@ -103,7 +129,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != two")
 	}
 
-	x, err = dq.U_Getitem__("Integer")
+	x, err = pydict.U_Getitem__("Integer")
 	if err != nil {
 		t.Fatalf("Failed to GetItem Integer: %v", err)
 	}
@@ -112,7 +138,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != 2")
 	}
 
-	poppedInnerDict, err := dq.U_Getitem__("inner")
+	poppedInnerDict, err := pydict.U_Getitem__("inner")
 	if err != nil {
 		t.Fatalf("Failed to GetItem inner: %v", err)
 	}
@@ -125,7 +151,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("inner dict x != 100. x=%v", x.(int64))
 	}
 
-	x, err = dq.U_Getitem__("User")
+	x, err = pydict.U_Getitem__("User")
 	if err != nil {
 		t.Fatalf("Failed to Pop: %v", err)
 	}

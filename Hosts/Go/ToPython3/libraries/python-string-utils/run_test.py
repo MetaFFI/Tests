@@ -30,7 +30,8 @@ def build(tests_root_path: str, build_metaffi: Callable[[str, Optional[str], str
 
 
 def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
-	exec_cmd('go test')
+	exec_cmd('go get -u -t')
+	exec_cmd('go test -v')
 
 
 	
@@ -38,3 +39,5 @@ def cleanup(tests_root_path: str, dylib_ext: str):
 	shutil.rmtree('__pycache__')
 	shutil.rmtree('string_utils')
 	os.remove('string_utils_MetaFFIGuest.py')
+	os.remove('metaffi_objects.py')
+	os.remove('metaffi_objects_MetaFFIGuest.py')

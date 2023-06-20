@@ -5,6 +5,7 @@ import (
 	"os"
 	. "test/collections"
 	"testing"
+	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 )
 
 func TestMain(m *testing.M) {
@@ -86,18 +87,38 @@ func TestDeque(t *testing.T) {
 		t.Fatalf("Failed to Pop: %v", err)
 	}
 
-	fmt.Printf("%v\n", x)
+	l := UserList{}
+	l.SetHandle(x.(metaffi.Handle))
 
-	if x.([]int64)[0] != 1 {
-		t.Fatalf("x[0] != 1")
-	}
+	v, err := l.U_Getitem__(0)
+    if err != nil {
+        t.Fatalf("Failed to GetItem from List: %v", err)
+    }
 
-	if x.([]int64)[1] != 2 {
-		t.Fatalf("x[0] != 2")
-	}
-	if x.([]int64)[2] != 3 {
-		t.Fatalf("x[0] != 3")
-	}
+    fmt.Printf("%v\n", v)
+    if v.(int64) != 1 {
+        t.Fatalf("x[0] != 1")
+    }
+
+    v, err = l.U_Getitem__(1)
+    if err != nil {
+        t.Fatalf("Failed to GetItem from List: %v", err)
+    }
+
+    fmt.Printf("%v\n", v)
+    if v.(int64) != 2 {
+        t.Fatalf("x[1] != 2")
+    }
+
+    v, err = l.U_Getitem__(2)
+    if err != nil {
+        t.Fatalf("Failed to GetItem from List: %v", err)
+    }
+
+    fmt.Printf("%v\n", v)
+    if v.(int64) != 3 {
+        t.Fatalf("x[2] != 3")
+    }
 
 	x, err = dq.Pop()
 	fmt.Printf("%v\n", x)

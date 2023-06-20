@@ -73,6 +73,4 @@ func TestPandas(t *testing.T) {
 	fmt.Println("iloc[1].to_string()")
 	fmt.Println(str)
 
-	// ************  TODO:  metaffi -c --idl pandas.core.indexing.py --idl-plugin py -g -h go;
-	//                      generates pandas.core_MetaFFIGuest, and it should be "pandas_core_indexing_MetaFFIGuest"
 }

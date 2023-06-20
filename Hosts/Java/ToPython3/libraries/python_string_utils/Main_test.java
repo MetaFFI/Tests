@@ -24,7 +24,7 @@ public class Main_test
         if( !stripped.equals("test: click here") )
         {
             System.out.printf("Popped string from deque is not the text \"test: click here\", but: \"%s\"", stripped);
-            return
+            return;
         }
 
 	}

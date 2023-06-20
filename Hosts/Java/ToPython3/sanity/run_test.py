@@ -21,7 +21,7 @@ def cleanup(tests_root_path: str, dylib_ext: str):
 	shutil.rmtree('__pycache__')
 	os.remove('TestFuncs_MetaFFIHost.jar')
 	os.remove('Main_test.class')
-	os.remove('testmap.java')
-	os.remove('TestFuncs.java')
+	os.remove('metaffi_objects.py')
+	os.remove('metaffi_objects_MetaFFIGuest.py')
 
 

@@ -22,7 +22,5 @@ def cleanup(tests_root_path: str, dylib_ext: str):
 	os.remove('TestFuncs_MetaFFIGuest'+dylib_ext)
 	os.remove('TestFuncs_MetaFFIHost.jar')
 	os.remove('Main_test.class')
-	os.remove('TestMap.java')
-	os.remove('go.java')
 
 

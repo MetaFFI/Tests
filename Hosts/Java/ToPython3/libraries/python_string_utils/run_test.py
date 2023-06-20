@@ -16,9 +16,10 @@ def execute(tests_root_path: str, exec_cmd: Callable[[str], None]):
 	
 def cleanup(tests_root_path: str, dylib_ext: str):
 	os.remove('Main_test.class')
-	os.remove('string_utils.java')
 	os.remove('string_utils_MetaFFIGuest.py')
 	os.remove('string_utils_MetaFFIHost.jar')
 	shutil.rmtree('__pycache__')
+	os.remove('metaffi_objects.py')
+	os.remove('metaffi_objects_MetaFFIGuest.py')
 
 

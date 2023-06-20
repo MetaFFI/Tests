@@ -80,7 +80,7 @@ func TestListArgs1(t *testing.T){
     lst := collections.UserList{}
     lst.SetHandle(listHandle.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
 
     if item0.(string) != "default"{
@@ -99,7 +99,7 @@ func TestListArgs2(t *testing.T){
     lst := collections.UserList{}
     lst.SetHandle(listHandle.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
 
     if item0.(string) != "None Default"{
@@ -130,29 +130,29 @@ func TestListArgs(t *testing.T){
     lst := collections.UserList{}
     lst.SetHandle(listHandle.(Handle))
 
-	len, err := lst.Underscore_Len__()
+	len, err := lst.U_Len__()
 	if err != nil{ t.Fatal(err) }
 	fmt.Printf("returned list size: %v\n", len)
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
     if item0.(string) != "None-Default 2"{
         t.Fatalf("\"None-Default 2\" != %v", item0)
     }
 
-    item1, err := lst.Underscore_Getitem__(1) // get first item
+    item1, err := lst.U_Getitem__(1) // get first item
     if err != nil{ t.Fatal(err) }
     if item1.(string) != "arg1"{
         t.Fatalf("\"arg1\" != %v", item1)
     }
 
-    item2, err := lst.Underscore_Getitem__(2) // get first item
+    item2, err := lst.U_Getitem__(2) // get first item
     if err != nil{ t.Fatal(err) }
     if item2.(string) != "arg2"{
         t.Fatalf("\"arg2\" != %v", item2)
     }
 
-    item3, err := lst.Underscore_Getitem__(3) // get first item
+    item3, err := lst.U_Getitem__(3) // get first item
     if err != nil{ t.Fatal(err) }
     if item3.(string) != "arg3"{
         t.Fatalf("\"arg3\" != %v", item3)
@@ -171,7 +171,7 @@ func TestDictArgs1(t *testing.T){
 	lst := collections.UserList{}
     lst.SetHandle(res.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
     if item0.(string) != "default"{
         t.Fatalf("\"default\" != %v", item0)
@@ -189,7 +189,7 @@ func TestDictArgs2(t *testing.T){
 	lst := collections.UserList{}
     lst.SetHandle(res.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
     if item0.(string) != "none-default"{
         t.Fatalf("\"none-default\" != %v", item0)
@@ -213,19 +213,19 @@ func TestDictArgs(t *testing.T){
 	lst := collections.UserList{}
     lst.SetHandle(res.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
     if item0.(string) != "none-default"{
         t.Fatalf("\"none-default\" != %v", item0)
     }
 
-    item1, err := lst.Underscore_Getitem__(1) // get first item
+    item1, err := lst.U_Getitem__(1) // get first item
     if err != nil{ t.Fatal(err) }
     if item1.(string) != "key1"{
         t.Fatalf("\"key1\" != %v", item1)
     }
 
-    item2, err := lst.Underscore_Getitem__(2) // get first item
+    item2, err := lst.U_Getitem__(2) // get first item
     if err != nil{ t.Fatal(err) }
     if item2.(string) != "val1"{
         t.Fatalf("\"val1\" != %v", item2)
@@ -283,7 +283,7 @@ func TestArgPositionalArgNamed1(t *testing.T){
     lst := collections.UserList{}
     lst.SetHandle(lstHandle.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
     if item0.(string) != "default"{
         t.Fatalf("\"default\" != %v", item0)
@@ -301,7 +301,7 @@ func TestArgPositionalArgNamed2(t *testing.T){
     lst := collections.UserList{}
     lst.SetHandle(lstHandle.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
     if item0.(string) != "positional arg"{
         t.Fatalf("\"positional arg\" != %v", item0)
@@ -325,13 +325,13 @@ func TestArgPositionalArgNamed3(t *testing.T){
     lst := collections.UserList{}
     lst.SetHandle(lstHandle.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
     if item0.(string) != "positional arg"{
         t.Fatalf("\"positional arg\" != %v", item0)
     }
 
-    item1, err := lst.Underscore_Getitem__(1) // get first item
+    item1, err := lst.U_Getitem__(1) // get first item
     if err != nil{ t.Fatal(err) }
     if item1.(string) != "var positional arg"{
         t.Fatalf("\"var positional arg\" != %v", item1)
@@ -360,25 +360,25 @@ func TestArgPositionalArgNamed(t *testing.T){
     lst := collections.UserList{}
     lst.SetHandle(lstHandle.(Handle))
 
-    item0, err := lst.Underscore_Getitem__(0) // get first item
+    item0, err := lst.U_Getitem__(0) // get first item
     if err != nil{ t.Fatal(err) }
     if item0.(string) != "positional arg"{
         t.Fatalf("\"positional arg\" != %v", item0)
     }
 
-    item1, err := lst.Underscore_Getitem__(1) // get first item
+    item1, err := lst.U_Getitem__(1) // get first item
     if err != nil{ t.Fatal(err) }
     if item1.(string) != "var positional arg"{
         t.Fatalf("\"var positional arg\" != %v", item1)
     }
 
-    item2, err := lst.Underscore_Getitem__(2) // get first item
+    item2, err := lst.U_Getitem__(2) // get first item
     if err != nil{ t.Fatal(err) }
     if item2.(string) != "key1"{
         t.Fatalf("\"key1\" != %v", item2)
     }
 
-    item3, err := lst.Underscore_Getitem__(3) // get first item
+    item3, err := lst.U_Getitem__(3) // get first item
     if err != nil{ t.Fatal(err) }
     if item3.(string) != "val1"{
         t.Fatalf("\"val1\" != %v", item3)
