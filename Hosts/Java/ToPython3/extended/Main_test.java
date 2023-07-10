@@ -9,9 +9,9 @@ public class Main_test
 	{
 		try
 		{
- 			metaffi_host.collections.load("collections_MetaFFIGuest");
- 			metaffi_host.extended_testModule.load("extended_test_MetaFFIGuest");
-            metaffi_host.metaffi_objects.load("metaffi_objects_MetaFFIGuest");
+ 			metaffi_host.collections.metaffi_load("collections_MetaFFIGuest");
+ 			metaffi_host.extended_testModule.metaffi_load("extended_test_MetaFFIGuest");
+            metaffi_host.metaffi_objects.metaffi_load("metaffi_objects_MetaFFIGuest");
             System.out.println("--- test_property");
             test_property();
 
@@ -48,8 +48,8 @@ public class Main_test
     {
         var ext = new extended_test();
 
-        ext.Setx(4);
-        var x = ext.Getx();
+        ext.Setx_MetaFFISetter(4);
+        var x = ext.Getx_MetaFFIGetter();
 
         if(x != 4)
         {

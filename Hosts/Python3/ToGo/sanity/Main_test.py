@@ -2,7 +2,7 @@ import unittest
 from TestFuncs_MetaFFIHost import *
 import collections
 
-load('TestFuncs_MetaFFIGuest')
+metaffi_load('TestFuncs_MetaFFIGuest')
 class TestSanity(unittest.TestCase):
 
 	def test_hello_world(self):
@@ -35,7 +35,7 @@ class TestSanity(unittest.TestCase):
 			self.fail('Expected A,b,C. Got: '+res)
 
 	def test_wait_a_bit(self):
-		fivesec = GetFiveSeconds()
+		fivesec = GetFiveSeconds_metaffi_getter()
 		WaitABit(fivesec)
 
 	def test_test_map(self):
@@ -66,8 +66,8 @@ class TestSanity(unittest.TestCase):
 		if val != 600:
 			self.fail('mapped_deq should contain 600')
 
-		map.SetName('MyName')
-		newname = map.GetName()
+		map.SetName_metaffi_setter('MyName')
+		newname = map.GetName_metaffi_getter()
 		if newname != 'MyName':
 			self.fail('TestMap.Name should be MyName and it is '+newname)
 		

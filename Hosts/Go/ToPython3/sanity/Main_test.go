@@ -10,7 +10,7 @@ import (
 // --------------------------------------------------------------------
 func TestMain(m *testing.M) {
 	fmt.Println("Going to load TestFuncs module")
-	Load("TestFuncs_MetaFFIGuest")
+	MetaFFILoad("TestFuncs_MetaFFIGuest")
 	fmt.Println("Start running")
 	exitVal := m.Run()
 	fmt.Println("Done running - going to free runtime")
@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 
 // --------------------------------------------------------------------
 func TestHelloWorld(t *testing.T) {
-	err := HelloWorld()
+	err := Hello_World()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,7 +29,7 @@ func TestHelloWorld(t *testing.T) {
 
 // --------------------------------------------------------------------
 func TestReturnsAnError(t *testing.T) {
-	err := ReturnsAnError()
+	err := Returns_An_Error()
 	if err == nil {
 		t.Fatal("Error expected")
 	}
@@ -37,7 +37,7 @@ func TestReturnsAnError(t *testing.T) {
 
 // --------------------------------------------------------------------
 func TestDivIntegers(t *testing.T) {
-	res, err := DivIntegers(1, 2)
+	res, err := Div_Integers(1, 2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +46,7 @@ func TestDivIntegers(t *testing.T) {
 		t.Fatalf("Expected 0.5, got: %v", res)
 	}
 
-	res, err = DivIntegers(1, 0)
+	res, err = Div_Integers(1, 0)
 	if err == nil {
 		t.Fatal("Expected an error - divisor is 0")
 	}
@@ -54,7 +54,7 @@ func TestDivIntegers(t *testing.T) {
 
 // --------------------------------------------------------------------
 func TestJoinStrings(t *testing.T) {
-	res, err := JoinStrings([]string{"A", "b", "C"})
+	res, err := Join_Strings([]string{"A", "b", "C"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,12 +67,12 @@ func TestJoinStrings(t *testing.T) {
 // --------------------------------------------------------------------
 func TestWaitABit(t *testing.T) {
 
-	fsec, err := GetfiveSeconds()
+	fsec, err := Getfive_Seconds_MetaFFIGetter()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	shouldBeNullError, mffiError := WaitABit(fsec)
+	shouldBeNullError, mffiError := Wait_A_Bit(fsec)
 	if mffiError != nil {
 		t.Fatal(mffiError)
 	}
@@ -104,12 +104,12 @@ func TestTestMap(t *testing.T) {
 		t.Fatalf("Expected one=1. one=%v", one)
 	}
 
-	err = m.Setname("TheMap!")
+	err = m.Setname_MetaFFISetter("TheMap!")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	name, err := m.Getname()
+	name, err := m.Getname_MetaFFIGetter()
 	if err != nil {
 		t.Fatal(err)
 	}

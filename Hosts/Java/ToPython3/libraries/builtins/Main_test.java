@@ -6,7 +6,7 @@ public class Main_test
 {
 	public static void main(String[] args) throws metaffi.MetaFFIException
 	{
-		metaffi_host.builtins.load("builtins_MetaFFIGuest");
+		metaffi_host.builtins.metaffi_load("builtins_MetaFFIGuest");
 
 		var pydict = new metaffi_host.dict();
         pydict.__setitem__("four", 4);

@@ -10,7 +10,7 @@ import (
 
 func TestMain(m *testing.M) {
 
-	Load("collections_MetaFFIGuest")
+	MetaFFILoad("collections_MetaFFIGuest")
 
 	exitVal := m.Run()
 
@@ -90,7 +90,7 @@ func TestDeque(t *testing.T) {
 	l := UserList{}
 	l.SetHandle(x.(metaffi.Handle))
 
-	v, err := l.U_Getitem__(0)
+	v, err := l.U___Getitem____(0)
     if err != nil {
         t.Fatalf("Failed to GetItem from List: %v", err)
     }
@@ -100,7 +100,7 @@ func TestDeque(t *testing.T) {
         t.Fatalf("x[0] != 1")
     }
 
-    v, err = l.U_Getitem__(1)
+    v, err = l.U___Getitem____(1)
     if err != nil {
         t.Fatalf("Failed to GetItem from List: %v", err)
     }
@@ -110,7 +110,7 @@ func TestDeque(t *testing.T) {
         t.Fatalf("x[1] != 2")
     }
 
-    v, err = l.U_Getitem__(2)
+    v, err = l.U___Getitem____(2)
     if err != nil {
         t.Fatalf("Failed to GetItem from List: %v", err)
     }

@@ -8,7 +8,7 @@ public class Main_test
 	{
 		try
 		{
- 			metaffi_host.TestFuncs.load("TestFuncs_MetaFFIGuest");
+ 			metaffi_host.TestFuncs.metaffi_load("TestFuncs_MetaFFIGuest");
 			testHelloWorld();
 			testReturnsAnError();
 			testDivIntegers();
@@ -87,7 +87,7 @@ public class Main_test
 
 	private static void testWaitABit() throws Exception
     {
-        metaffi_host.TestFuncs.wait_a_bit(metaffi_host.TestFuncs.Getfive_seconds());
+        metaffi_host.TestFuncs.wait_a_bit(metaffi_host.TestFuncs.Getfive_seconds_MetaFFIGetter());
     }
 
 	private static void testTestMap() throws Exception
@@ -102,8 +102,8 @@ public class Main_test
             System.exit(1);
         }
 
-        m.Setname("TheMap!");
-        String name = m.Getname();
+        m.Setname_MetaFFISetter("TheMap!");
+        String name = m.Getname_MetaFFIGetter();
         if(!name.equals("TheMap!"))
         {
             System.out.printf("Expected name=TheMap!. name=%s\n", name);

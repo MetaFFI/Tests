@@ -13,9 +13,9 @@ import (
 
 func TestMain(m *testing.M) {
 
-	pandas.Load("pandas_MetaFFIGuest")
-	metaffi_objects.Load("metaffi_objects_MetaFFIGuest")
- 	pandas_core_indexing.Load("pandas_core_indexing_MetaFFIGuest")
+	pandas.MetaFFILoad("pandas_MetaFFIGuest")
+	metaffi_objects.MetaFFILoad("metaffi_objects_MetaFFIGuest")
+ 	pandas_core_indexing.MetaFFILoad("pandas_core_indexing_MetaFFIGuest")
 
 	exitVal := m.Run()
 
@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 
 func TestPandas(t *testing.T) {
 
-	dfHandle, err := pandas.ReadCsv1("input.csv")
+	dfHandle, err := pandas.Read_Csv1("input.csv")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,15 +32,14 @@ func TestPandas(t *testing.T) {
 	df := pandas.DataFrame{}
 	df.SetHandle(dfHandle.(metaffi.Handle))
 
-	str, err := df.ToString1()
+	str, err := df.To_String1()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	res := `   r11  r12  r13
-0  r21  r22  r23
-1  r31  r32  r33
-`
+	res := `  col1 col2 col3
+0  r11  r12  r13
+1  r21  r22  r23`
 
 	fmt.Println("df.to_string()")
 	fmt.Println(str)
@@ -49,23 +48,23 @@ func TestPandas(t *testing.T) {
 		t.Fatalf("\"%v\" != \"%v\"", str, res)
 	}
 
-	ilocHandle, err := df.Getiloc()
+	ilocHandle, err := df.Getiloc_MetaFFIGetter()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// TODO: if starts with "_" remove "_"
-	iloc := pandas_core_indexing.U_ILocIndexer{}
+	iloc := pandas_core_indexing.U__ILocIndexer{}
 	iloc.SetHandle(ilocHandle.(metaffi.Handle))
 
-	dfHandle, err = iloc.U_Getitem__(1)
+	dfHandle, err = iloc.U___Getitem____(1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	df.SetHandle(dfHandle.(metaffi.Handle))
 
-	str, err = df.ToString1()
+	str, err = df.To_String1()
 	if err != nil {
 		t.Fatal(err)
 	}

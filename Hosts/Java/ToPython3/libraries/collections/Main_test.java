@@ -6,7 +6,7 @@ public class Main_test
 {
 	public static void main(String[] args) throws metaffi.MetaFFIException
 	{
-		metaffi_host.collections.load("collections_MetaFFIGuest");
+		metaffi_host.collections.metaffi_load("collections_MetaFFIGuest");
 
 		var pydeque = new metaffi_host.deque();
         pydeque.append(4);

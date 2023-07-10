@@ -5,7 +5,7 @@ import distutils.ccompiler
 
 filepath = pathlib.Path(__file__).resolve().parent
 dylib_ext = distutils.ccompiler.new_compiler().shared_lib_extension
-load('TestFuncs_MetaFFIGuest{};{}/TestFuncs_MetaFFIGuest.jar'.format(dylib_ext, filepath))
+metaffi_load('TestFuncs_MetaFFIGuest{};{}/TestFuncs_MetaFFIGuest.jar'.format(dylib_ext, filepath))
 class TestSanity(unittest.TestCase):
 
 	def test_hello_world(self):

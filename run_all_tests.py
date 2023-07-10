@@ -5,6 +5,7 @@ import glob
 
 
 def main():
+	testdir = 'No test path'
 	try:
 		tests = glob.glob('./Hosts/**/run_test.py', recursive=True)
 		for testfile in tests:
@@ -30,6 +31,7 @@ def main():
 	except Exception as e:
 		print('Exception running test:')
 		print(e)
+		print('rerun with the command "python3 run_test.py '+testdir+'"')
 		exit(2)
 
 

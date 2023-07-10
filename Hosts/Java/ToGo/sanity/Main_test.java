@@ -11,7 +11,7 @@ public class Main_test
 		try
 		{
 
-			metaffi_host.go.load("TestFuncs_MetaFFIGuest");
+			metaffi_host.go.metaffi_load("TestFuncs_MetaFFIGuest");
 
 			System.out.println("Calling HelloWorld");
 			testHelloWorld();
@@ -96,7 +96,7 @@ public class Main_test
 
 	private static void testWaitABit() throws Exception
 	{
-		metaffi_host.go.WaitABit(metaffi_host.go.GetFiveSeconds());
+		metaffi_host.go.WaitABit(metaffi_host.go.GetFiveSeconds_MetaFFIGetter());
 	}
 
 	private static void testTestMap() throws Exception
@@ -111,8 +111,8 @@ public class Main_test
             System.exit(1);
         }
 
-        m.SetName("TheMap!");
-        String name = m.GetName();
+        m.SetName_MetaFFISetter("TheMap!");
+        String name = m.GetName_MetaFFIGetter();
         if(!name.equals("TheMap!"))
         {
             System.out.printf("Expected name=TheMap!. name=%s\n", name);

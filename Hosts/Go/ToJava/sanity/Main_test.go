@@ -34,8 +34,8 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	tf.Load(fmt.Sprintf("%v/TestFuncs_MetaFFIGuest%v;%v/TestFuncs_MetaFFIGuest.jar", p, getDynamicLibSuffix(), p))
-	tm.Load(fmt.Sprintf("%v/TestMap_MetaFFIGuest%v;%v/TestMap_MetaFFIGuest.jar", p, getDynamicLibSuffix(), p))
+	tf.MetaFFILoad(fmt.Sprintf("%v/TestFuncs_MetaFFIGuest%v;%v/TestFuncs_MetaFFIGuest.jar", p, getDynamicLibSuffix(), p))
+	tm.MetaFFILoad(fmt.Sprintf("%v/TestMap_MetaFFIGuest%v;%v/TestMap_MetaFFIGuest.jar", p, getDynamicLibSuffix(), p))
 	exitVal := m.Run()
 	os.Exit(exitVal)
 }
@@ -126,12 +126,12 @@ func TestTestMap(t *testing.T) {
 		t.Fatalf("Expected one=1. one=%v", one)
 	}
 
-	err = m.Setname("TheMap!")
+	err = m.Setname_MetaFFISetter("TheMap!")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	name, err := m.Getname()
+	name, err := m.Getname_MetaFFIGetter()
 	if err != nil {
 		t.Fatal(err)
 	}

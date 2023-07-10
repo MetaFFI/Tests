@@ -9,7 +9,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	Load("builtins_MetaFFIGuest")
+	MetaFFILoad("builtins_MetaFFIGuest")
 
 	exitVal := m.Run()
 
@@ -28,7 +28,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("Failed to create inner Dict: %v", err)
 	}
 
-	err = innerDict.U_Setitem__("InnerInteger", 100)
+	err = innerDict.U___Setitem____("InnerInteger", 100)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
@@ -41,32 +41,32 @@ func TestDict(t *testing.T) {
 	user := User{Name: "Tom"}
 
 	// deque
-	err = pydict.U_Setitem__("User", user)
+	err = pydict.U___Setitem____("User", user)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = pydict.U_Setitem__("inner", innerDict)
+	err = pydict.U___Setitem____("inner", innerDict)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = pydict.U_Setitem__("Integer", 2)
+	err = pydict.U___Setitem____("Integer", 2)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = pydict.U_Setitem__("String", "two")
+	err = pydict.U___Setitem____("String", "two")
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = pydict.U_Setitem__("Float", 3.5)
+	err = pydict.U___Setitem____("Float", 3.5)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
 
-	err = pydict.U_Setitem__("Array", arrayOfInts)
+	err = pydict.U___Setitem____("Array", arrayOfInts)
 	if err != nil {
 		t.Fatalf("Failed to Setitem: %v", err)
 	}
@@ -74,14 +74,14 @@ func TestDict(t *testing.T) {
 	// Notice, in this scenario, array returns as handle to Python list.
 	// as python doesn't have an array, but a "list", which can contain anything, not just int64[]
 	// TODO: this should be fixed by supporting array of "any".
-	x, err := pydict.U_Getitem__("Array")
+	x, err := pydict.U___Getitem____("Array")
 	if err != nil {
 		t.Fatalf("Failed to GetItem from dictionary: %v", err)
 	}
 
 	l := List{}
 	l.SetHandle(x.(metaffi.Handle))
-	v, err := l.U_Getitem__(0)
+	v, err := l.U___Getitem____(0)
 	if err != nil {
         t.Fatalf("Failed to GetItem from List: %v", err)
     }
@@ -91,7 +91,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x[0] != 1")
 	}
 
-	v, err = l.U_Getitem__(1)
+	v, err = l.U___Getitem____(1)
     if err != nil {
         t.Fatalf("Failed to GetItem from List: %v", err)
     }
@@ -101,7 +101,7 @@ func TestDict(t *testing.T) {
         t.Fatalf("x[1] != 2")
     }
 
-	v, err = l.U_Getitem__(2)
+	v, err = l.U___Getitem____(2)
 	if err != nil {
         t.Fatalf("Failed to GetItem from List: %v", err)
     }
@@ -111,7 +111,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x[2] != 3")
 	}
 
-	x, err = pydict.U_Getitem__("Float")
+	x, err = pydict.U___Getitem____("Float")
 	fmt.Printf("%v\n", x)
 	if err != nil {
 		t.Fatalf("Failed to GetItem Float: %v", err)
@@ -120,7 +120,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != 3.5")
 	}
 
-	x, err = pydict.U_Getitem__("String")
+	x, err = pydict.U___Getitem____("String")
 	if err != nil {
 		t.Fatalf("Failed to GetItem String: %v", err)
 	}
@@ -129,7 +129,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != two")
 	}
 
-	x, err = pydict.U_Getitem__("Integer")
+	x, err = pydict.U___Getitem____("Integer")
 	if err != nil {
 		t.Fatalf("Failed to GetItem Integer: %v", err)
 	}
@@ -138,11 +138,11 @@ func TestDict(t *testing.T) {
 		t.Fatalf("x != 2")
 	}
 
-	poppedInnerDict, err := pydict.U_Getitem__("inner")
+	poppedInnerDict, err := pydict.U___Getitem____("inner")
 	if err != nil {
 		t.Fatalf("Failed to GetItem inner: %v", err)
 	}
-	x, err = (poppedInnerDict.(*Dict)).U_Getitem__("InnerInteger")
+	x, err = (poppedInnerDict.(*Dict)).U___Getitem____("InnerInteger")
 	if err != nil {
 		t.Fatalf("Failed to GetItem InnerInteger: %v", err)
 	}
@@ -151,7 +151,7 @@ func TestDict(t *testing.T) {
 		t.Fatalf("inner dict x != 100. x=%v", x.(int64))
 	}
 
-	x, err = pydict.U_Getitem__("User")
+	x, err = pydict.U___Getitem____("User")
 	if err != nil {
 		t.Fatalf("Failed to Pop: %v", err)
 	}

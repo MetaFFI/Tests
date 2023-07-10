@@ -2,12 +2,12 @@ import unittest
 import time
 from mcache_MetaFFIHost import *
 
-load('mcache_MetaFFIGuest')
+metaffi_load('mcache_MetaFFIGuest')
 class TestSanity(unittest.TestCase):
 
 	def test_mcache(self):
 
-		INFINITY = GetTTL_FOREVER()
+		INFINITY = GetTTL_FOREVER_metaffi_getter()
 
 		mcache = CacheDriver()
 		mcache.Set('integer', 101, INFINITY)

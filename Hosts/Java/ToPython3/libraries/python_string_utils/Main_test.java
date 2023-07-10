@@ -6,7 +6,7 @@ public class Main_test
 {
 	public static void main(String[] args) throws metaffi.MetaFFIException
 	{
-		metaffi_host.string_utils.load("string_utils_MetaFFIGuest");
+		metaffi_host.string_utils.metaffi_load("string_utils_MetaFFIGuest");
 		//defer metaffi_host.validation.free();
 		var pyval = new metaffi_host.string_utils();
         boolean resTrue = pyval.is_json("[1, 2, 3]");
