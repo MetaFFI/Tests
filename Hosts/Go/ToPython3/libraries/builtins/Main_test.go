@@ -5,6 +5,7 @@ import (
 	"os"
 	. "test/builtins"
 	"testing"
+
 	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 )
 
@@ -18,12 +19,12 @@ func TestMain(m *testing.M) {
 
 func TestDict(t *testing.T) {
 
-	pydict, err := NewDict1()
+	pydict, err := NewDict_Overload1()
 	if err != nil {
 		t.Fatalf("Failed to create Dict: %v", err)
 	}
 
-	innerDict, err := NewDict1()
+	innerDict, err := NewDict_Overload1()
 	if err != nil {
 		t.Fatalf("Failed to create inner Dict: %v", err)
 	}
@@ -83,8 +84,8 @@ func TestDict(t *testing.T) {
 	l.SetHandle(x.(metaffi.Handle))
 	v, err := l.U___Getitem____(0)
 	if err != nil {
-        t.Fatalf("Failed to GetItem from List: %v", err)
-    }
+		t.Fatalf("Failed to GetItem from List: %v", err)
+	}
 
 	fmt.Printf("%v\n", v)
 	if v.(int64) != 1 {
@@ -92,19 +93,19 @@ func TestDict(t *testing.T) {
 	}
 
 	v, err = l.U___Getitem____(1)
-    if err != nil {
-        t.Fatalf("Failed to GetItem from List: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Failed to GetItem from List: %v", err)
+	}
 
-    fmt.Printf("%v\n", v)
-    if v.(int64) != 2 {
-        t.Fatalf("x[1] != 2")
-    }
+	fmt.Printf("%v\n", v)
+	if v.(int64) != 2 {
+		t.Fatalf("x[1] != 2")
+	}
 
 	v, err = l.U___Getitem____(2)
 	if err != nil {
-        t.Fatalf("Failed to GetItem from List: %v", err)
-    }
+		t.Fatalf("Failed to GetItem from List: %v", err)
+	}
 
 	fmt.Printf("%v\n", v)
 	if v.(int64) != 3 {

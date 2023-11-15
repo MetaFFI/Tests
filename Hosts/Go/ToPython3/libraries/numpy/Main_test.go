@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 	"os"
 	"test/metaffi_objects"
 	"test/numpy"
 	"testing"
+
+	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 )
 
 func TestMain(m *testing.M) {
@@ -22,17 +23,17 @@ func TestMain(m *testing.M) {
 func TestNumpy(t *testing.T) {
 
 	/*
-		# Create a 1D array
-	    arr = np.array([1, 2, 3, 4, 5])
+			# Create a 1D array
+		    arr = np.array([1, 2, 3, 4, 5])
 
-	    # Perform element-wise addition
-	    arr = arr + 1
+		    # Perform element-wise addition
+		    arr = arr + 1
 
-	    # Calculate the mean of the array
-	    mean = np.mean(arr)
+		    # Calculate the mean of the array
+		    mean = np.mean(arr)
 
-	    print(f"Array: {arr}")
-	    print(f"Mean: {mean}")
+		    print(f"Array: {arr}")
+		    print(f"Mean: {mean}")
 	*/
 
 	arr := make([]int64, 0)
@@ -57,7 +58,7 @@ func TestNumpy(t *testing.T) {
 	numpyArr := numpy.Ndarray{}
 	numpyArr.SetHandle(arrayHandle.(metaffi.Handle))
 
-	mean, err := numpy.Mean1(arrayHandle.(metaffi.Handle))
+	mean, err := numpy.Mean_Overload1(arrayHandle.(metaffi.Handle))
 	if err != nil {
 		t.Fatal(err)
 	}

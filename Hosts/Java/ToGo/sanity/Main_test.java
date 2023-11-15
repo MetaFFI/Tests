@@ -10,8 +10,7 @@ public class Main_test
 
 		try
 		{
-
-			metaffi_host.go.metaffi_load("TestFuncs_MetaFFIGuest");
+			TestFuncs.metaffi_load("TestFuncs_MetaFFIGuest");
 
 			System.out.println("Calling HelloWorld");
 			testHelloWorld();
@@ -31,13 +30,14 @@ public class Main_test
 		{
 			System.out.println("Unexpected exception has occurred during tests");
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 	}
 
 	private static void testHelloWorld() throws Exception
 	{
-		metaffi_host.go.HelloWorld();
+		TestFuncs.HelloWorld();
 	}
 
 	private static void testReturnsAnError() throws Exception
@@ -45,7 +45,7 @@ public class Main_test
 		try
 		{
 			System.out.println("Calling testReturnsAnError");
-			metaffi_host.go.ReturnsAnError();
+			TestFuncs.ReturnsAnError();
 			System.out.println("Test should have failed");
 			System.exit(1);
 		}
@@ -61,7 +61,7 @@ public class Main_test
 
 	private static void testDivIntegers() throws Exception
 	{
-		float res = metaffi_host.go.DivIntegers(1, 2);
+		float res = TestFuncs.DivIntegers(1, 2);
         if(res != 0.5)
         {
             System.out.println("Expected 0.5, got: "+res);
@@ -70,7 +70,7 @@ public class Main_test
 
         try
         {
-            metaffi_host.go.DivIntegers(1, 0);
+			TestFuncs.DivIntegers(1, 0);
             System.out.println("Expected an error - divisor is 0");
             System.exit(1);
         }
@@ -86,7 +86,7 @@ public class Main_test
 
 	private static void testJoinStrings() throws Exception
 	{
-		String res = metaffi_host.go.JoinStrings(new String[]{"A","b","C"});
+		String res = TestFuncs.JoinStrings(new String[]{"A","b","C"});
     	if(!res.equals("A,b,C"))
     	{
     	    System.out.println("Expected A,b,C. Got: "+res);
@@ -96,12 +96,12 @@ public class Main_test
 
 	private static void testWaitABit() throws Exception
 	{
-		metaffi_host.go.WaitABit(metaffi_host.go.GetFiveSeconds_MetaFFIGetter());
+		TestFuncs.WaitABit(TestFuncs.GetFiveSeconds_MetaFFIGetter());
 	}
 
 	private static void testTestMap() throws Exception
     {
-        metaffi_host.TestMap m = new metaffi_host.TestMap();
+        TestMap m = new TestMap((metaffi.MetaFFIHandle)TestFuncs.NewTestMap());
         m.Set("one", 1);
 
         int one = (int)m.Get("one");

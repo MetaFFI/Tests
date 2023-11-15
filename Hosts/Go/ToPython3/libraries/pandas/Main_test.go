@@ -2,20 +2,21 @@ package main
 
 import (
 	"fmt"
-	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 	"os"
+	"strings"
 	"test/metaffi_objects"
 	"test/pandas"
- 	"test/pandas_core_indexing"
+	"test/pandas_core_indexing"
 	"testing"
-	"strings"
+
+	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 )
 
 func TestMain(m *testing.M) {
 
 	pandas.MetaFFILoad("pandas_MetaFFIGuest")
 	metaffi_objects.MetaFFILoad("metaffi_objects_MetaFFIGuest")
- 	pandas_core_indexing.MetaFFILoad("pandas_core_indexing_MetaFFIGuest")
+	pandas_core_indexing.MetaFFILoad("pandas_core_indexing_MetaFFIGuest")
 
 	exitVal := m.Run()
 
@@ -24,7 +25,7 @@ func TestMain(m *testing.M) {
 
 func TestPandas(t *testing.T) {
 
-	dfHandle, err := pandas.Read_Csv1("input.csv")
+	dfHandle, err := pandas.Read_Csv_Overload1("input.csv")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +33,7 @@ func TestPandas(t *testing.T) {
 	df := pandas.DataFrame{}
 	df.SetHandle(dfHandle.(metaffi.Handle))
 
-	str, err := df.To_String1()
+	str, err := df.To_String_Overload1()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +65,7 @@ func TestPandas(t *testing.T) {
 
 	df.SetHandle(dfHandle.(metaffi.Handle))
 
-	str, err = df.To_String1()
+	str, err = df.To_String_Overload1()
 	if err != nil {
 		t.Fatal(err)
 	}

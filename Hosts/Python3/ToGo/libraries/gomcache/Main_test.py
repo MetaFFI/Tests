@@ -10,6 +10,8 @@ class TestSanity(unittest.TestCase):
 		INFINITY = GetTTL_FOREVER_metaffi_getter()
 
 		mcache = CacheDriver()
+		mcache.obj_handle = New()
+
 		mcache.Set('integer', 101, INFINITY)
 		l = mcache.Len()
 		print('length: {}'.format(l))

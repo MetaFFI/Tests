@@ -2,12 +2,14 @@
 
 package sanity
 
-import "testing"
-import tf "GoToJava/testfuncs"
-import tm "GoToJava/testmap"
-import "fmt"
-import "runtime"
-import "os"
+import (
+	tf "GoToJava/testfuncs"
+	tm "GoToJava/testmap"
+	"fmt"
+	"os"
+	"runtime"
+	"testing"
+)
 
 func trace(s string) {
 	pc := make([]uintptr, 10) // at least 1 entry needed

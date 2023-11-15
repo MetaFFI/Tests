@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 	"os"
 	"test/bs4"
 	"test/builtins"
 	"test/requests"
 	"testing"
+
+	metaffi "github.com/MetaFFI/lang-plugin-go/go-runtime"
 )
 
 func TestMain(m *testing.M) {
@@ -31,8 +32,7 @@ func TestBeautifulSoup(t *testing.T) {
 		    for link in soup.find_all('a'):
 		        print(link.get('href'))
 	*/
-
-	responseHandle, err := requests.Get1("https://www.microsoft.com")
+	responseHandle, err := requests.Get_Overload1("https://www.microsoft.com")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,12 +45,12 @@ func TestBeautifulSoup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bs, err := bs4.NewBeautifulSoup3(text, "html.parser")
+	bs, err := bs4.NewBeautifulSoup_Overload3(text, "html.parser")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	linksArray, err := bs.Find_All2("a")
+	linksArray, err := bs.Find_All_Overload2("a")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestBeautifulSoup(t *testing.T) {
 		tag := bs4.Tag{}
 		tag.SetHandle(tagHandle.(metaffi.Handle))
 
-		link, err := tag.Get1("href")
+		link, err := tag.Get_Overload1("href")
 		if err != nil {
 			t.Fatal(err)
 		}

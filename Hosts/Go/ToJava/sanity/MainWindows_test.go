@@ -2,12 +2,14 @@
 
 package sanity
 
-import "testing"
-import tf "GoToJava/testfuncs"
-import tm "GoToJava/testmap"
-import "fmt"
-import "runtime"
-import "os"
+import (
+	tf "GoToJava/testfuncs"
+	tm "GoToJava/testmap"
+	"fmt"
+	"os"
+	"runtime"
+	"testing"
+)
 
 func trace(s string) {
 	pc := make([]uintptr, 10) // at least 1 entry needed
@@ -29,14 +31,18 @@ func getDynamicLibSuffix() string {
 }
 
 func TestMain(m *testing.M) {
-	runtime.TestingWER = true
+	//runtime.TestingWER = true
 	p, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
 
+	println("TEST 1")
 	tf.MetaFFILoad(fmt.Sprintf("%v/TestFuncs_MetaFFIGuest%v;%v/TestFuncs_MetaFFIGuest.jar", p, getDynamicLibSuffix(), p))
+	println("TEST 2")
 	tm.MetaFFILoad(fmt.Sprintf("%v/TestMap_MetaFFIGuest%v;%v/TestMap_MetaFFIGuest.jar", p, getDynamicLibSuffix(), p))
+	println("TEST 3")
+
 	exitVal := m.Run()
 	os.Exit(exitVal)
 }
