@@ -14,7 +14,7 @@ def exec_cmd(cmd: str):
 		raise RuntimeError(f'Execution Failed: "{cmd}"')
 
 
-def build_metaffi(idl: str, idl_plugin: Optional[str], host_lang: str, host_options: Optional[str] = None):
+def build_metaffi(idl: str, idl_plugin: Optional[str], host_lang: str, host_options: Optional[str] = None, guest_options: Optional[str] = None):
 	cmd = f'metaffi -c --idl {idl} '
 
 	if idl_plugin is not None:
@@ -24,6 +24,9 @@ def build_metaffi(idl: str, idl_plugin: Optional[str], host_lang: str, host_opti
 
 	if host_options is not None:
 		cmd += f'--host-options "{host_options}"'
+
+	if guest_options is not None:
+		cmd += f'--guest_options "{guest_options}"'
 
 	exec_cmd(cmd)
 
