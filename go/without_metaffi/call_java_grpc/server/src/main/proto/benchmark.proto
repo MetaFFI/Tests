@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package benchmark;
+
+option go_package = "./pb";
+option java_package = "benchmark";
+option java_outer_classname = "BenchmarkProto";
+
+// BenchmarkService wraps the Java guest module for cross-language benchmarking.
+service BenchmarkService {
+  rpc VoidCall(VoidCallRequest) returns (VoidCallResponse);
+  rpc DivIntegers(DivIntegersRequest) returns (DivIntegersResponse);
+  rpc JoinStrings(JoinStringsRequest) returns (JoinStringsResponse);
+  rpc ArraySum(ArraySumRequest) returns (ArraySumResponse);
+  rpc ObjectMethod(ObjectMethodRequest) returns (ObjectMethodResponse);
+  rpc CallbackAdd(stream CallbackClientMsg) returns (stream CallbackServerMsg);
+  rpc ReturnsAnError(Empty) returns (Empty);
+}
+
+message VoidCallRequest { int64 secs = 1; }
+message VoidCallResponse {}
+
+message DivIntegersRequest { int64 x = 1; int64 y = 2; }
+message DivIntegersResponse { double result = 1; }
+
+message JoinStringsRequest { repeated string values = 1; }
+message JoinStringsResponse { string result = 1; }
+
+message ArraySumRequest { repeated int64 values = 1; }
+message ArraySumResponse { int64 sum = 1; }
+
+message ObjectMethodRequest { string name = 1; }
+message ObjectMethodResponse { string result = 1; }
+
+message CallbackClientMsg {
+  oneof msg {
+    bool invoke = 1;
+    int64 add_result = 2;
+  }
+}
+message CallbackServerMsg {
+  oneof msg {
+    CallbackArgs compute = 1;
+    int64 final_result = 2;
+  }
+}
+message CallbackArgs { int64 a = 1; int64 b = 2; }
+
+message Empty {}

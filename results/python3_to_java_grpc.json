@@ -1,0 +1,274 @@
+{
+  "metadata": {
+    "host": "python3",
+    "guest": "java",
+    "mechanism": "grpc",
+    "timestamp": "2026-02-10T08:57:02Z",
+    "environment": {
+      "os": "windows",
+      "arch": "AMD64",
+      "python_version": "3.12.5"
+    },
+    "config": {
+      "warmup_iterations": 2,
+      "measured_iterations": 5,
+      "timer_overhead_ns": 0
+    }
+  },
+  "initialization": {
+    "server_start_ns": 518721100
+  },
+  "correctness": null,
+  "benchmarks": [
+    {
+      "scenario": "void_call",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        1599400,
+        1229600,
+        1169600,
+        1445900,
+        1557300
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 1400360.0,
+          "median_ns": 1445900.0,
+          "p95_ns": 1599400.0,
+          "p99_ns": 1599400.0,
+          "stddev_ns": 172470.3638310072,
+          "ci95_ns": [
+            1249183.0606089407,
+            1551536.9393910593
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "primitive_echo",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        1382800,
+        1325000,
+        1342700,
+        1218700,
+        1018200
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 1317300.0,
+          "median_ns": 1333850.0,
+          "p95_ns": 1382800.0,
+          "p99_ns": 1382800.0,
+          "stddev_ns": 60656.12087827575,
+          "ci95_ns": [
+            1257857.0015392897,
+            1376742.9984607103
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "string_echo",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        1394400,
+        1372400,
+        1210400,
+        1310300,
+        1111300
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 1279760.0,
+          "median_ns": 1310300.0,
+          "p95_ns": 1394400.0,
+          "p99_ns": 1394400.0,
+          "stddev_ns": 105685.1664142135,
+          "ci95_ns": [
+            1187122.8672043008,
+            1372397.1327956992
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 10,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        2196900,
+        1198200,
+        2529300,
+        1149600,
+        1136000
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 1642000.0,
+          "median_ns": 1198200.0,
+          "p95_ns": 2529300.0,
+          "p99_ns": 2529300.0,
+          "stddev_ns": 598442.561989035,
+          "ci95_ns": [
+            1117441.9662992475,
+            2166558.0337007525
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 100,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        1191700,
+        1116300,
+        1134100,
+        974600,
+        887000
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 1060740.0,
+          "median_ns": 1116300.0,
+          "p95_ns": 1191700.0,
+          "p99_ns": 1191700.0,
+          "stddev_ns": 112449.82169839133,
+          "ci95_ns": [
+            962173.3854128692,
+            1159306.614587131
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 1000,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        1255300,
+        1133900,
+        1066500,
+        1170100,
+        1156000
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 1153333.3333333333,
+          "median_ns": 1156000.0,
+          "p95_ns": 1170100.0,
+          "p99_ns": 1170100.0,
+          "stddev_ns": 14898.396632598497,
+          "ci95_ns": [
+            1136474.210452937,
+            1170192.4562137295
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 10000,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        2636000,
+        2827500,
+        2600100,
+        2951600,
+        1444200
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 2753800.0,
+          "median_ns": 2731750.0,
+          "p95_ns": 2951600.0,
+          "p99_ns": 2951600.0,
+          "stddev_ns": 143228.01751054157,
+          "ci95_ns": [
+            2613436.542839669,
+            2894163.457160331
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "object_method",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        1308600,
+        1187500,
+        1393600,
+        1057300,
+        1065400
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 1202480.0,
+          "median_ns": 1187500.0,
+          "p95_ns": 1393600.0,
+          "p99_ns": 1393600.0,
+          "stddev_ns": 132575.16207796996,
+          "ci95_ns": [
+            1086272.746782518,
+            1318687.253217482
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "callback",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        2159400,
+        3470000,
+        2420500,
+        2346200,
+        2321400
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 2362700.0,
+          "median_ns": 2346200.0,
+          "p95_ns": 2420500.0,
+          "p99_ns": 2420500.0,
+          "stddev_ns": 42106.13573657249,
+          "ci95_ns": [
+            2315052.4219479915,
+            2410347.5780520085
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "error_propagation",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        872200,
+        667500,
+        629300,
+        618200,
+        715100
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 657525.0,
+          "median_ns": 648400.0,
+          "p95_ns": 715100.0,
+          "p99_ns": 715100.0,
+          "stddev_ns": 37939.05474573661,
+          "ci95_ns": [
+            620344.7263491781,
+            694705.2736508219
+          ]
+        }
+      }
+    }
+  ]
+}

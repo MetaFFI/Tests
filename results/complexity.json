@@ -1,0 +1,3168 @@
+{
+  "generated_at": "2026-02-10T12:32:37.025270+00:00",
+  "total_implementations": 18,
+  "aggregate_by_mechanism": {
+    "grpc": {
+      "count": 6,
+      "avg_source_sloc": 462.3,
+      "avg_benchmark_sloc": 462.3,
+      "min_source_sloc": 371,
+      "max_source_sloc": 591,
+      "avg_language_count": 3.0,
+      "avg_file_count": 2.0,
+      "avg_max_cc": 11.0
+    },
+    "metaffi": {
+      "count": 6,
+      "avg_source_sloc": 928.2,
+      "avg_benchmark_sloc": 335.0,
+      "min_source_sloc": 689,
+      "max_source_sloc": 1119,
+      "avg_language_count": 1.0,
+      "avg_file_count": 2.3,
+      "avg_max_cc": 10.5
+    },
+    "native": {
+      "count": 6,
+      "avg_source_sloc": 396.8,
+      "avg_benchmark_sloc": 396.8,
+      "min_source_sloc": 205,
+      "max_source_sloc": 517,
+      "avg_language_count": 1.7,
+      "avg_file_count": 2.8,
+      "avg_max_cc": 6.7
+    }
+  },
+  "pair_comparisons": [
+    {
+      "host": "go",
+      "guest": "java",
+      "mechanisms": {
+        "grpc": {
+          "source_sloc": 591,
+          "benchmark_only_sloc": 591,
+          "build_sloc": 126,
+          "proto_sloc": 98,
+          "generated_sloc": 10610,
+          "total_hand_written_sloc": 815,
+          "benchmark_hand_written_sloc": 815,
+          "source_file_count": 2,
+          "language_count": 3,
+          "languages": [
+            "Go",
+            "Java",
+            "Protobuf"
+          ],
+          "max_cyclomatic_complexity": 14,
+          "avg_cyclomatic_complexity": 2.74
+        },
+        "jni": {
+          "source_sloc": 456,
+          "benchmark_only_sloc": 456,
+          "build_sloc": 0,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 456,
+          "benchmark_hand_written_sloc": 456,
+          "source_file_count": 2,
+          "language_count": 1,
+          "languages": [
+            "Go"
+          ],
+          "max_cyclomatic_complexity": 5,
+          "avg_cyclomatic_complexity": 2.25
+        },
+        "metaffi": {
+          "source_sloc": 1015,
+          "benchmark_only_sloc": 339,
+          "build_sloc": 0,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 1015,
+          "benchmark_hand_written_sloc": 339,
+          "source_file_count": 2,
+          "language_count": 1,
+          "languages": [
+            "Go"
+          ],
+          "max_cyclomatic_complexity": 12,
+          "avg_cyclomatic_complexity": 3.0
+        }
+      }
+    },
+    {
+      "host": "go",
+      "guest": "python3",
+      "mechanisms": {
+        "cpython": {
+          "source_sloc": 448,
+          "benchmark_only_sloc": 448,
+          "build_sloc": 0,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 448,
+          "benchmark_hand_written_sloc": 448,
+          "source_file_count": 2,
+          "language_count": 1,
+          "languages": [
+            "Go"
+          ],
+          "max_cyclomatic_complexity": 5,
+          "avg_cyclomatic_complexity": 2.16
+        },
+        "grpc": {
+          "source_sloc": 511,
+          "benchmark_only_sloc": 511,
+          "build_sloc": 36,
+          "proto_sloc": 58,
+          "generated_sloc": 1591,
+          "total_hand_written_sloc": 605,
+          "benchmark_hand_written_sloc": 605,
+          "source_file_count": 2,
+          "language_count": 3,
+          "languages": [
+            "Go",
+            "Protobuf",
+            "Python"
+          ],
+          "max_cyclomatic_complexity": 9,
+          "avg_cyclomatic_complexity": 2.42
+        },
+        "metaffi": {
+          "source_sloc": 937,
+          "benchmark_only_sloc": 352,
+          "build_sloc": 0,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 937,
+          "benchmark_hand_written_sloc": 352,
+          "source_file_count": 2,
+          "language_count": 1,
+          "languages": [
+            "Go"
+          ],
+          "max_cyclomatic_complexity": 12,
+          "avg_cyclomatic_complexity": 3.38
+        }
+      }
+    },
+    {
+      "host": "java",
+      "guest": "go",
+      "mechanisms": {
+        "grpc": {
+          "source_sloc": 449,
+          "benchmark_only_sloc": 449,
+          "build_sloc": 91,
+          "proto_sloc": 60,
+          "generated_sloc": 10531,
+          "total_hand_written_sloc": 600,
+          "benchmark_hand_written_sloc": 600,
+          "source_file_count": 2,
+          "language_count": 3,
+          "languages": [
+            "Go",
+            "Java",
+            "Protobuf"
+          ],
+          "max_cyclomatic_complexity": 15,
+          "avg_cyclomatic_complexity": 4.12
+        },
+        "jni": {
+          "source_sloc": 517,
+          "benchmark_only_sloc": 517,
+          "build_sloc": 63,
+          "proto_sloc": 0,
+          "generated_sloc": 67,
+          "total_hand_written_sloc": 580,
+          "benchmark_hand_written_sloc": 580,
+          "source_file_count": 6,
+          "language_count": 3,
+          "languages": [
+            "C",
+            "Go",
+            "Java"
+          ],
+          "max_cyclomatic_complexity": 11,
+          "avg_cyclomatic_complexity": 1.89
+        },
+        "metaffi": {
+          "source_sloc": 1091,
+          "benchmark_only_sloc": 386,
+          "build_sloc": 55,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 1146,
+          "benchmark_hand_written_sloc": 441,
+          "source_file_count": 2,
+          "language_count": 1,
+          "languages": [
+            "Java"
+          ],
+          "max_cyclomatic_complexity": 13,
+          "avg_cyclomatic_complexity": 1.77
+        }
+      }
+    },
+    {
+      "host": "java",
+      "guest": "python3",
+      "mechanisms": {
+        "grpc": {
+          "source_sloc": 440,
+          "benchmark_only_sloc": 440,
+          "build_sloc": 94,
+          "proto_sloc": 60,
+          "generated_sloc": 9740,
+          "total_hand_written_sloc": 594,
+          "benchmark_hand_written_sloc": 594,
+          "source_file_count": 2,
+          "language_count": 3,
+          "languages": [
+            "Java",
+            "Protobuf",
+            "Python"
+          ],
+          "max_cyclomatic_complexity": 15,
+          "avg_cyclomatic_complexity": 3.4
+        },
+        "jep": {
+          "source_sloc": 311,
+          "benchmark_only_sloc": 311,
+          "build_sloc": 56,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 367,
+          "benchmark_hand_written_sloc": 367,
+          "source_file_count": 1,
+          "language_count": 1,
+          "languages": [
+            "Java"
+          ],
+          "max_cyclomatic_complexity": 11,
+          "avg_cyclomatic_complexity": 4.7
+        },
+        "metaffi": {
+          "source_sloc": 1119,
+          "benchmark_only_sloc": 410,
+          "build_sloc": 55,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 1174,
+          "benchmark_hand_written_sloc": 465,
+          "source_file_count": 2,
+          "language_count": 1,
+          "languages": [
+            "Java"
+          ],
+          "max_cyclomatic_complexity": 14,
+          "avg_cyclomatic_complexity": 1.75
+        }
+      }
+    },
+    {
+      "host": "python3",
+      "guest": "go",
+      "mechanisms": {
+        "ctypes": {
+          "source_sloc": 444,
+          "benchmark_only_sloc": 444,
+          "build_sloc": 0,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 444,
+          "benchmark_hand_written_sloc": 444,
+          "source_file_count": 5,
+          "language_count": 3,
+          "languages": [
+            "C",
+            "Go",
+            "Python"
+          ],
+          "max_cyclomatic_complexity": 4,
+          "avg_cyclomatic_complexity": 1.74
+        },
+        "grpc": {
+          "source_sloc": 371,
+          "benchmark_only_sloc": 371,
+          "build_sloc": 0,
+          "proto_sloc": 58,
+          "generated_sloc": 1591,
+          "total_hand_written_sloc": 429,
+          "benchmark_hand_written_sloc": 429,
+          "source_file_count": 2,
+          "language_count": 3,
+          "languages": [
+            "Go",
+            "Protobuf",
+            "Python"
+          ],
+          "max_cyclomatic_complexity": 9,
+          "avg_cyclomatic_complexity": 2.43
+        },
+        "metaffi": {
+          "source_sloc": 718,
+          "benchmark_only_sloc": 246,
+          "build_sloc": 0,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 718,
+          "benchmark_hand_written_sloc": 246,
+          "source_file_count": 3,
+          "language_count": 1,
+          "languages": [
+            "Python"
+          ],
+          "max_cyclomatic_complexity": 4,
+          "avg_cyclomatic_complexity": 1.35
+        }
+      }
+    },
+    {
+      "host": "python3",
+      "guest": "java",
+      "mechanisms": {
+        "grpc": {
+          "source_sloc": 412,
+          "benchmark_only_sloc": 412,
+          "build_sloc": 106,
+          "proto_sloc": 98,
+          "generated_sloc": 9740,
+          "total_hand_written_sloc": 616,
+          "benchmark_hand_written_sloc": 616,
+          "source_file_count": 2,
+          "language_count": 3,
+          "languages": [
+            "Java",
+            "Protobuf",
+            "Python"
+          ],
+          "max_cyclomatic_complexity": 4,
+          "avg_cyclomatic_complexity": 2.46
+        },
+        "jpype": {
+          "source_sloc": 205,
+          "benchmark_only_sloc": 205,
+          "build_sloc": 0,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 205,
+          "benchmark_hand_written_sloc": 205,
+          "source_file_count": 1,
+          "language_count": 1,
+          "languages": [
+            "Python"
+          ],
+          "max_cyclomatic_complexity": 4,
+          "avg_cyclomatic_complexity": 2.33
+        },
+        "metaffi": {
+          "source_sloc": 689,
+          "benchmark_only_sloc": 277,
+          "build_sloc": 0,
+          "proto_sloc": 0,
+          "generated_sloc": 0,
+          "total_hand_written_sloc": 689,
+          "benchmark_hand_written_sloc": 277,
+          "source_file_count": 3,
+          "language_count": 1,
+          "languages": [
+            "Python"
+          ],
+          "max_cyclomatic_complexity": 8,
+          "avg_cyclomatic_complexity": 1.51
+        }
+      }
+    }
+  ],
+  "implementations": [
+    {
+      "host": "go",
+      "guest": "python3",
+      "mechanism": "metaffi",
+      "label": "Go->Python3 MetaFFI",
+      "source_file_count": 2,
+      "build_file_count": 2,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Go"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 937,
+        "by_language": {
+          "Go": {
+            "code": 937,
+            "comment": 128,
+            "blank": 182,
+            "files": 2
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 352,
+        "by_language": {
+          "Go": {
+            "code": 352,
+            "comment": 43,
+            "blank": 64,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 12,
+        "avg_cc": 3.38,
+        "total_functions": 68,
+        "top_5_complex": [
+          {
+            "nloc": 21,
+            "ccn": 12,
+            "token_count": 230,
+            "params": 1,
+            "length": 21,
+            "name": "TestArraysMakeRagged@486-506@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_python3\\correctness_test.go"
+          },
+          {
+            "nloc": 15,
+            "ccn": 9,
+            "token_count": 168,
+            "params": 1,
+            "length": 15,
+            "name": "TestArraysMake2D@457-471@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_python3\\correctness_test.go"
+          },
+          {
+            "nloc": 24,
+            "ccn": 8,
+            "token_count": 242,
+            "params": 1,
+            "length": 35,
+            "name": "TestCoreReturnMultipleReturnValues@213-247@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_python3\\correctness_test.go"
+          },
+          {
+            "nloc": 19,
+            "ccn": 8,
+            "token_count": 201,
+            "params": 1,
+            "length": 23,
+            "name": "TestReturnErrorTuple@579-601@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_python3\\correctness_test.go"
+          },
+          {
+            "nloc": 34,
+            "ccn": 7,
+            "token_count": 432,
+            "params": 1,
+            "length": 46,
+            "name": "TestTestMapSetGetContains@374-419@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_python3\\correctness_test.go"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 1,
+        "distinct_api_calls": 7,
+        "api_calls_list": [
+          "LoadModule",
+          "LoadRuntimePlugin",
+          "MetaFFIModule",
+          "MetaFFIRuntime",
+          "NewMetaFFIRuntime",
+          "load_module",
+          "load_runtime_plugin"
+        ]
+      },
+      "source_files": [
+        "go\\call_python3\\benchmark_test.go",
+        "go\\call_python3\\correctness_test.go"
+      ],
+      "build_files": [
+        "go\\call_python3\\go.mod",
+        "go\\call_python3\\go.work"
+      ],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "go",
+      "guest": "java",
+      "mechanism": "metaffi",
+      "label": "Go->Java MetaFFI",
+      "source_file_count": 2,
+      "build_file_count": 2,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Go"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 1015,
+        "by_language": {
+          "Go": {
+            "code": 1015,
+            "comment": 137,
+            "blank": 201,
+            "files": 2
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 339,
+        "by_language": {
+          "Go": {
+            "code": 339,
+            "comment": 27,
+            "blank": 60,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 12,
+        "avg_cc": 3.0,
+        "total_functions": 83,
+        "top_5_complex": [
+          {
+            "nloc": 21,
+            "ccn": 12,
+            "token_count": 228,
+            "params": 1,
+            "length": 21,
+            "name": "TestArraysMakeRagged@524-544@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_java\\correctness_test.go"
+          },
+          {
+            "nloc": 15,
+            "ccn": 9,
+            "token_count": 166,
+            "params": 1,
+            "length": 15,
+            "name": "TestArraysMake2d@495-509@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_java\\correctness_test.go"
+          },
+          {
+            "nloc": 23,
+            "ccn": 7,
+            "token_count": 270,
+            "params": 1,
+            "length": 32,
+            "name": "TestStaticStateCounter@379-410@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_java\\correctness_test.go"
+          },
+          {
+            "nloc": 19,
+            "ccn": 6,
+            "token_count": 161,
+            "params": 1,
+            "length": 22,
+            "name": "TestCoreReturnCallbackAdd@181-202@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_java\\correctness_test.go"
+          },
+          {
+            "nloc": 27,
+            "ccn": 6,
+            "token_count": 312,
+            "params": 1,
+            "length": 36,
+            "name": "TestTestMapSetGetContains@310-345@C:\\src\\github.com\\MetaFFI\\tests\\go\\call_java\\correctness_test.go"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 1,
+        "distinct_api_calls": 7,
+        "api_calls_list": [
+          "LoadModule",
+          "LoadRuntimePlugin",
+          "MetaFFIModule",
+          "MetaFFIRuntime",
+          "NewMetaFFIRuntime",
+          "load_module",
+          "load_runtime_plugin"
+        ]
+      },
+      "source_files": [
+        "go\\call_java\\benchmark_test.go",
+        "go\\call_java\\correctness_test.go"
+      ],
+      "build_files": [
+        "go\\call_java\\go.mod",
+        "go\\call_java\\go.work"
+      ],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "python3",
+      "guest": "go",
+      "mechanism": "metaffi",
+      "label": "Python3->Go MetaFFI",
+      "source_file_count": 3,
+      "build_file_count": 0,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Python"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 718,
+        "by_language": {
+          "Python": {
+            "code": 718,
+            "comment": 146,
+            "blank": 218,
+            "files": 3
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 246,
+        "by_language": {
+          "Python": {
+            "code": 246,
+            "comment": 64,
+            "blank": 89,
+            "files": 2
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 4,
+        "avg_cc": 1.35,
+        "total_functions": 66,
+        "top_5_complex": [
+          {
+            "nloc": 25,
+            "ccn": 4,
+            "token_count": 210,
+            "params": 1,
+            "length": 37,
+            "name": "compute_stats@33-69@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_go\\test_benchmark.py"
+          },
+          {
+            "nloc": 10,
+            "ccn": 4,
+            "token_count": 84,
+            "params": 1,
+            "length": 13,
+            "name": "remove_outliers_iqr@72-84@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_go\\test_benchmark.py"
+          },
+          {
+            "nloc": 26,
+            "ccn": 4,
+            "token_count": 136,
+            "params": 5,
+            "length": 41,
+            "name": "run_benchmark@102-142@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_go\\test_benchmark.py"
+          },
+          {
+            "nloc": 67,
+            "ccn": 4,
+            "token_count": 447,
+            "params": 2,
+            "length": 131,
+            "name": "test_all_benchmarks@196-326@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_go\\test_benchmark.py"
+          },
+          {
+            "nloc": 8,
+            "ccn": 2,
+            "token_count": 51,
+            "params": 0,
+            "length": 9,
+            "name": "measure_timer_overhead@87-95@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_go\\test_benchmark.py"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 9,
+        "distinct_api_calls": 3,
+        "api_calls_list": [
+          "MetaFFIRuntime",
+          "load_module",
+          "load_runtime_plugin"
+        ]
+      },
+      "source_files": [
+        "python3\\call_go\\conftest.py",
+        "python3\\call_go\\test_benchmark.py",
+        "python3\\call_go\\test_correctness.py"
+      ],
+      "build_files": [],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "python3",
+      "guest": "java",
+      "mechanism": "metaffi",
+      "label": "Python3->Java MetaFFI",
+      "source_file_count": 3,
+      "build_file_count": 0,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Python"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 689,
+        "by_language": {
+          "Python": {
+            "code": 689,
+            "comment": 87,
+            "blank": 178,
+            "files": 3
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 277,
+        "by_language": {
+          "Python": {
+            "code": 277,
+            "comment": 46,
+            "blank": 87,
+            "files": 2
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 8,
+        "avg_cc": 1.51,
+        "total_functions": 55,
+        "top_5_complex": [
+          {
+            "nloc": 90,
+            "ccn": 8,
+            "token_count": 543,
+            "params": 2,
+            "length": 156,
+            "name": "test_all_benchmarks@182-337@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_java\\test_benchmark.py"
+          },
+          {
+            "nloc": 22,
+            "ccn": 4,
+            "token_count": 209,
+            "params": 1,
+            "length": 28,
+            "name": "compute_stats@33-60@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_java\\test_benchmark.py"
+          },
+          {
+            "nloc": 10,
+            "ccn": 4,
+            "token_count": 83,
+            "params": 1,
+            "length": 12,
+            "name": "remove_outliers_iqr@63-74@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_java\\test_benchmark.py"
+          },
+          {
+            "nloc": 26,
+            "ccn": 4,
+            "token_count": 135,
+            "params": 5,
+            "length": 30,
+            "name": "run_benchmark@91-120@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_java\\test_benchmark.py"
+          },
+          {
+            "nloc": 8,
+            "ccn": 2,
+            "token_count": 50,
+            "params": 0,
+            "length": 8,
+            "name": "measure_timer_overhead@77-84@C:\\src\\github.com\\MetaFFI\\tests\\python3\\call_java\\test_benchmark.py"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 9,
+        "distinct_api_calls": 3,
+        "api_calls_list": [
+          "MetaFFIRuntime",
+          "load_module",
+          "load_runtime_plugin"
+        ]
+      },
+      "source_files": [
+        "python3\\call_java\\conftest.py",
+        "python3\\call_java\\test_benchmark.py",
+        "python3\\call_java\\test_correctness.py"
+      ],
+      "build_files": [],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "java",
+      "guest": "go",
+      "mechanism": "metaffi",
+      "label": "Java->Go MetaFFI",
+      "source_file_count": 2,
+      "build_file_count": 1,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Java"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 1091,
+        "by_language": {
+          "Java": {
+            "code": 1091,
+            "comment": 143,
+            "blank": 177,
+            "files": 2
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 386,
+        "by_language": {
+          "Java": {
+            "code": 386,
+            "comment": 31,
+            "blank": 69,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 55,
+        "by_language": {
+          "Maven": {
+            "code": 55,
+            "comment": 0,
+            "blank": 5,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 13,
+        "avg_cc": 1.77,
+        "total_functions": 66,
+        "top_5_complex": [
+          {
+            "nloc": 118,
+            "ccn": 13,
+            "token_count": 1000,
+            "params": 0,
+            "length": 147,
+            "name": "TestBenchmark::testAllBenchmarks@277-423@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_go\\src\\test\\java\\TestBenchmark.java"
+          },
+          {
+            "nloc": 53,
+            "ccn": 8,
+            "token_count": 536,
+            "params": 5,
+            "length": 68,
+            "name": "TestBenchmark::runBenchmark@185-252@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_go\\src\\test\\java\\TestBenchmark.java"
+          },
+          {
+            "nloc": 21,
+            "ccn": 6,
+            "token_count": 161,
+            "params": 1,
+            "length": 24,
+            "name": "TestBenchmark::removeOutliersIQR@140-163@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_go\\src\\test\\java\\TestBenchmark.java"
+          },
+          {
+            "nloc": 29,
+            "ccn": 5,
+            "token_count": 243,
+            "params": 1,
+            "length": 35,
+            "name": "TestBenchmark::computeStats@104-138@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_go\\src\\test\\java\\TestBenchmark.java"
+          },
+          {
+            "nloc": 55,
+            "ccn": 5,
+            "token_count": 498,
+            "params": 2,
+            "length": 61,
+            "name": "TestBenchmark::writeResults@425-485@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_go\\src\\test\\java\\TestBenchmark.java"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 17,
+        "distinct_api_calls": 6,
+        "api_calls_list": [
+          "MetaFFIModule",
+          "MetaFFIRuntime",
+          "loadModule",
+          "loadRuntimePlugin",
+          "load_module",
+          "load_runtime_plugin"
+        ]
+      },
+      "source_files": [
+        "java\\call_go\\src\\test\\java\\TestBenchmark.java",
+        "java\\call_go\\src\\test\\java\\TestCorrectness.java"
+      ],
+      "build_files": [
+        "java\\call_go\\pom.xml"
+      ],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "java",
+      "guest": "python3",
+      "mechanism": "metaffi",
+      "label": "Java->Python3 MetaFFI",
+      "source_file_count": 2,
+      "build_file_count": 1,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Java"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 1119,
+        "by_language": {
+          "Java": {
+            "code": 1119,
+            "comment": 79,
+            "blank": 160,
+            "files": 2
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 410,
+        "by_language": {
+          "Java": {
+            "code": 410,
+            "comment": 34,
+            "blank": 72,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 55,
+        "by_language": {
+          "Maven": {
+            "code": 55,
+            "comment": 0,
+            "blank": 5,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 14,
+        "avg_cc": 1.75,
+        "total_functions": 71,
+        "top_5_complex": [
+          {
+            "nloc": 142,
+            "ccn": 14,
+            "token_count": 1243,
+            "params": 0,
+            "length": 177,
+            "name": "TestBenchmark::testAllBenchmarks@277-453@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_python3\\src\\test\\java\\TestBenchmark.java"
+          },
+          {
+            "nloc": 53,
+            "ccn": 8,
+            "token_count": 536,
+            "params": 5,
+            "length": 68,
+            "name": "TestBenchmark::runBenchmark@185-252@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_python3\\src\\test\\java\\TestBenchmark.java"
+          },
+          {
+            "nloc": 21,
+            "ccn": 6,
+            "token_count": 161,
+            "params": 1,
+            "length": 24,
+            "name": "TestBenchmark::removeOutliersIQR@140-163@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_python3\\src\\test\\java\\TestBenchmark.java"
+          },
+          {
+            "nloc": 55,
+            "ccn": 6,
+            "token_count": 502,
+            "params": 2,
+            "length": 61,
+            "name": "TestBenchmark::writeResults@455-515@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_python3\\src\\test\\java\\TestBenchmark.java"
+          },
+          {
+            "nloc": 29,
+            "ccn": 5,
+            "token_count": 243,
+            "params": 1,
+            "length": 35,
+            "name": "TestBenchmark::computeStats@104-138@C:\\src\\github.com\\MetaFFI\\tests\\java\\call_python3\\src\\test\\java\\TestBenchmark.java"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 17,
+        "distinct_api_calls": 6,
+        "api_calls_list": [
+          "MetaFFIModule",
+          "MetaFFIRuntime",
+          "loadModule",
+          "loadRuntimePlugin",
+          "load_module",
+          "load_runtime_plugin"
+        ]
+      },
+      "source_files": [
+        "java\\call_python3\\src\\test\\java\\TestBenchmark.java",
+        "java\\call_python3\\src\\test\\java\\TestCorrectness.java"
+      ],
+      "build_files": [
+        "java\\call_python3\\pom.xml"
+      ],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "go",
+      "guest": "python3",
+      "mechanism": "cpython",
+      "label": "Go->Python3 cgo+CPython",
+      "source_file_count": 2,
+      "build_file_count": 1,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Go"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 448,
+        "by_language": {
+          "Go": {
+            "code": 448,
+            "comment": 311,
+            "blank": 151,
+            "files": 2
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 448,
+        "by_language": {
+          "Go": {
+            "code": 448,
+            "comment": 311,
+            "blank": 151,
+            "files": 2
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 5,
+        "avg_cc": 2.16,
+        "total_functions": 38,
+        "top_5_complex": [
+          {
+            "nloc": 36,
+            "ccn": 5,
+            "token_count": 257,
+            "params": 1,
+            "length": 47,
+            "name": "computeStats@172-218@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_cpython\\benchmark_test.go"
+          },
+          {
+            "nloc": 18,
+            "ccn": 5,
+            "token_count": 121,
+            "params": 1,
+            "length": 20,
+            "name": "removeOutliersIQR@221-240@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_cpython\\benchmark_test.go"
+          },
+          {
+            "nloc": 41,
+            "ccn": 5,
+            "token_count": 248,
+            "params": 6,
+            "length": 51,
+            "name": "runBenchmark@259-309@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_cpython\\benchmark_test.go"
+          },
+          {
+            "nloc": 34,
+            "ccn": 4,
+            "token_count": 229,
+            "params": 1,
+            "length": 49,
+            "name": "TestMain@39-87@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_cpython\\benchmark_test.go"
+          },
+          {
+            "nloc": 40,
+            "ccn": 4,
+            "token_count": 235,
+            "params": 5,
+            "length": 44,
+            "name": "writeResults@402-445@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_cpython\\benchmark_test.go"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 2,
+        "distinct_api_calls": 7,
+        "api_calls_list": [
+          "PyFloat_",
+          "PyList_",
+          "PyLong_",
+          "PyObject_",
+          "PyTuple_",
+          "PyUnicode_",
+          "Py_Initialize"
+        ]
+      },
+      "source_files": [
+        "go\\without_metaffi\\call_python3_cpython\\benchmark_test.go",
+        "go\\without_metaffi\\call_python3_cpython\\bridge.go"
+      ],
+      "build_files": [
+        "go\\without_metaffi\\call_python3_cpython\\go.mod"
+      ],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "go",
+      "guest": "java",
+      "mechanism": "jni",
+      "label": "Go->Java cgo+JNI",
+      "source_file_count": 2,
+      "build_file_count": 1,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Go"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 456,
+        "by_language": {
+          "Go": {
+            "code": 456,
+            "comment": 319,
+            "blank": 140,
+            "files": 2
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 456,
+        "by_language": {
+          "Go": {
+            "code": 456,
+            "comment": 319,
+            "blank": 140,
+            "files": 2
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 5,
+        "avg_cc": 2.25,
+        "total_functions": 36,
+        "top_5_complex": [
+          {
+            "nloc": 30,
+            "ccn": 5,
+            "token_count": 229,
+            "params": 1,
+            "length": 41,
+            "name": "TestMain@24-64@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_jni\\benchmark_test.go"
+          },
+          {
+            "nloc": 34,
+            "ccn": 5,
+            "token_count": 251,
+            "params": 1,
+            "length": 40,
+            "name": "computeStats@137-176@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_jni\\benchmark_test.go"
+          },
+          {
+            "nloc": 18,
+            "ccn": 5,
+            "token_count": 121,
+            "params": 1,
+            "length": 20,
+            "name": "removeOutliersIQR@178-197@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_jni\\benchmark_test.go"
+          },
+          {
+            "nloc": 41,
+            "ccn": 5,
+            "token_count": 248,
+            "params": 6,
+            "length": 47,
+            "name": "runBenchmark@215-261@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_jni\\benchmark_test.go"
+          },
+          {
+            "nloc": 26,
+            "ccn": 4,
+            "token_count": 182,
+            "params": 1,
+            "length": 119,
+            "name": "TestBenchmarkAll@267-385@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_jni\\benchmark_test.go"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 2,
+        "distinct_api_calls": 6,
+        "api_calls_list": [
+          "CallObjectMethod",
+          "FindClass",
+          "GetMethodID",
+          "GetStaticMethodID",
+          "JNI_CreateJavaVM",
+          "NewObject"
+        ]
+      },
+      "source_files": [
+        "go\\without_metaffi\\call_java_jni\\benchmark_test.go",
+        "go\\without_metaffi\\call_java_jni\\bridge.go"
+      ],
+      "build_files": [
+        "go\\without_metaffi\\call_java_jni\\go.mod"
+      ],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "python3",
+      "guest": "go",
+      "mechanism": "ctypes",
+      "label": "Python3->Go ctypes",
+      "source_file_count": 5,
+      "build_file_count": 2,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "C",
+        "Go",
+        "Python"
+      ],
+      "language_count": 3,
+      "source_sloc": {
+        "total": 444,
+        "by_language": {
+          "Python": {
+            "code": 270,
+            "comment": 54,
+            "blank": 86,
+            "files": 1
+          },
+          "Go": {
+            "code": 107,
+            "comment": 53,
+            "blank": 36,
+            "files": 1
+          },
+          "C/C++ Header": {
+            "code": 67,
+            "comment": 11,
+            "blank": 27,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 444,
+        "by_language": {
+          "Python": {
+            "code": 270,
+            "comment": 54,
+            "blank": 86,
+            "files": 1
+          },
+          "Go": {
+            "code": 107,
+            "comment": 53,
+            "blank": 36,
+            "files": 1
+          },
+          "C/C++ Header": {
+            "code": 67,
+            "comment": 11,
+            "blank": 27,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 4,
+        "avg_cc": 1.74,
+        "total_functions": 50,
+        "top_5_complex": [
+          {
+            "nloc": 22,
+            "ccn": 4,
+            "token_count": 210,
+            "params": 1,
+            "length": 29,
+            "name": "compute_stats@123-151@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_ctypes\\benchmark.py"
+          },
+          {
+            "nloc": 10,
+            "ccn": 4,
+            "token_count": 84,
+            "params": 1,
+            "length": 13,
+            "name": "remove_outliers_iqr@154-166@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_ctypes\\benchmark.py"
+          },
+          {
+            "nloc": 26,
+            "ccn": 4,
+            "token_count": 136,
+            "params": 5,
+            "length": 33,
+            "name": "run_benchmark@184-216@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_ctypes\\benchmark.py"
+          },
+          {
+            "nloc": 12,
+            "ccn": 4,
+            "token_count": 85,
+            "params": 0,
+            "length": 15,
+            "name": "main.bench_object@353-367@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_ctypes\\benchmark.py"
+          },
+          {
+            "nloc": 54,
+            "ccn": 4,
+            "token_count": 331,
+            "params": 0,
+            "length": 141,
+            "name": "main@266-406@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_ctypes\\benchmark.py"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 10,
+        "distinct_api_calls": 2,
+        "api_calls_list": [
+          "ctypes.POINTER",
+          "ctypes.c_"
+        ]
+      },
+      "source_files": [
+        "python3\\without_metaffi\\call_go_ctypes\\benchmark.py",
+        "python3\\without_metaffi\\call_go_ctypes\\go_bridge\\bridge.go",
+        "python3\\without_metaffi\\call_go_ctypes\\go_bridge\\bridge.h",
+        "python3\\without_metaffi\\call_go_ctypes\\go_bridge\\bridge.go",
+        "python3\\without_metaffi\\call_go_ctypes\\go_bridge\\bridge.h"
+      ],
+      "build_files": [
+        "python3\\without_metaffi\\call_go_ctypes\\go_bridge\\go.mod",
+        "python3\\without_metaffi\\call_go_ctypes\\go_bridge\\go.mod"
+      ],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "python3",
+      "guest": "java",
+      "mechanism": "jpype",
+      "label": "Python3->Java JPype",
+      "source_file_count": 1,
+      "build_file_count": 0,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Python"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 205,
+        "by_language": {
+          "Python": {
+            "code": 205,
+            "comment": 36,
+            "blank": 68,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 205,
+        "by_language": {
+          "Python": {
+            "code": 205,
+            "comment": 36,
+            "blank": 68,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 4,
+        "avg_cc": 2.33,
+        "total_functions": 15,
+        "top_5_complex": [
+          {
+            "nloc": 22,
+            "ccn": 4,
+            "token_count": 209,
+            "params": 1,
+            "length": 28,
+            "name": "compute_stats@59-86@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_jpype\\benchmark.py"
+          },
+          {
+            "nloc": 10,
+            "ccn": 4,
+            "token_count": 83,
+            "params": 1,
+            "length": 12,
+            "name": "remove_outliers_iqr@89-100@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_jpype\\benchmark.py"
+          },
+          {
+            "nloc": 26,
+            "ccn": 4,
+            "token_count": 135,
+            "params": 5,
+            "length": 30,
+            "name": "run_benchmark@117-146@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_jpype\\benchmark.py"
+          },
+          {
+            "nloc": 52,
+            "ccn": 3,
+            "token_count": 313,
+            "params": 0,
+            "length": 111,
+            "name": "main@195-305@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_jpype\\benchmark.py"
+          },
+          {
+            "nloc": 7,
+            "ccn": 2,
+            "token_count": 44,
+            "params": 0,
+            "length": 9,
+            "name": "start_jvm@44-52@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_jpype\\benchmark.py"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 10,
+        "distinct_api_calls": 2,
+        "api_calls_list": [
+          "jpype.JArray",
+          "jpype.startJVM"
+        ]
+      },
+      "source_files": [
+        "python3\\without_metaffi\\call_java_jpype\\benchmark.py"
+      ],
+      "build_files": [],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "java",
+      "guest": "go",
+      "mechanism": "jni",
+      "label": "Java->Go JNI+cgo",
+      "source_file_count": 6,
+      "build_file_count": 5,
+      "proto_file_count": 0,
+      "generated_file_count": 2,
+      "languages": [
+        "C",
+        "Go",
+        "Java"
+      ],
+      "language_count": 3,
+      "source_sloc": {
+        "total": 517,
+        "by_language": {
+          "Java": {
+            "code": 301,
+            "comment": 32,
+            "blank": 52,
+            "files": 2
+          },
+          "C": {
+            "code": 110,
+            "comment": 39,
+            "blank": 33,
+            "files": 1
+          },
+          "Go": {
+            "code": 106,
+            "comment": 48,
+            "blank": 36,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 517,
+        "by_language": {
+          "Java": {
+            "code": 301,
+            "comment": 32,
+            "blank": 52,
+            "files": 2
+          },
+          "C": {
+            "code": 110,
+            "comment": 39,
+            "blank": 33,
+            "files": 1
+          },
+          "Go": {
+            "code": 106,
+            "comment": 48,
+            "blank": 36,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 63,
+        "by_language": {
+          "Maven": {
+            "code": 45,
+            "comment": 0,
+            "blank": 4,
+            "files": 1
+          },
+          "PowerShell": {
+            "code": 18,
+            "comment": 2,
+            "blank": 5,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 67,
+        "by_language": {
+          "C/C++ Header": {
+            "code": 67,
+            "comment": 11,
+            "blank": 27,
+            "files": 1
+          }
+        }
+      },
+      "complexity": {
+        "max_cc": 11,
+        "avg_cc": 1.89,
+        "total_functions": 61,
+        "top_5_complex": [
+          {
+            "nloc": 81,
+            "ccn": 11,
+            "token_count": 587,
+            "params": 0,
+            "length": 100,
+            "name": "BenchmarkTest::testAllBenchmarks@186-285@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_jni\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 50,
+            "ccn": 8,
+            "token_count": 536,
+            "params": 5,
+            "length": 55,
+            "name": "BenchmarkTest::runBenchmark@113-167@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_jni\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 18,
+            "ccn": 6,
+            "token_count": 159,
+            "params": 1,
+            "length": 20,
+            "name": "BenchmarkTest::removeOutliersIQR@75-94@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_jni\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 52,
+            "ccn": 6,
+            "token_count": 461,
+            "params": 2,
+            "length": 56,
+            "name": "BenchmarkTest::writeResults@287-342@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_jni\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 16,
+            "ccn": 5,
+            "token_count": 222,
+            "params": 1,
+            "length": 20,
+            "name": "BenchmarkTest::computeStats@54-73@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_jni\\src\\test\\java\\BenchmarkTest.java"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 11,
+        "distinct_api_calls": 1,
+        "api_calls_list": [
+          "GetMethodID"
+        ]
+      },
+      "source_files": [
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\bridge.go",
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\jni_impl.c",
+        "java\\without_metaffi\\call_go_jni\\src\\test\\java\\BenchmarkTest.java",
+        "java\\without_metaffi\\call_go_jni\\src\\test\\java\\GoBridge.java",
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\bridge.go",
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\jni_impl.c"
+      ],
+      "build_files": [
+        "java\\without_metaffi\\call_go_jni\\pom.xml",
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\build.ps1",
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\go.mod",
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\build.ps1",
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\go.mod"
+      ],
+      "proto_files": [],
+      "generated_files": [
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\go_jni_bridge.h",
+        "java\\without_metaffi\\call_go_jni\\go_bridge\\go_jni_bridge.h"
+      ]
+    },
+    {
+      "host": "java",
+      "guest": "python3",
+      "mechanism": "jep",
+      "label": "Java->Python3 Jep",
+      "source_file_count": 1,
+      "build_file_count": 1,
+      "proto_file_count": 0,
+      "generated_file_count": 0,
+      "languages": [
+        "Java"
+      ],
+      "language_count": 1,
+      "source_sloc": {
+        "total": 311,
+        "by_language": {
+          "Java": {
+            "code": 311,
+            "comment": 22,
+            "blank": 51,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 311,
+        "by_language": {
+          "Java": {
+            "code": 311,
+            "comment": 22,
+            "blank": 51,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 56,
+        "by_language": {
+          "Maven": {
+            "code": 56,
+            "comment": 0,
+            "blank": 4,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "generated_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "complexity": {
+        "max_cc": 11,
+        "avg_cc": 4.7,
+        "total_functions": 10,
+        "top_5_complex": [
+          {
+            "nloc": 91,
+            "ccn": 11,
+            "token_count": 641,
+            "params": 0,
+            "length": 114,
+            "name": "BenchmarkTest::testAllBenchmarks@211-324@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_jep\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 50,
+            "ccn": 8,
+            "token_count": 536,
+            "params": 5,
+            "length": 55,
+            "name": "BenchmarkTest::runBenchmark@138-192@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_jep\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 18,
+            "ccn": 6,
+            "token_count": 159,
+            "params": 1,
+            "length": 20,
+            "name": "BenchmarkTest::removeOutliersIQR@100-119@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_jep\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 54,
+            "ccn": 6,
+            "token_count": 485,
+            "params": 2,
+            "length": 58,
+            "name": "BenchmarkTest::writeResults@326-383@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_jep\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 16,
+            "ccn": 5,
+            "token_count": 222,
+            "params": 1,
+            "length": 20,
+            "name": "BenchmarkTest::computeStats@79-98@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_jep\\src\\test\\java\\BenchmarkTest.java"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 13,
+        "distinct_api_calls": 3,
+        "api_calls_list": [
+          "SharedInterpreter",
+          "interp.exec",
+          "interp.getValue"
+        ]
+      },
+      "source_files": [
+        "java\\without_metaffi\\call_python3_jep\\src\\test\\java\\BenchmarkTest.java"
+      ],
+      "build_files": [
+        "java\\without_metaffi\\call_python3_jep\\pom.xml"
+      ],
+      "proto_files": [],
+      "generated_files": []
+    },
+    {
+      "host": "go",
+      "guest": "python3",
+      "mechanism": "grpc",
+      "label": "Go->Python3 gRPC",
+      "source_file_count": 2,
+      "build_file_count": 5,
+      "proto_file_count": 1,
+      "generated_file_count": 4,
+      "languages": [
+        "Go",
+        "Protobuf",
+        "Python"
+      ],
+      "language_count": 3,
+      "source_sloc": {
+        "total": 511,
+        "by_language": {
+          "Go": {
+            "code": 435,
+            "comment": 47,
+            "blank": 76,
+            "files": 1
+          },
+          "Python": {
+            "code": 76,
+            "comment": 20,
+            "blank": 26,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 511,
+        "by_language": {
+          "Go": {
+            "code": 435,
+            "comment": 47,
+            "blank": 76,
+            "files": 1
+          },
+          "Python": {
+            "code": 76,
+            "comment": 20,
+            "blank": 26,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 36,
+        "by_language": {
+          "Bourne Shell": {
+            "code": 17,
+            "comment": 5,
+            "blank": 4,
+            "files": 1
+          },
+          "DOS Batch": {
+            "code": 16,
+            "comment": 5,
+            "blank": 4,
+            "files": 1
+          },
+          "Text": {
+            "code": 3,
+            "comment": 0,
+            "blank": 0,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 58,
+        "by_language": {
+          "Protocol Buffers": {
+            "code": 58,
+            "comment": 17,
+            "blank": 16,
+            "files": 1
+          }
+        }
+      },
+      "generated_sloc": {
+        "total": 1591,
+        "by_language": {
+          "Go": {
+            "code": 1230,
+            "comment": 73,
+            "blank": 168,
+            "files": 2
+          },
+          "Python": {
+            "code": 361,
+            "comment": 39,
+            "blank": 34,
+            "files": 2
+          }
+        }
+      },
+      "complexity": {
+        "max_cc": 9,
+        "avg_cc": 2.42,
+        "total_functions": 36,
+        "top_5_complex": [
+          {
+            "nloc": 68,
+            "ccn": 9,
+            "token_count": 490,
+            "params": 1,
+            "length": 91,
+            "name": "TestMain@43-133@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_grpc\\benchmark_test.go"
+          },
+          {
+            "nloc": 34,
+            "ccn": 8,
+            "token_count": 226,
+            "params": 0,
+            "length": 43,
+            "name": "@449-491@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_grpc\\benchmark_test.go"
+          },
+          {
+            "nloc": 34,
+            "ccn": 5,
+            "token_count": 251,
+            "params": 1,
+            "length": 40,
+            "name": "computeStats@216-255@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_grpc\\benchmark_test.go"
+          },
+          {
+            "nloc": 18,
+            "ccn": 5,
+            "token_count": 121,
+            "params": 1,
+            "length": 20,
+            "name": "removeOutliersIQR@257-276@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_grpc\\benchmark_test.go"
+          },
+          {
+            "nloc": 41,
+            "ccn": 5,
+            "token_count": 248,
+            "params": 6,
+            "length": 47,
+            "name": "runBenchmark@294-340@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_python3_grpc\\benchmark_test.go"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 8,
+        "distinct_api_calls": 1,
+        "api_calls_list": [
+          "grpc.server"
+        ]
+      },
+      "source_files": [
+        "go\\without_metaffi\\call_python3_grpc\\benchmark_test.go",
+        "go\\without_metaffi\\call_python3_grpc\\server\\server.py"
+      ],
+      "build_files": [
+        "go\\without_metaffi\\call_python3_grpc\\generate.bat",
+        "go\\without_metaffi\\call_python3_grpc\\generate.sh",
+        "go\\without_metaffi\\call_python3_grpc\\go.mod",
+        "go\\without_metaffi\\call_python3_grpc\\go.sum",
+        "go\\without_metaffi\\call_python3_grpc\\server\\requirements.txt"
+      ],
+      "proto_files": [
+        "go\\without_metaffi\\call_python3_grpc\\benchmark.proto"
+      ],
+      "generated_files": [
+        "go\\without_metaffi\\call_python3_grpc\\pb\\benchmark.pb.go",
+        "go\\without_metaffi\\call_python3_grpc\\pb\\benchmark_grpc.pb.go",
+        "go\\without_metaffi\\call_python3_grpc\\server\\benchmark_pb2.py",
+        "go\\without_metaffi\\call_python3_grpc\\server\\benchmark_pb2_grpc.py"
+      ]
+    },
+    {
+      "host": "go",
+      "guest": "java",
+      "mechanism": "grpc",
+      "label": "Go->Java gRPC",
+      "source_file_count": 2,
+      "build_file_count": 5,
+      "proto_file_count": 2,
+      "generated_file_count": 77,
+      "languages": [
+        "Go",
+        "Java",
+        "Protobuf"
+      ],
+      "language_count": 3,
+      "source_sloc": {
+        "total": 591,
+        "by_language": {
+          "Go": {
+            "code": 468,
+            "comment": 49,
+            "blank": 84,
+            "files": 1
+          },
+          "Java": {
+            "code": 123,
+            "comment": 21,
+            "blank": 18,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 591,
+        "by_language": {
+          "Go": {
+            "code": 468,
+            "comment": 49,
+            "blank": 84,
+            "files": 1
+          },
+          "Java": {
+            "code": 123,
+            "comment": 21,
+            "blank": 18,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 126,
+        "by_language": {
+          "Maven": {
+            "code": 106,
+            "comment": 3,
+            "blank": 7,
+            "files": 1
+          },
+          "Bourne Shell": {
+            "code": 11,
+            "comment": 4,
+            "blank": 5,
+            "files": 1
+          },
+          "DOS Batch": {
+            "code": 9,
+            "comment": 1,
+            "blank": 3,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 98,
+        "by_language": {
+          "Protocol Buffers": {
+            "code": 98,
+            "comment": 18,
+            "blank": 26,
+            "files": 2
+          }
+        }
+      },
+      "generated_sloc": {
+        "total": 10610,
+        "by_language": {
+          "Java": {
+            "code": 7085,
+            "comment": 841,
+            "blank": 722,
+            "files": 2
+          },
+          "Protocol Buffers": {
+            "code": 2294,
+            "comment": 7546,
+            "blank": 1158,
+            "files": 73
+          },
+          "Go": {
+            "code": 1231,
+            "comment": 73,
+            "blank": 168,
+            "files": 2
+          }
+        }
+      },
+      "complexity": {
+        "max_cc": 14,
+        "avg_cc": 2.74,
+        "total_functions": 34,
+        "top_5_complex": [
+          {
+            "nloc": 101,
+            "ccn": 14,
+            "token_count": 786,
+            "params": 1,
+            "length": 136,
+            "name": "TestMain@43-178@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_grpc\\benchmark_test.go"
+          },
+          {
+            "nloc": 34,
+            "ccn": 8,
+            "token_count": 226,
+            "params": 0,
+            "length": 43,
+            "name": "@492-534@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_grpc\\benchmark_test.go"
+          },
+          {
+            "nloc": 34,
+            "ccn": 5,
+            "token_count": 251,
+            "params": 1,
+            "length": 40,
+            "name": "computeStats@259-298@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_grpc\\benchmark_test.go"
+          },
+          {
+            "nloc": 18,
+            "ccn": 5,
+            "token_count": 121,
+            "params": 1,
+            "length": 20,
+            "name": "removeOutliersIQR@300-319@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_grpc\\benchmark_test.go"
+          },
+          {
+            "nloc": 41,
+            "ccn": 5,
+            "token_count": 248,
+            "params": 6,
+            "length": 47,
+            "name": "runBenchmark@337-383@C:\\src\\github.com\\MetaFFI\\tests\\go\\without_metaffi\\call_java_grpc\\benchmark_test.go"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 11,
+        "distinct_api_calls": 1,
+        "api_calls_list": [
+          "ServerBuilder"
+        ]
+      },
+      "source_files": [
+        "go\\without_metaffi\\call_java_grpc\\benchmark_test.go",
+        "go\\without_metaffi\\call_java_grpc\\server\\src\\main\\java\\benchmark\\BenchmarkServer.java"
+      ],
+      "build_files": [
+        "go\\without_metaffi\\call_java_grpc\\generate.bat",
+        "go\\without_metaffi\\call_java_grpc\\generate.sh",
+        "go\\without_metaffi\\call_java_grpc\\go.mod",
+        "go\\without_metaffi\\call_java_grpc\\go.sum",
+        "go\\without_metaffi\\call_java_grpc\\server\\pom.xml"
+      ],
+      "proto_files": [
+        "go\\without_metaffi\\call_java_grpc\\benchmark.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\src\\main\\proto\\benchmark.proto"
+      ],
+      "generated_files": [
+        "go\\without_metaffi\\call_java_grpc\\pb\\benchmark.pb.go",
+        "go\\without_metaffi\\call_java_grpc\\pb\\benchmark_grpc.pb.go",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\generated-sources\\protobuf\\grpc-java\\benchmark\\BenchmarkServiceGrpc.java",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\generated-sources\\protobuf\\java\\benchmark\\BenchmarkProto.java",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\annotations.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\auth.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\backend.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\billing.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\client.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\config_change.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\consumer.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\context.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\control.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\distribution.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\documentation.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\endpoint.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\error_reason.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\field_behavior.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\field_info.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\http.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\httpbody.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\label.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\launch_stage.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\log.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\logging.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\metric.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\monitored_resource.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\monitoring.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\policy.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\quota.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\resource.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\routing.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\service.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\source_info.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\system_parameter.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\usage.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\visibility.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\extended_operations.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\audit\\audit_log.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\location\\locations.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\geo\\type\\viewport.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\logging\\type\\http_request.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\logging\\type\\log_severity.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\longrunning\\operations.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\code.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\error_details.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\status.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\context\\attribute_context.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\context\\audit_context.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\calendar_period.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\color.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\date.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\datetime.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\dayofweek.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\decimal.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\expr.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\fraction.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\interval.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\latlng.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\localized_text.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\money.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\month.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\phone_number.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\postal_address.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\quaternion.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\timeofday.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\any.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\api.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\descriptor.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\duration.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\empty.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\field_mask.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\source_context.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\struct.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\timestamp.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\type.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\wrappers.proto"
+      ]
+    },
+    {
+      "host": "python3",
+      "guest": "go",
+      "mechanism": "grpc",
+      "label": "Python3->Go gRPC",
+      "source_file_count": 2,
+      "build_file_count": 2,
+      "proto_file_count": 1,
+      "generated_file_count": 4,
+      "languages": [
+        "Go",
+        "Protobuf",
+        "Python"
+      ],
+      "language_count": 3,
+      "source_sloc": {
+        "total": 371,
+        "by_language": {
+          "Python": {
+            "code": 279,
+            "comment": 61,
+            "blank": 96,
+            "files": 1
+          },
+          "Go": {
+            "code": 92,
+            "comment": 16,
+            "blank": 19,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 371,
+        "by_language": {
+          "Python": {
+            "code": 279,
+            "comment": 61,
+            "blank": 96,
+            "files": 1
+          },
+          "Go": {
+            "code": 92,
+            "comment": 16,
+            "blank": 19,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 0,
+        "by_language": {}
+      },
+      "proto_sloc": {
+        "total": 58,
+        "by_language": {
+          "Protocol Buffers": {
+            "code": 58,
+            "comment": 16,
+            "blank": 16,
+            "files": 1
+          }
+        }
+      },
+      "generated_sloc": {
+        "total": 1591,
+        "by_language": {
+          "Go": {
+            "code": 1230,
+            "comment": 71,
+            "blank": 168,
+            "files": 2
+          },
+          "Python": {
+            "code": 361,
+            "comment": 38,
+            "blank": 34,
+            "files": 2
+          }
+        }
+      },
+      "complexity": {
+        "max_cc": 9,
+        "avg_cc": 2.43,
+        "total_functions": 30,
+        "top_5_complex": [
+          {
+            "nloc": 32,
+            "ccn": 9,
+            "token_count": 157,
+            "params": 1,
+            "length": 36,
+            "name": "CallbackAdd@57-92@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_grpc\\server\\server.go"
+          },
+          {
+            "nloc": 61,
+            "ccn": 5,
+            "token_count": 365,
+            "params": 0,
+            "length": 210,
+            "name": "main@223-432@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_grpc\\benchmark.py"
+          },
+          {
+            "nloc": 22,
+            "ccn": 4,
+            "token_count": 209,
+            "params": 1,
+            "length": 28,
+            "name": "compute_stats@88-115@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_grpc\\benchmark.py"
+          },
+          {
+            "nloc": 10,
+            "ccn": 4,
+            "token_count": 83,
+            "params": 1,
+            "length": 12,
+            "name": "remove_outliers_iqr@118-129@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_grpc\\benchmark.py"
+          },
+          {
+            "nloc": 26,
+            "ccn": 4,
+            "token_count": 135,
+            "params": 5,
+            "length": 30,
+            "name": "run_benchmark@146-175@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_grpc\\benchmark.py"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 13,
+        "distinct_api_calls": 2,
+        "api_calls_list": [
+          "grpc.NewServer",
+          "grpc.insecure_channel"
+        ]
+      },
+      "source_files": [
+        "python3\\without_metaffi\\call_go_grpc\\benchmark.py",
+        "python3\\without_metaffi\\call_go_grpc\\server\\server.go"
+      ],
+      "build_files": [
+        "python3\\without_metaffi\\call_go_grpc\\server\\go.mod",
+        "python3\\without_metaffi\\call_go_grpc\\server\\go.sum"
+      ],
+      "proto_files": [
+        "python3\\without_metaffi\\call_go_grpc\\benchmark.proto"
+      ],
+      "generated_files": [
+        "python3\\without_metaffi\\call_go_grpc\\benchmark_pb2.py",
+        "python3\\without_metaffi\\call_go_grpc\\benchmark_pb2_grpc.py",
+        "python3\\without_metaffi\\call_go_grpc\\server\\pb\\benchmark.pb.go",
+        "python3\\without_metaffi\\call_go_grpc\\server\\pb\\benchmark_grpc.pb.go"
+      ]
+    },
+    {
+      "host": "python3",
+      "guest": "java",
+      "mechanism": "grpc",
+      "label": "Python3->Java gRPC",
+      "source_file_count": 2,
+      "build_file_count": 1,
+      "proto_file_count": 2,
+      "generated_file_count": 77,
+      "languages": [
+        "Java",
+        "Protobuf",
+        "Python"
+      ],
+      "language_count": 3,
+      "source_sloc": {
+        "total": 412,
+        "by_language": {
+          "Python": {
+            "code": 289,
+            "comment": 47,
+            "blank": 91,
+            "files": 1
+          },
+          "Java": {
+            "code": 123,
+            "comment": 21,
+            "blank": 18,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 412,
+        "by_language": {
+          "Python": {
+            "code": 289,
+            "comment": 47,
+            "blank": 91,
+            "files": 1
+          },
+          "Java": {
+            "code": 123,
+            "comment": 21,
+            "blank": 18,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 106,
+        "by_language": {
+          "Maven": {
+            "code": 106,
+            "comment": 3,
+            "blank": 7,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 98,
+        "by_language": {
+          "Protocol Buffers": {
+            "code": 98,
+            "comment": 18,
+            "blank": 26,
+            "files": 2
+          }
+        }
+      },
+      "generated_sloc": {
+        "total": 9740,
+        "by_language": {
+          "Java": {
+            "code": 7085,
+            "comment": 841,
+            "blank": 722,
+            "files": 2
+          },
+          "Protocol Buffers": {
+            "code": 2294,
+            "comment": 7546,
+            "blank": 1158,
+            "files": 73
+          },
+          "Python": {
+            "code": 361,
+            "comment": 39,
+            "blank": 34,
+            "files": 2
+          }
+        }
+      },
+      "complexity": {
+        "max_cc": 4,
+        "avg_cc": 2.46,
+        "total_functions": 28,
+        "top_5_complex": [
+          {
+            "nloc": 29,
+            "ccn": 4,
+            "token_count": 213,
+            "params": 1,
+            "length": 41,
+            "name": "start@62-102@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_grpc\\benchmark.py"
+          },
+          {
+            "nloc": 22,
+            "ccn": 4,
+            "token_count": 209,
+            "params": 1,
+            "length": 28,
+            "name": "compute_stats@122-149@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_grpc\\benchmark.py"
+          },
+          {
+            "nloc": 10,
+            "ccn": 4,
+            "token_count": 83,
+            "params": 1,
+            "length": 12,
+            "name": "remove_outliers_iqr@152-163@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_grpc\\benchmark.py"
+          },
+          {
+            "nloc": 26,
+            "ccn": 4,
+            "token_count": 135,
+            "params": 5,
+            "length": 30,
+            "name": "run_benchmark@180-209@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_grpc\\benchmark.py"
+          },
+          {
+            "nloc": 23,
+            "ccn": 4,
+            "token_count": 151,
+            "params": 0,
+            "length": 48,
+            "name": "main.bench_callback@347-394@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_java_grpc\\benchmark.py"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 22,
+        "distinct_api_calls": 2,
+        "api_calls_list": [
+          "ServerBuilder",
+          "grpc.insecure_channel"
+        ]
+      },
+      "source_files": [
+        "python3\\without_metaffi\\call_java_grpc\\benchmark.py",
+        "go\\without_metaffi\\call_java_grpc\\server\\src\\main\\java\\benchmark\\BenchmarkServer.java"
+      ],
+      "build_files": [
+        "go\\without_metaffi\\call_java_grpc\\server\\pom.xml"
+      ],
+      "proto_files": [
+        "python3\\without_metaffi\\call_java_grpc\\benchmark.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\src\\main\\proto\\benchmark.proto"
+      ],
+      "generated_files": [
+        "python3\\without_metaffi\\call_java_grpc\\benchmark_pb2.py",
+        "python3\\without_metaffi\\call_java_grpc\\benchmark_pb2_grpc.py",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\generated-sources\\protobuf\\grpc-java\\benchmark\\BenchmarkServiceGrpc.java",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\generated-sources\\protobuf\\java\\benchmark\\BenchmarkProto.java",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\annotations.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\auth.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\backend.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\billing.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\client.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\config_change.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\consumer.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\context.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\control.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\distribution.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\documentation.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\endpoint.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\error_reason.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\field_behavior.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\field_info.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\http.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\httpbody.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\label.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\launch_stage.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\log.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\logging.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\metric.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\monitored_resource.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\monitoring.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\policy.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\quota.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\resource.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\routing.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\service.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\source_info.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\system_parameter.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\usage.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\visibility.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\extended_operations.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\audit\\audit_log.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\location\\locations.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\geo\\type\\viewport.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\logging\\type\\http_request.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\logging\\type\\log_severity.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\longrunning\\operations.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\code.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\error_details.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\status.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\context\\attribute_context.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\context\\audit_context.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\calendar_period.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\color.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\date.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\datetime.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\dayofweek.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\decimal.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\expr.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\fraction.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\interval.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\latlng.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\localized_text.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\money.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\month.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\phone_number.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\postal_address.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\quaternion.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\timeofday.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\any.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\api.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\descriptor.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\duration.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\empty.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\field_mask.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\source_context.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\struct.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\timestamp.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\type.proto",
+        "go\\without_metaffi\\call_java_grpc\\server\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\wrappers.proto"
+      ]
+    },
+    {
+      "host": "java",
+      "guest": "go",
+      "mechanism": "grpc",
+      "label": "Java->Go gRPC",
+      "source_file_count": 2,
+      "build_file_count": 3,
+      "proto_file_count": 1,
+      "generated_file_count": 77,
+      "languages": [
+        "Go",
+        "Java",
+        "Protobuf"
+      ],
+      "language_count": 3,
+      "source_sloc": {
+        "total": 449,
+        "by_language": {
+          "Java": {
+            "code": 357,
+            "comment": 24,
+            "blank": 55,
+            "files": 1
+          },
+          "Go": {
+            "code": 92,
+            "comment": 16,
+            "blank": 19,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 449,
+        "by_language": {
+          "Java": {
+            "code": 357,
+            "comment": 24,
+            "blank": 55,
+            "files": 1
+          },
+          "Go": {
+            "code": 92,
+            "comment": 16,
+            "blank": 19,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 91,
+        "by_language": {
+          "Maven": {
+            "code": 91,
+            "comment": 1,
+            "blank": 6,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 60,
+        "by_language": {
+          "Protocol Buffers": {
+            "code": 60,
+            "comment": 16,
+            "blank": 16,
+            "files": 1
+          }
+        }
+      },
+      "generated_sloc": {
+        "total": 10531,
+        "by_language": {
+          "Java": {
+            "code": 7007,
+            "comment": 943,
+            "blank": 719,
+            "files": 2
+          },
+          "Protocol Buffers": {
+            "code": 2294,
+            "comment": 7546,
+            "blank": 1158,
+            "files": 73
+          },
+          "Go": {
+            "code": 1230,
+            "comment": 71,
+            "blank": 168,
+            "files": 2
+          }
+        }
+      },
+      "complexity": {
+        "max_cc": 15,
+        "avg_cc": 4.12,
+        "total_functions": 17,
+        "top_5_complex": [
+          {
+            "nloc": 115,
+            "ccn": 15,
+            "token_count": 936,
+            "params": 0,
+            "length": 140,
+            "name": "BenchmarkTest::testAllBenchmarks@237-376@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_grpc\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 32,
+            "ccn": 9,
+            "token_count": 157,
+            "params": 1,
+            "length": 36,
+            "name": "CallbackAdd@57-92@C:\\src\\github.com\\MetaFFI\\tests\\python3\\without_metaffi\\call_go_grpc\\server\\server.go"
+          },
+          {
+            "nloc": 50,
+            "ccn": 8,
+            "token_count": 536,
+            "params": 5,
+            "length": 58,
+            "name": "BenchmarkTest::runBenchmark@161-218@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_grpc\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 18,
+            "ccn": 6,
+            "token_count": 159,
+            "params": 1,
+            "length": 20,
+            "name": "BenchmarkTest::removeOutliersIQR@123-142@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_grpc\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 54,
+            "ccn": 6,
+            "token_count": 485,
+            "params": 2,
+            "length": 58,
+            "name": "BenchmarkTest::writeResults@378-435@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_go_grpc\\src\\test\\java\\BenchmarkTest.java"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 20,
+        "distinct_api_calls": 2,
+        "api_calls_list": [
+          "ManagedChannelBuilder",
+          "grpc.NewServer"
+        ]
+      },
+      "source_files": [
+        "java\\without_metaffi\\call_go_grpc\\src\\test\\java\\BenchmarkTest.java",
+        "python3\\without_metaffi\\call_go_grpc\\server\\server.go"
+      ],
+      "build_files": [
+        "java\\without_metaffi\\call_go_grpc\\pom.xml",
+        "python3\\without_metaffi\\call_go_grpc\\server\\go.mod",
+        "python3\\without_metaffi\\call_go_grpc\\server\\go.sum"
+      ],
+      "proto_files": [
+        "java\\without_metaffi\\call_go_grpc\\src\\main\\proto\\benchmark.proto"
+      ],
+      "generated_files": [
+        "java\\without_metaffi\\call_go_grpc\\target\\generated-sources\\protobuf\\grpc-java\\benchmark\\BenchmarkServiceGrpc.java",
+        "java\\without_metaffi\\call_go_grpc\\target\\generated-sources\\protobuf\\java\\benchmark\\BenchmarkProto.java",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\annotations.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\auth.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\backend.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\billing.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\client.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\config_change.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\consumer.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\context.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\control.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\distribution.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\documentation.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\endpoint.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\error_reason.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\field_behavior.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\field_info.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\http.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\httpbody.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\label.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\launch_stage.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\log.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\logging.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\metric.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\monitored_resource.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\monitoring.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\policy.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\quota.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\resource.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\routing.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\service.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\source_info.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\system_parameter.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\usage.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\visibility.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\extended_operations.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\audit\\audit_log.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\location\\locations.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\geo\\type\\viewport.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\logging\\type\\http_request.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\logging\\type\\log_severity.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\longrunning\\operations.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\code.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\error_details.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\status.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\context\\attribute_context.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\context\\audit_context.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\calendar_period.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\color.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\date.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\datetime.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\dayofweek.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\decimal.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\expr.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\fraction.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\interval.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\latlng.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\localized_text.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\money.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\month.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\phone_number.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\postal_address.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\quaternion.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\timeofday.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\any.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\api.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\descriptor.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\duration.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\empty.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\field_mask.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\source_context.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\struct.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\timestamp.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\type.proto",
+        "java\\without_metaffi\\call_go_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\wrappers.proto",
+        "python3\\without_metaffi\\call_go_grpc\\server\\pb\\benchmark.pb.go",
+        "python3\\without_metaffi\\call_go_grpc\\server\\pb\\benchmark_grpc.pb.go"
+      ]
+    },
+    {
+      "host": "java",
+      "guest": "python3",
+      "mechanism": "grpc",
+      "label": "Java->Python3 gRPC",
+      "source_file_count": 2,
+      "build_file_count": 2,
+      "proto_file_count": 1,
+      "generated_file_count": 77,
+      "languages": [
+        "Java",
+        "Protobuf",
+        "Python"
+      ],
+      "language_count": 3,
+      "source_sloc": {
+        "total": 440,
+        "by_language": {
+          "Java": {
+            "code": 364,
+            "comment": 23,
+            "blank": 56,
+            "files": 1
+          },
+          "Python": {
+            "code": 76,
+            "comment": 20,
+            "blank": 26,
+            "files": 1
+          }
+        }
+      },
+      "benchmark_only_sloc": {
+        "total": 440,
+        "by_language": {
+          "Java": {
+            "code": 364,
+            "comment": 23,
+            "blank": 56,
+            "files": 1
+          },
+          "Python": {
+            "code": 76,
+            "comment": 20,
+            "blank": 26,
+            "files": 1
+          }
+        }
+      },
+      "build_sloc": {
+        "total": 94,
+        "by_language": {
+          "Maven": {
+            "code": 91,
+            "comment": 1,
+            "blank": 6,
+            "files": 1
+          },
+          "Text": {
+            "code": 3,
+            "comment": 0,
+            "blank": 0,
+            "files": 1
+          }
+        }
+      },
+      "proto_sloc": {
+        "total": 60,
+        "by_language": {
+          "Protocol Buffers": {
+            "code": 60,
+            "comment": 16,
+            "blank": 16,
+            "files": 1
+          }
+        }
+      },
+      "generated_sloc": {
+        "total": 9740,
+        "by_language": {
+          "Java": {
+            "code": 7085,
+            "comment": 981,
+            "blank": 722,
+            "files": 2
+          },
+          "Protocol Buffers": {
+            "code": 2294,
+            "comment": 7546,
+            "blank": 1158,
+            "files": 73
+          },
+          "Python": {
+            "code": 361,
+            "comment": 39,
+            "blank": 34,
+            "files": 2
+          }
+        }
+      },
+      "complexity": {
+        "max_cc": 15,
+        "avg_cc": 3.4,
+        "total_functions": 20,
+        "top_5_complex": [
+          {
+            "nloc": 119,
+            "ccn": 15,
+            "token_count": 922,
+            "params": 0,
+            "length": 144,
+            "name": "BenchmarkTest::testAllBenchmarks@240-383@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_grpc\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 50,
+            "ccn": 8,
+            "token_count": 536,
+            "params": 5,
+            "length": 57,
+            "name": "BenchmarkTest::runBenchmark@165-221@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_grpc\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 18,
+            "ccn": 6,
+            "token_count": 159,
+            "params": 1,
+            "length": 20,
+            "name": "BenchmarkTest::removeOutliersIQR@127-146@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_grpc\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 54,
+            "ccn": 6,
+            "token_count": 485,
+            "params": 2,
+            "length": 58,
+            "name": "BenchmarkTest::writeResults@385-442@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_grpc\\src\\test\\java\\BenchmarkTest.java"
+          },
+          {
+            "nloc": 13,
+            "ccn": 5,
+            "token_count": 75,
+            "params": 0,
+            "length": 13,
+            "name": "BenchmarkTest::tearDown@83-95@C:\\src\\github.com\\MetaFFI\\tests\\java\\without_metaffi\\call_python3_grpc\\src\\test\\java\\BenchmarkTest.java"
+          }
+        ]
+      },
+      "api_surface": {
+        "distinct_imports": 25,
+        "distinct_api_calls": 2,
+        "api_calls_list": [
+          "ManagedChannelBuilder",
+          "grpc.server"
+        ]
+      },
+      "source_files": [
+        "java\\without_metaffi\\call_python3_grpc\\src\\test\\java\\BenchmarkTest.java",
+        "go\\without_metaffi\\call_python3_grpc\\server\\server.py"
+      ],
+      "build_files": [
+        "java\\without_metaffi\\call_python3_grpc\\pom.xml",
+        "go\\without_metaffi\\call_python3_grpc\\server\\requirements.txt"
+      ],
+      "proto_files": [
+        "java\\without_metaffi\\call_python3_grpc\\src\\main\\proto\\benchmark.proto"
+      ],
+      "generated_files": [
+        "java\\without_metaffi\\call_python3_grpc\\target\\generated-sources\\protobuf\\grpc-java\\benchmark\\BenchmarkServiceGrpc.java",
+        "java\\without_metaffi\\call_python3_grpc\\target\\generated-sources\\protobuf\\java\\benchmark\\BenchmarkProto.java",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\annotations.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\auth.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\backend.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\billing.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\client.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\config_change.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\consumer.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\context.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\control.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\distribution.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\documentation.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\endpoint.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\error_reason.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\field_behavior.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\field_info.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\http.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\httpbody.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\label.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\launch_stage.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\log.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\logging.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\metric.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\monitored_resource.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\monitoring.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\policy.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\quota.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\resource.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\routing.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\service.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\source_info.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\system_parameter.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\usage.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\api\\visibility.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\extended_operations.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\audit\\audit_log.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\cloud\\location\\locations.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\geo\\type\\viewport.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\logging\\type\\http_request.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\logging\\type\\log_severity.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\longrunning\\operations.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\code.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\error_details.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\status.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\context\\attribute_context.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\rpc\\context\\audit_context.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\calendar_period.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\color.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\date.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\datetime.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\dayofweek.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\decimal.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\expr.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\fraction.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\interval.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\latlng.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\localized_text.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\money.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\month.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\phone_number.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\postal_address.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\quaternion.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\03550e49ba376b4e5f711e77da66a926\\google\\type\\timeofday.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\any.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\api.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\descriptor.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\duration.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\empty.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\field_mask.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\source_context.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\struct.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\timestamp.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\type.proto",
+        "java\\without_metaffi\\call_python3_grpc\\target\\protoc-dependencies\\2438186b5939dfef30b1c415d9ac1354\\google\\protobuf\\wrappers.proto",
+        "go\\without_metaffi\\call_python3_grpc\\server\\benchmark_pb2.py",
+        "go\\without_metaffi\\call_python3_grpc\\server\\benchmark_pb2_grpc.py"
+      ]
+    }
+  ]
+}

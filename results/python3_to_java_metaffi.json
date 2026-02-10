@@ -1,0 +1,258 @@
+{
+  "metadata": {
+    "host": "python3",
+    "guest": "java",
+    "mechanism": "metaffi",
+    "timestamp": "2026-02-10T08:50:57Z",
+    "environment": {
+      "os": "windows",
+      "arch": "AMD64",
+      "python_version": "3.12.5"
+    },
+    "config": {
+      "warmup_iterations": 2,
+      "measured_iterations": 5,
+      "timer_overhead_ns": 0
+    }
+  },
+  "initialization": {
+    "load_runtime_plugin_ns": 41403800,
+    "load_module_ns": 9700
+  },
+  "correctness": null,
+  "benchmarks": [
+    {
+      "scenario": "void_call",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        16100,
+        10600,
+        9300,
+        9300,
+        9000
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 9550.0,
+          "median_ns": 9300.0,
+          "p95_ns": 10600.0,
+          "p99_ns": 10600.0,
+          "stddev_ns": 618.4658438426491,
+          "ci95_ns": [
+            8943.903473034205,
+            10156.096526965795
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "primitive_echo",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        15500,
+        12100,
+        11600,
+        11700,
+        11400
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 11700.0,
+          "median_ns": 11650.0,
+          "p95_ns": 12100.0,
+          "p99_ns": 12100.0,
+          "stddev_ns": 254.95097567963924,
+          "ci95_ns": [
+            11450.148043833953,
+            11949.851956166047
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "string_echo",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        15800,
+        13000,
+        11800,
+        11700,
+        12900
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 12350.0,
+          "median_ns": 12350.0,
+          "p95_ns": 13000.0,
+          "p99_ns": 13000.0,
+          "stddev_ns": 602.0797289396148,
+          "ci95_ns": [
+            11759.961865639178,
+            12940.038134360822
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 10,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        23100,
+        21500,
+        19800,
+        19100,
+        19000
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 20500.0,
+          "median_ns": 19800.0,
+          "p95_ns": 23100.0,
+          "p99_ns": 23100.0,
+          "stddev_ns": 1578.6069808536893,
+          "ci95_ns": [
+            19116.289972573733,
+            21883.710027426267
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 100,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        85000,
+        86100,
+        87900,
+        106000,
+        81500
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 85125.0,
+          "median_ns": 85550.0,
+          "p95_ns": 87900.0,
+          "p99_ns": 87900.0,
+          "stddev_ns": 2334.925052330374,
+          "ci95_ns": [
+            82836.77344871624,
+            87413.22655128376
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 1000,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        733800,
+        800800,
+        750100,
+        810200,
+        740900
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 767160.0,
+          "median_ns": 750100.0,
+          "p95_ns": 810200.0,
+          "p99_ns": 810200.0,
+          "stddev_ns": 31867.262198061508,
+          "ci95_ns": [
+            739227.1131035835,
+            795092.8868964165
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 10000,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        6010200,
+        6235200,
+        6371200,
+        6335700,
+        6290200
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 6308075.0,
+          "median_ns": 6312950.0,
+          "p95_ns": 6371200.0,
+          "p99_ns": 6371200.0,
+          "stddev_ns": 50936.694778911595,
+          "ci95_ns": [
+            6258157.039116667,
+            6357992.960883333
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "object_method",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        26100,
+        21900,
+        21500,
+        19300,
+        19800
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 20625.0,
+          "median_ns": 20650.0,
+          "p95_ns": 21900.0,
+          "p99_ns": 21900.0,
+          "stddev_ns": 1098.5786271359916,
+          "ci95_ns": [
+            19548.39294540673,
+            21701.60705459327
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "callback",
+      "data_size": null,
+      "status": "FAIL",
+      "error": "Failed to load entity in module C:\\src\\github.com\\MetaFFI\\sdk\\test_modules\\guest_modules\\java\\test_bin\\guest_java.jarusing entity path class=guest.CoreFunctions,callable=callCallbackAdd\n. error: java.lang.NoSuchMethodException: guest.CoreFunctions.callCallbackAdd(metaffi.api.accessor.Caller)",
+      "raw_iterations_ns": [],
+      "phases": {}
+    },
+    {
+      "scenario": "error_propagation",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        18300,
+        15400,
+        15000,
+        14900,
+        14900
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 15050.0,
+          "median_ns": 14950.0,
+          "p95_ns": 15400.0,
+          "p99_ns": 15400.0,
+          "stddev_ns": 206.15528128088303,
+          "ci95_ns": [
+            14847.967824344734,
+            15252.032175655266
+          ]
+        }
+      }
+    }
+  ]
+}

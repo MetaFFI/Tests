@@ -1,0 +1,9 @@
+go 1.23.0
+
+toolchain go1.24.4
+
+use (
+	.
+	../../../sdk/api/go
+	../../../sdk/idl_entities/go
+)

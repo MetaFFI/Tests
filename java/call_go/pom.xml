@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>metaffi.tests</groupId>
+    <artifactId>java-call-go</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>metaffi</groupId>
+            <artifactId>api</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${env.METAFFI_HOME}/sdk/api/jvm/metaffi.api.jar</systemPath>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${env.METAFFI_HOME}/sdk/api/jvm/metaffi.api.jar</additionalClasspathElement>
+                    </additionalClasspathElements>
+                    <environmentVariables>
+                        <METAFFI_HOME>${env.METAFFI_HOME}</METAFFI_HOME>
+                        <METAFFI_SOURCE_ROOT>${env.METAFFI_SOURCE_ROOT}</METAFFI_SOURCE_ROOT>
+                        <METAFFI_TEST_WARMUP>${env.METAFFI_TEST_WARMUP}</METAFFI_TEST_WARMUP>
+                        <METAFFI_TEST_ITERATIONS>${env.METAFFI_TEST_ITERATIONS}</METAFFI_TEST_ITERATIONS>
+                        <METAFFI_TEST_MODE>${env.METAFFI_TEST_MODE}</METAFFI_TEST_MODE>
+                        <METAFFI_TEST_RESULTS_FILE>${env.METAFFI_TEST_RESULTS_FILE}</METAFFI_TEST_RESULTS_FILE>
+                    </environmentVariables>
+                    <argLine>-Djava.library.path="${env.METAFFI_HOME}/sdk/api/jvm;${env.METAFFI_HOME};${env.METAFFI_HOME}/go;${env.METAFFI_HOME}/jvm"</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

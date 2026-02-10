@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package benchmark;
+
+option go_package = "./pb";
+
+// BenchmarkService wraps the Go guest module for cross-language benchmarking.
+// Each RPC maps to one of the 7 benchmark scenarios.
+service BenchmarkService {
+  // Scenario 1: void call (WaitABit(0))
+  rpc VoidCall(VoidCallRequest) returns (VoidCallResponse);
+
+  // Scenario 2: primitive echo (DivIntegers(10, 2) -> 5.0)
+  rpc DivIntegers(DivIntegersRequest) returns (DivIntegersResponse);
+
+  // Scenario 3: string echo (JoinStrings(["hello","world"]) -> "hello,world")
+  rpc JoinStrings(JoinStringsRequest) returns (JoinStringsResponse);
+
+  // Scenario 4: array echo (EchoBytes(data) -> data)
+  rpc EchoBytes(EchoBytesRequest) returns (EchoBytesResponse);
+
+  // Scenario 5: object method (NewTestMap() + GetName())
+  rpc ObjectMethod(ObjectMethodRequest) returns (ObjectMethodResponse);
+
+  // Scenario 6: callback via bidirectional streaming
+  rpc CallbackAdd(stream CallbackClientMsg) returns (stream CallbackServerMsg);
+
+  // Scenario 7: error propagation (ReturnsAnError() -> gRPC INTERNAL error)
+  rpc ReturnsAnError(Empty) returns (Empty);
+}
+
+// --- Scenario 1 ---
+message VoidCallRequest {
+  int64 ms = 1;
+}
+message VoidCallResponse {}
+
+// --- Scenario 2 ---
+message DivIntegersRequest {
+  int64 x = 1;
+  int64 y = 2;
+}
+message DivIntegersResponse {
+  double result = 1;
+}
+
+// --- Scenario 3 ---
+message JoinStringsRequest {
+  repeated string values = 1;
+}
+message JoinStringsResponse {
+  string result = 1;
+}
+
+// --- Scenario 4 ---
+message EchoBytesRequest {
+  bytes data = 1;
+}
+message EchoBytesResponse {
+  bytes data = 1;
+}
+
+// --- Scenario 5 ---
+message ObjectMethodRequest {
+  string name = 1;
+}
+message ObjectMethodResponse {
+  string result = 1;
+}
+
+// --- Scenario 6 (callback via bidirectional streaming) ---
+message CallbackClientMsg {
+  oneof msg {
+    bool invoke = 1;
+    int64 add_result = 2;
+  }
+}
+message CallbackServerMsg {
+  oneof msg {
+    CallbackArgs compute = 1;
+    int64 final_result = 2;
+  }
+}
+message CallbackArgs {
+  int64 a = 1;
+  int64 b = 2;
+}
+
+// --- Scenario 7 ---
+message Empty {}

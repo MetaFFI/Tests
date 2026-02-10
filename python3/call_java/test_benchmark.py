@@ -1,0 +1,337 @@
+"""Performance benchmarks: Python3 -> Java via MetaFFI
+
+7 scenarios matching the plan specification, with statistical rigor.
+Outputs results to tests/results/python3_to_java_metaffi.json.
+"""
+
+import json
+import math
+import os
+import platform
+import sys
+import time
+
+import pytest
+import metaffi
+from conftest import init_timing
+
+T = metaffi.MetaFFITypes
+ti = metaffi.metaffi_type_info
+
+# ---------------------------------------------------------------------------
+# Configuration (from env or defaults)
+# ---------------------------------------------------------------------------
+
+WARMUP = int(os.environ.get("METAFFI_TEST_WARMUP", "100"))
+ITERATIONS = int(os.environ.get("METAFFI_TEST_ITERATIONS", "10000"))
+
+
+# ---------------------------------------------------------------------------
+# Statistical helpers (matching Go implementation)
+# ---------------------------------------------------------------------------
+
+def compute_stats(sorted_ns: list[int]) -> dict:
+    n = len(sorted_ns)
+    if n == 0:
+        return {"mean_ns": 0, "median_ns": 0, "p95_ns": 0, "p99_ns": 0,
+                "stddev_ns": 0, "ci95_ns": [0, 0]}
+
+    total = sum(sorted_ns)
+    mean = total / n
+
+    if n % 2 == 1:
+        median = float(sorted_ns[n // 2])
+    else:
+        median = (sorted_ns[n // 2 - 1] + sorted_ns[n // 2]) / 2.0
+
+    p95 = float(sorted_ns[int(n * 0.95)])
+    p99 = float(sorted_ns[min(int(n * 0.99), n - 1)])
+
+    sq_diff_sum = sum((v - mean) ** 2 for v in sorted_ns)
+    stddev = math.sqrt(sq_diff_sum / n)
+
+    se = stddev / math.sqrt(n)
+    ci95 = [mean - 1.96 * se, mean + 1.96 * se]
+
+    return {
+        "mean_ns": mean, "median_ns": median,
+        "p95_ns": p95, "p99_ns": p99,
+        "stddev_ns": stddev, "ci95_ns": ci95,
+    }
+
+
+def remove_outliers_iqr(sorted_ns: list[int]) -> list[int]:
+    n = len(sorted_ns)
+    if n < 4:
+        return sorted_ns
+
+    q1 = float(sorted_ns[n // 4])
+    q3 = float(sorted_ns[3 * n // 4])
+    iqr = q3 - q1
+    lower = q1 - 1.5 * iqr
+    upper = q3 + 1.5 * iqr
+
+    return [v for v in sorted_ns if lower <= v <= upper]
+
+
+def measure_timer_overhead() -> int:
+    samples = []
+    for _ in range(10000):
+        start = time.perf_counter_ns()
+        elapsed = time.perf_counter_ns() - start
+        samples.append(elapsed)
+    samples.sort()
+    return samples[5000]
+
+
+# ---------------------------------------------------------------------------
+# Benchmark runner
+# ---------------------------------------------------------------------------
+
+def run_benchmark(scenario: str, data_size: int | None,
+                  warmup: int, iterations: int,
+                  bench_fn: callable) -> dict:
+
+    for i in range(warmup):
+        try:
+            bench_fn()
+        except Exception as e:
+            raise RuntimeError(
+                f"Benchmark '{scenario}' warmup iteration {i}: {e}"
+            ) from e
+
+    raw_ns = []
+    for i in range(iterations):
+        start = time.perf_counter_ns()
+        bench_fn()
+        elapsed = time.perf_counter_ns() - start
+        raw_ns.append(elapsed)
+
+    sorted_ns = sorted(raw_ns)
+    cleaned = remove_outliers_iqr(sorted_ns)
+    total_stats = compute_stats(cleaned)
+
+    return {
+        "scenario": scenario,
+        "data_size": data_size,
+        "status": "PASS",
+        "raw_iterations_ns": raw_ns,
+        "phases": {"total": total_stats},
+    }
+
+
+def make_failed_result(scenario: str, data_size: int | None,
+                       error: str) -> dict:
+    """Record a scenario that failed due to an SDK bug."""
+    return {
+        "scenario": scenario,
+        "data_size": data_size,
+        "status": "FAIL",
+        "error": error,
+        "raw_iterations_ns": [],
+        "phases": {},
+    }
+
+
+# ---------------------------------------------------------------------------
+# Result writer
+# ---------------------------------------------------------------------------
+
+def write_results(benchmarks: list[dict], timer_overhead: int):
+    result_path = os.environ.get("METAFFI_TEST_RESULTS_FILE", "")
+    if not result_path:
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        result_path = os.path.join(this_dir, "..", "..", "results",
+                                   "python3_to_java_metaffi.json")
+
+    result = {
+        "metadata": {
+            "host": "python3",
+            "guest": "java",
+            "mechanism": "metaffi",
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "environment": {
+                "os": platform.system().lower(),
+                "arch": platform.machine(),
+                "python_version": platform.python_version(),
+            },
+            "config": {
+                "warmup_iterations": WARMUP,
+                "measured_iterations": ITERATIONS,
+                "timer_overhead_ns": timer_overhead,
+            },
+        },
+        "initialization": init_timing,
+        "correctness": None,
+        "benchmarks": benchmarks,
+    }
+
+    os.makedirs(os.path.dirname(os.path.abspath(result_path)), exist_ok=True)
+    with open(result_path, "w") as f:
+        json.dump(result, f, indent=2)
+
+    print(f"Results written to {result_path}", file=sys.stderr)
+
+
+# ---------------------------------------------------------------------------
+# Benchmark tests (7 scenarios)
+# ---------------------------------------------------------------------------
+
+class TestBenchmarks:
+
+    def test_all_benchmarks(self, java_module):
+        """Run all 7 benchmark scenarios and write results to JSON."""
+
+        mode = os.environ.get("METAFFI_TEST_MODE", "")
+        if mode == "correctness":
+            pytest.skip("Skipping benchmarks: METAFFI_TEST_MODE=correctness")
+
+        timer_overhead = measure_timer_overhead()
+        print(f"Timer overhead: {timer_overhead} ns", file=sys.stderr)
+
+        benchmarks = []
+
+        # --- Scenario 1: Void call ---
+        wait_fn = java_module.load_entity(
+            "class=guest.CoreFunctions,callable=waitABit",
+            [ti(T.metaffi_int64_type)], None)
+
+        benchmarks.append(run_benchmark(
+            "void_call", None, WARMUP, ITERATIONS,
+            lambda: wait_fn(0)
+        ))
+        del wait_fn
+
+        # --- Scenario 2: Primitive echo (int64, int64 -> float64) ---
+        div_fn = java_module.load_entity(
+            "class=guest.CoreFunctions,callable=divIntegers",
+            [ti(T.metaffi_int64_type), ti(T.metaffi_int64_type)],
+            [ti(T.metaffi_float64_type)])
+
+        def bench_primitive():
+            result = div_fn(10, 2)
+            if abs(result - 5.0) > 1e-10:
+                raise RuntimeError(f"divIntegers(10,2) = {result}, want 5.0")
+
+        benchmarks.append(run_benchmark(
+            "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
+        ))
+        del div_fn
+
+        # --- Scenario 3: String echo ---
+        join_fn = java_module.load_entity(
+            "class=guest.CoreFunctions,callable=joinStrings",
+            [ti(T.metaffi_string8_array_type, dims=1)],
+            [ti(T.metaffi_string8_type)])
+
+        def bench_string():
+            result = join_fn(["hello", "world"])
+            if result != "hello,world":
+                raise RuntimeError(f"joinStrings = {result!r}")
+
+        benchmarks.append(run_benchmark(
+            "string_echo", None, WARMUP, ITERATIONS, bench_string
+        ))
+        del join_fn
+
+        # --- Scenario 4: Array sum (varying sizes, int32 2D) ---
+        sum_fn = java_module.load_entity(
+            "class=guest.ArrayFunctions,callable=sumRaggedArray",
+            [ti(T.metaffi_int32_array_type, dims=2)],
+            [ti(T.metaffi_int32_type)])
+
+        for size in [10, 100, 1000, 10000]:
+            row = list(range(1, size + 1))
+            expected = size * (size + 1) // 2
+            arr = [row]
+
+            def bench_array(a=arr, e=expected):
+                result = sum_fn(a)
+                if result != e:
+                    raise RuntimeError(
+                        f"sumRaggedArray({len(a[0])}): got {result}, want {e}"
+                    )
+
+            benchmarks.append(run_benchmark(
+                "array_sum", size, WARMUP, ITERATIONS, bench_array
+            ))
+
+        del sum_fn
+
+        # --- Scenario 5: Object create + method call ---
+        new_class = java_module.load_entity(
+            "class=guest.SomeClass,callable=<init>",
+            [ti(T.metaffi_string8_type)],
+            [ti(T.metaffi_handle_type)])
+        print_fn = java_module.load_entity(
+            "class=guest.SomeClass,callable=print,instance_required",
+            [ti(T.metaffi_handle_type)],
+            [ti(T.metaffi_string8_type)])
+
+        def bench_object():
+            handle = new_class("bench")
+            result = print_fn(handle)
+            if result != "Hello from SomeClass bench":
+                raise RuntimeError(f"print() = {result!r}")
+
+        benchmarks.append(run_benchmark(
+            "object_method", None, WARMUP, ITERATIONS, bench_object
+        ))
+        del new_class, print_fn
+
+        # --- Scenario 6: Callback invocation ---
+        # Known SDK bug: callable type params fail to load in JVM plugin.
+        # Record as FAIL if entity loading fails, continue with other scenarios.
+        try:
+            call_cb = java_module.load_entity(
+                "class=guest.CoreFunctions,callable=callCallbackAdd",
+                [ti(T.metaffi_callable_type)],
+                [ti(T.metaffi_int32_type)])
+
+            def adder(a: int, b: int) -> int:
+                return a + b
+
+            metaffi_adder = metaffi.make_metaffi_callable(adder)
+
+            def bench_callback():
+                result = call_cb(metaffi_adder)
+                if result != 3:
+                    raise RuntimeError(
+                        f"callCallbackAdd: got {result}, want 3")
+
+            benchmarks.append(run_benchmark(
+                "callback", None, WARMUP, ITERATIONS, bench_callback
+            ))
+            del call_cb, metaffi_adder
+        except RuntimeError as e:
+            print(f"Callback scenario FAILED (entity loading): {e}",
+                  file=sys.stderr)
+            benchmarks.append(make_failed_result(
+                "callback", None, str(e)))
+
+        # --- Scenario 7: Error propagation ---
+        err_fn = java_module.load_entity(
+            "class=guest.CoreFunctions,callable=returnsAnError",
+            None, None)
+
+        def bench_error():
+            try:
+                err_fn()
+                raise RuntimeError("returnsAnError did not raise")
+            except RuntimeError:
+                pass
+
+        benchmarks.append(run_benchmark(
+            "error_propagation", None, WARMUP, ITERATIONS, bench_error
+        ))
+        del err_fn
+
+        # --- Write results ---
+        write_results(benchmarks, timer_overhead)
+
+        # Report any failed scenarios
+        failed = [b for b in benchmarks if b["status"] == "FAIL"]
+        if failed:
+            names = ", ".join(b["scenario"] for b in failed)
+            print(f"WARNING: {len(failed)} scenario(s) failed: {names}",
+                  file=sys.stderr)

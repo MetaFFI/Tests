@@ -1,0 +1,436 @@
+"""Performance benchmarks: Python3 -> Go via gRPC (baseline)
+
+7 scenarios matching the MetaFFI benchmark.
+Starts a Go gRPC server as a subprocess, benchmarks from Python client.
+Outputs results to tests/results/python3_to_go_grpc.json.
+"""
+
+import json
+import math
+import os
+import platform
+import subprocess
+import sys
+import time
+
+import grpc
+
+# Add this directory to sys.path so generated stubs are importable
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+if THIS_DIR not in sys.path:
+    sys.path.insert(0, THIS_DIR)
+
+import benchmark_pb2
+import benchmark_pb2_grpc
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
+WARMUP = int(os.environ.get("METAFFI_TEST_WARMUP", "100"))
+ITERATIONS = int(os.environ.get("METAFFI_TEST_ITERATIONS", "10000"))
+SERVER_DIR = os.path.join(THIS_DIR, "server")
+SERVER_EXE = os.path.join(SERVER_DIR, "server.exe")
+
+
+# ---------------------------------------------------------------------------
+# Server lifecycle
+# ---------------------------------------------------------------------------
+
+class GrpcServerProcess:
+    """Manages the Go gRPC server subprocess."""
+
+    def __init__(self):
+        self.process = None
+        self.port = None
+
+    def start(self):
+        """Start the server and wait for READY:<port>."""
+        if not os.path.isfile(SERVER_EXE):
+            raise RuntimeError(
+                f"Server executable not found: {SERVER_EXE}\n"
+                "Build it: cd server && go build -o server.exe ."
+            )
+
+        self.process = subprocess.Popen(
+            [SERVER_EXE],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=SERVER_DIR,
+        )
+
+        # Read READY:<port> from stdout
+        line = self.process.stdout.readline().decode().strip()
+        if not line.startswith("READY:"):
+            self.stop()
+            raise RuntimeError(f"Server did not print READY:<port>, got: {line!r}")
+
+        self.port = int(line.split(":")[1])
+
+    def stop(self):
+        """Kill the server process."""
+        if self.process:
+            self.process.terminate()
+            try:
+                self.process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+            self.process = None
+
+    def address(self) -> str:
+        return f"127.0.0.1:{self.port}"
+
+
+# ---------------------------------------------------------------------------
+# Statistical helpers (matching MetaFFI implementation)
+# ---------------------------------------------------------------------------
+
+def compute_stats(sorted_ns: list[int]) -> dict:
+    n = len(sorted_ns)
+    if n == 0:
+        return {"mean_ns": 0, "median_ns": 0, "p95_ns": 0, "p99_ns": 0,
+                "stddev_ns": 0, "ci95_ns": [0, 0]}
+
+    total = sum(sorted_ns)
+    mean = total / n
+
+    if n % 2 == 1:
+        median = float(sorted_ns[n // 2])
+    else:
+        median = (sorted_ns[n // 2 - 1] + sorted_ns[n // 2]) / 2.0
+
+    p95 = float(sorted_ns[int(n * 0.95)])
+    p99 = float(sorted_ns[min(int(n * 0.99), n - 1)])
+
+    sq_diff_sum = sum((v - mean) ** 2 for v in sorted_ns)
+    stddev = math.sqrt(sq_diff_sum / n)
+
+    se = stddev / math.sqrt(n)
+    ci95 = [mean - 1.96 * se, mean + 1.96 * se]
+
+    return {
+        "mean_ns": mean, "median_ns": median,
+        "p95_ns": p95, "p99_ns": p99,
+        "stddev_ns": stddev, "ci95_ns": ci95,
+    }
+
+
+def remove_outliers_iqr(sorted_ns: list[int]) -> list[int]:
+    n = len(sorted_ns)
+    if n < 4:
+        return sorted_ns
+
+    q1 = float(sorted_ns[n // 4])
+    q3 = float(sorted_ns[3 * n // 4])
+    iqr = q3 - q1
+    lower = q1 - 1.5 * iqr
+    upper = q3 + 1.5 * iqr
+
+    return [v for v in sorted_ns if lower <= v <= upper]
+
+
+def measure_timer_overhead() -> int:
+    samples = []
+    for _ in range(10000):
+        start = time.perf_counter_ns()
+        elapsed = time.perf_counter_ns() - start
+        samples.append(elapsed)
+    samples.sort()
+    return samples[5000]
+
+
+# ---------------------------------------------------------------------------
+# Benchmark runner
+# ---------------------------------------------------------------------------
+
+def run_benchmark(scenario: str, data_size: int | None,
+                  warmup: int, iterations: int,
+                  bench_fn: callable) -> dict:
+
+    for i in range(warmup):
+        try:
+            bench_fn()
+        except Exception as e:
+            raise RuntimeError(
+                f"Benchmark '{scenario}' warmup iteration {i}: {e}"
+            ) from e
+
+    raw_ns = []
+    for i in range(iterations):
+        start = time.perf_counter_ns()
+        bench_fn()
+        elapsed = time.perf_counter_ns() - start
+        raw_ns.append(elapsed)
+
+    sorted_ns = sorted(raw_ns)
+    cleaned = remove_outliers_iqr(sorted_ns)
+    total_stats = compute_stats(cleaned)
+
+    return {
+        "scenario": scenario,
+        "data_size": data_size,
+        "status": "PASS",
+        "raw_iterations_ns": raw_ns,
+        "phases": {"total": total_stats},
+    }
+
+
+# ---------------------------------------------------------------------------
+# Result writer
+# ---------------------------------------------------------------------------
+
+def write_results(benchmarks: list[dict], timer_overhead: int, init_ns: int):
+    result_path = os.environ.get("METAFFI_TEST_RESULTS_FILE", "")
+    if not result_path:
+        result_path = os.path.join(THIS_DIR, "..", "..", "..", "results",
+                                   "python3_to_go_grpc.json")
+
+    result = {
+        "metadata": {
+            "host": "python3",
+            "guest": "go",
+            "mechanism": "grpc",
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "environment": {
+                "os": platform.system().lower(),
+                "arch": platform.machine(),
+                "python_version": platform.python_version(),
+            },
+            "config": {
+                "warmup_iterations": WARMUP,
+                "measured_iterations": ITERATIONS,
+                "timer_overhead_ns": timer_overhead,
+            },
+        },
+        "initialization": {
+            "server_start_ns": init_ns,
+        },
+        "correctness": None,
+        "benchmarks": benchmarks,
+    }
+
+    os.makedirs(os.path.dirname(os.path.abspath(result_path)), exist_ok=True)
+    with open(result_path, "w") as f:
+        json.dump(result, f, indent=2)
+
+    print(f"Results written to {result_path}", file=sys.stderr)
+
+
+# ---------------------------------------------------------------------------
+# Main benchmark
+# ---------------------------------------------------------------------------
+
+def main():
+    mode = os.environ.get("METAFFI_TEST_MODE", "")
+    if mode == "correctness":
+        print("Skipping benchmarks: METAFFI_TEST_MODE=correctness", file=sys.stderr)
+        return
+
+    # Start Go gRPC server
+    server = GrpcServerProcess()
+    init_start = time.perf_counter_ns()
+    server.start()
+    init_ns = time.perf_counter_ns() - init_start
+    print(f"Server started on {server.address()} in {init_ns / 1e6:.1f} ms",
+          file=sys.stderr)
+
+    try:
+        # Connect to server
+        channel = grpc.insecure_channel(server.address())
+        stub = benchmark_pb2_grpc.BenchmarkServiceStub(channel)
+
+        timer_overhead = measure_timer_overhead()
+        print(f"Timer overhead: {timer_overhead} ns", file=sys.stderr)
+
+        benchmarks = []
+
+        # --- Scenario 1: Void call ---
+        void_req = benchmark_pb2.VoidCallRequest(ms=0)
+
+        def bench_void():
+            stub.VoidCall(void_req)
+
+        benchmarks.append(run_benchmark(
+            "void_call", None, WARMUP, ITERATIONS, bench_void
+        ))
+
+        # --- Scenario 2: Primitive echo ---
+        div_req = benchmark_pb2.DivIntegersRequest(x=10, y=2)
+
+        def bench_primitive():
+            resp = stub.DivIntegers(div_req)
+            if abs(resp.result - 5.0) > 1e-10:
+                raise RuntimeError(f"DivIntegers: {resp.result}, want 5.0")
+
+        benchmarks.append(run_benchmark(
+            "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
+        ))
+
+        # --- Scenario 3: String echo ---
+        join_req = benchmark_pb2.JoinStringsRequest(values=["hello", "world"])
+
+        def bench_string():
+            resp = stub.JoinStrings(join_req)
+            if resp.result != "hello,world":
+                raise RuntimeError(f"JoinStrings: {resp.result!r}")
+
+        benchmarks.append(run_benchmark(
+            "string_echo", None, WARMUP, ITERATIONS, bench_string
+        ))
+
+        # --- Scenario 4: Array echo (varying sizes) ---
+        for size in [10, 100, 1000, 10000]:
+            data = bytes(i % 256 for i in range(size))
+            echo_req = benchmark_pb2.EchoBytesRequest(data=data)
+
+            def bench_array(req=echo_req, sz=size):
+                resp = stub.EchoBytes(req)
+                if len(resp.data) != sz:
+                    raise RuntimeError(
+                        f"EchoBytes({sz}): got len {len(resp.data)}"
+                    )
+
+            benchmarks.append(run_benchmark(
+                "array_echo", size, WARMUP, ITERATIONS, bench_array
+            ))
+
+        # --- Scenario 5: Object method ---
+        obj_req = benchmark_pb2.ObjectMethodRequest(name="bench")
+
+        def bench_object():
+            resp = stub.ObjectMethod(obj_req)
+            if resp.result != "name1":
+                raise RuntimeError(f"ObjectMethod: {resp.result!r}, want 'name1'")
+
+        benchmarks.append(run_benchmark(
+            "object_method", None, WARMUP, ITERATIONS, bench_object
+        ))
+
+        # --- Scenario 6: Callback via bidirectional streaming ---
+        def bench_callback():
+            # Each iteration opens a new stream
+            def request_iterator():
+                # Step 1: send invoke
+                yield benchmark_pb2.CallbackClientMsg(invoke=True)
+
+                # Step 3: receive compute request, compute, send result
+                # This is handled in the response loop below
+                # We need to yield the result after receiving compute
+                yield bench_callback._pending_result
+
+            # We need a two-phase approach: send invoke, recv compute, send result, recv final
+            responses = stub.CallbackAdd(iter([
+                benchmark_pb2.CallbackClientMsg(invoke=True),
+            ]))
+
+            # Receive compute request
+            resp = next(responses)
+            compute = resp.compute
+            add_result = compute.a + compute.b
+
+            # Send result via a new stream call (simplified: use single stream)
+            # Actually, bidirectional streaming requires sending and receiving on the same stream.
+            # Let me restructure to use a generator properly.
+            pass
+
+        # Bidirectional streaming is more complex - use a proper generator
+        def bench_callback_proper():
+            result_holder = [None]
+
+            def request_gen():
+                # Send invoke
+                yield benchmark_pb2.CallbackClientMsg(invoke=True)
+
+                # Wait for the compute response to be processed
+                # The main thread will set result_holder[0]
+                while result_holder[0] is None:
+                    time.sleep(0)  # yield to other code
+                yield result_holder[0]
+
+            # This approach won't work with gRPC's synchronous API.
+            # Use a simpler sequential approach with threading.
+            pass
+
+        # Simplified callback benchmark using threading
+        import threading
+        import queue
+
+        def bench_callback_threaded():
+            send_q = queue.Queue()
+            recv_q = queue.Queue()
+
+            def request_gen():
+                while True:
+                    msg = send_q.get()
+                    if msg is None:
+                        return
+                    yield msg
+
+            def run_stream():
+                try:
+                    responses = stub.CallbackAdd(request_gen())
+                    for resp in responses:
+                        recv_q.put(resp)
+                except Exception as e:
+                    recv_q.put(e)
+
+            t = threading.Thread(target=run_stream, daemon=True)
+            t.start()
+
+            # Step 1: Send invoke
+            send_q.put(benchmark_pb2.CallbackClientMsg(invoke=True))
+
+            # Step 2: Receive compute(a, b)
+            resp = recv_q.get(timeout=5)
+            if isinstance(resp, Exception):
+                raise resp
+            compute = resp.compute
+            result = compute.a + compute.b
+
+            # Step 3: Send result
+            send_q.put(benchmark_pb2.CallbackClientMsg(add_result=result))
+
+            # Step 4: Receive final result
+            resp = recv_q.get(timeout=5)
+            if isinstance(resp, Exception):
+                raise resp
+            final = resp.final_result
+
+            if final != 3:
+                raise RuntimeError(f"Callback: got {final}, want 3")
+
+            # Close stream
+            send_q.put(None)
+            t.join(timeout=5)
+
+        benchmarks.append(run_benchmark(
+            "callback", None, WARMUP, ITERATIONS, bench_callback_threaded
+        ))
+
+        # --- Scenario 7: Error propagation ---
+        empty_req = benchmark_pb2.Empty()
+
+        def bench_error():
+            try:
+                stub.ReturnsAnError(empty_req)
+                raise RuntimeError("ReturnsAnError did not raise")
+            except grpc.RpcError as e:
+                if e.code() != grpc.StatusCode.INTERNAL:
+                    raise RuntimeError(f"Expected INTERNAL, got {e.code()}")
+
+        benchmarks.append(run_benchmark(
+            "error_propagation", None, WARMUP, ITERATIONS, bench_error
+        ))
+
+        # --- Write results ---
+        write_results(benchmarks, timer_overhead, init_ns)
+
+        # Cleanup
+        channel.close()
+
+    finally:
+        server.stop()
+
+
+if __name__ == "__main__":
+    main()
