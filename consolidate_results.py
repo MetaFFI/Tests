@@ -112,19 +112,24 @@ def compute_comparison_table(results: list[dict[str, Any]]) -> list[dict[str, An
     # Collect all unique (host, guest) pairs from expected triples
     pairs = sorted({(h, g) for h, g, _ in ALL_EXPECTED_TRIPLES})
 
-    # Collect all unique scenarios from existing results
-    all_scenarios: set[str] = set()
+    # Collect scenarios per (host, guest) pair — only scenarios that exist
+    # in at least one mechanism for that pair
+    pair_scenarios: dict[tuple[str, str], set[str]] = {p: set() for p in pairs}
     for r in results:
+        meta = r["metadata"]
+        pair_key = (meta["host"], meta["guest"])
+        if pair_key not in pair_scenarios:
+            continue
         for b in r.get("benchmarks", []):
             scenario_key = b["scenario"]
             if b.get("data_size") is not None:
                 scenario_key += f"_{b['data_size']}"
-            all_scenarios.add(scenario_key)
+            pair_scenarios[pair_key].add(scenario_key)
 
     comparisons = []
 
     for host, guest in pairs:
-        for scenario in sorted(all_scenarios):
+        for scenario in sorted(pair_scenarios[(host, guest)]):
             row: dict[str, Any] = {
                 "host": host,
                 "guest": guest,
@@ -317,6 +322,13 @@ def main() -> int:
     has_issues = (summary["missing_result_files"] > 0
                   or summary["correctness"]["failed"] > 0
                   or summary["benchmarks"]["failed"] > 0)
+
+    # Generate tables
+    tables_script = Path(__file__).resolve().parent / "generate_tables.py"
+    if tables_script.is_file():
+        print()
+        import subprocess
+        subprocess.run([sys.executable, str(tables_script)], cwd=str(tables_script.parent))
 
     if has_issues:
         print()

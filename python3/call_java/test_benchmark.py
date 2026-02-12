@@ -13,6 +13,7 @@ import time
 
 import pytest
 import metaffi
+import ctypes
 from conftest import init_timing
 
 T = metaffi.MetaFFITypes
@@ -117,19 +118,6 @@ def run_benchmark(scenario: str, data_size: int | None,
         "status": "PASS",
         "raw_iterations_ns": raw_ns,
         "phases": {"total": total_stats},
-    }
-
-
-def make_failed_result(scenario: str, data_size: int | None,
-                       error: str) -> dict:
-    """Record a scenario that failed due to an SDK bug."""
-    return {
-        "scenario": scenario,
-        "data_size": data_size,
-        "status": "FAIL",
-        "error": error,
-        "raw_iterations_ns": [],
-        "phases": {},
     }
 
 
@@ -280,34 +268,43 @@ class TestBenchmarks:
         del new_class, print_fn
 
         # --- Scenario 6: Callback invocation ---
-        # Known SDK bug: callable type params fail to load in JVM plugin.
-        # Record as FAIL if entity loading fails, continue with other scenarios.
-        try:
-            call_cb = java_module.load_entity(
-                "class=guest.CoreFunctions,callable=callCallbackAdd",
-                [ti(T.metaffi_callable_type)],
-                [ti(T.metaffi_int32_type)])
+        adapter = java_module.load_entity(
+            "class=metaffi.api.accessor.CallbackAdapters,callable=asInterface",
+            [ti(T.metaffi_callable_type), ti(T.metaffi_string8_type)],
+            [ti(T.metaffi_handle_type)])
+        call_cb = java_module.load_entity(
+            "class=guest.CoreFunctions,callable=callCallbackAdd",
+            [ti(T.metaffi_handle_type,
+                alias="java.util.function.IntBinaryOperator")],
+            [ti(T.metaffi_int32_type)])
 
-            def adder(a: int, b: int) -> int:
-                return a + b
+        old_c_long_mapping = metaffi.metaffi_types.pytype_to_metaffi_type_dict.get(
+            "c_long")
+        metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"] = (
+            T.metaffi_int32_type.value)
 
-            metaffi_adder = metaffi.make_metaffi_callable(adder)
+        def adder(a: ctypes.c_long, b: ctypes.c_long) -> ctypes.c_long:
+            return a + b
 
-            def bench_callback():
-                result = call_cb(metaffi_adder)
-                if result != 3:
-                    raise RuntimeError(
-                        f"callCallbackAdd: got {result}, want 3")
+        metaffi_adder = metaffi.make_metaffi_callable(adder)
+        if old_c_long_mapping is None:
+            del metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"]
+        else:
+            metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"] = (
+                old_c_long_mapping)
+        proxy = adapter(metaffi_adder, "java.util.function.IntBinaryOperator")
+        assert proxy is not None
 
-            benchmarks.append(run_benchmark(
-                "callback", None, WARMUP, ITERATIONS, bench_callback
-            ))
-            del call_cb, metaffi_adder
-        except RuntimeError as e:
-            print(f"Callback scenario FAILED (entity loading): {e}",
-                  file=sys.stderr)
-            benchmarks.append(make_failed_result(
-                "callback", None, str(e)))
+        def bench_callback():
+            result = call_cb(proxy)
+            if result != 3:
+                raise RuntimeError(
+                    f"callCallbackAdd: got {result}, want 3")
+
+        benchmarks.append(run_benchmark(
+            "callback", None, WARMUP, ITERATIONS, bench_callback
+        ))
+        del adapter, call_cb, metaffi_adder, proxy
 
         # --- Scenario 7: Error propagation ---
         err_fn = java_module.load_entity(

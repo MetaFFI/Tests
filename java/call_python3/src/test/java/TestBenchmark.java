@@ -351,7 +351,7 @@ public class TestBenchmark
 			final long[][] finalData = data;
 			final long expectedSum = (long) size * (size + 1) / 2;
 
-			benchmarkJsons.add(runBenchmark("array_echo", size, WARMUP, ITERATIONS,
+			benchmarkJsons.add(runBenchmark("array_sum", size, WARMUP, ITERATIONS,
 				() -> {
 					Object[] result = acceptsRagged.call((Object) finalData);
 					if ((Long) result[0] != expectedSum)

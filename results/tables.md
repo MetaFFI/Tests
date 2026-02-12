@@ -2,16 +2,10 @@
 
 ## Benchmark Results Summary
 
-- **Result files**: 15 of 18 expected
-- **Missing result files**: 3
-- **Benchmarks passed**: 147
+- **Result files**: 18 of 18 expected
+- **Missing result files**: 0
+- **Benchmarks passed**: 176
 - **Benchmarks failed**: 3
-
-### Missing Result Files
-
-- **go->python3 [cpython]**: `go_to_python3_cpython.json`
-- **go->java [metaffi]**: `go_to_java_metaffi.json`
-- **go->java [jni]**: `go_to_java_jni.json`
 
 ### Failed Benchmarks
 
@@ -24,39 +18,31 @@
 
 | Scenario | metaffi (mean) | jni (mean) | grpc (mean) |
 |---|---|---|---|
-| array_echo_10 | MISSING | MISSING | MISSING |
-| array_echo_100 | MISSING | MISSING | MISSING |
-| array_echo_1000 | MISSING | MISSING | MISSING |
-| array_echo_10000 | MISSING | MISSING | MISSING |
-| array_sum_10 | MISSING | MISSING | 456.7 us |
-| array_sum_100 | MISSING | MISSING | 385.5 us |
-| array_sum_1000 | MISSING | MISSING | 622.4 us |
-| array_sum_10000 | MISSING | MISSING | 698.9 us |
-| callback | MISSING | MISSING | 807.6 us |
-| error_propagation | MISSING | MISSING | 424.7 us |
-| object_method | MISSING | MISSING | 491.0 us |
-| primitive_echo | MISSING | MISSING | 653.7 us |
-| string_echo | MISSING | MISSING | 663.6 us |
-| void_call | MISSING | MISSING | 845.9 us |
+| array_sum_10 | 0 ns | 0 ns | 456.7 us |
+| array_sum_100 | 0 ns | 0 ns | 385.5 us |
+| array_sum_1000 | 164.7 us | 0 ns | 622.4 us |
+| array_sum_10000 | 6.46 ms | 0 ns | 698.9 us |
+| callback | MISSING | 0 ns | 807.6 us |
+| error_propagation | 0 ns | 0 ns | 424.7 us |
+| object_method | 194.0 us | 0 ns | 491.0 us |
+| primitive_echo | 0 ns | 0 ns | 653.7 us |
+| string_echo | 0 ns | 0 ns | 663.6 us |
+| void_call | 0 ns | 0 ns | 845.9 us |
 
 ## Go -> Python3
 
 | Scenario | metaffi (mean) | cpython (mean) | grpc (mean) |
 |---|---|---|---|
-| array_echo_10 | MISSING | MISSING | MISSING |
-| array_echo_100 | MISSING | MISSING | MISSING |
-| array_echo_1000 | MISSING | MISSING | MISSING |
-| array_echo_10000 | MISSING | MISSING | MISSING |
-| array_sum_10 | 0 ns | MISSING | 241.2 us |
-| array_sum_100 | 0 ns | MISSING | 292.6 us |
-| array_sum_1000 | 551.8 us | MISSING | 320.8 us |
-| array_sum_10000 | 5.99 ms | MISSING | 854.6 us |
-| callback | 0 ns | MISSING | 617.7 us |
-| error_propagation | 0 ns | MISSING | 319.9 us |
-| object_method | FAIL | MISSING | 355.7 us |
-| primitive_echo | 0 ns | MISSING | 223.4 us |
-| string_echo | 0 ns | MISSING | 273.5 us |
-| void_call | 0 ns | MISSING | 276.6 us |
+| array_sum_10 | 0 ns | 0 ns | 241.2 us |
+| array_sum_100 | 0 ns | 0 ns | 292.6 us |
+| array_sum_1000 | 551.8 us | 0 ns | 320.8 us |
+| array_sum_10000 | 5.99 ms | 0 ns | 854.6 us |
+| callback | 0 ns | 0 ns | 617.7 us |
+| error_propagation | 0 ns | 0 ns | 319.9 us |
+| object_method | FAIL | 0 ns | 355.7 us |
+| primitive_echo | 0 ns | 0 ns | 223.4 us |
+| string_echo | 0 ns | 0 ns | 273.5 us |
+| void_call | 0 ns | 0 ns | 276.6 us |
 
 ## Java -> Go
 
@@ -66,10 +52,6 @@
 | array_echo_100 | 1.30 ms | 2.7 us | 2.52 ms |
 | array_echo_1000 | 12.13 ms | 3.3 us | 1.98 ms |
 | array_echo_10000 | 126.73 ms | 8.8 us | 2.02 ms |
-| array_sum_10 | MISSING | MISSING | MISSING |
-| array_sum_100 | MISSING | MISSING | MISSING |
-| array_sum_1000 | MISSING | MISSING | MISSING |
-| array_sum_10000 | MISSING | MISSING | MISSING |
 | callback | 24.4 us | 1.9 us | 3.04 ms |
 | error_propagation | 12.3 us | 2.8 us | 2.86 ms |
 | object_method | 19.8 us | 5.4 us | 8.76 ms |
@@ -81,14 +63,10 @@
 
 | Scenario | metaffi (mean) | jep (mean) | grpc (mean) |
 |---|---|---|---|
-| array_echo_10 | 116.8 us | MISSING | MISSING |
-| array_echo_100 | 1.02 ms | MISSING | MISSING |
-| array_echo_1000 | 11.06 ms | MISSING | MISSING |
-| array_echo_10000 | 307.52 ms | MISSING | MISSING |
-| array_sum_10 | MISSING | 16.6 us | 2.17 ms |
-| array_sum_100 | MISSING | 16.5 us | 1.90 ms |
-| array_sum_1000 | MISSING | 19.2 us | 1.83 ms |
-| array_sum_10000 | MISSING | 43.8 us | 3.00 ms |
+| array_sum_10 | 116.8 us | 16.6 us | 2.17 ms |
+| array_sum_100 | 1.02 ms | 16.5 us | 1.90 ms |
+| array_sum_1000 | 11.06 ms | 19.2 us | 1.83 ms |
+| array_sum_10000 | 307.52 ms | 43.8 us | 3.00 ms |
 | callback | 51.7 us | 23.3 us | 3.02 ms |
 | error_propagation | 39.9 us | 83.9 us | 1.50 ms |
 | object_method | FAIL | 24.1 us | 1.77 ms |
@@ -104,10 +82,6 @@
 | array_echo_100 | 267.0 us | 3.9 us | 180.2 us |
 | array_echo_1000 | 2.40 ms | 4.4 us | 183.8 us |
 | array_echo_10000 | 20.42 ms | 5.1 us | 202.3 us |
-| array_sum_10 | MISSING | MISSING | MISSING |
-| array_sum_100 | MISSING | MISSING | MISSING |
-| array_sum_1000 | MISSING | MISSING | MISSING |
-| array_sum_10000 | MISSING | MISSING | MISSING |
 | callback | 13.2 us | 2.6 us | 1.26 ms |
 | error_propagation | 4.8 us | 4.1 us | 190.8 us |
 | object_method | 14.9 us | 7.2 us | 169.2 us |
@@ -119,10 +93,6 @@
 
 | Scenario | metaffi (mean) | jpype (mean) | grpc (mean) |
 |---|---|---|---|
-| array_echo_10 | MISSING | MISSING | MISSING |
-| array_echo_100 | MISSING | MISSING | MISSING |
-| array_echo_1000 | MISSING | MISSING | MISSING |
-| array_echo_10000 | MISSING | MISSING | MISSING |
 | array_sum_10 | 20.5 us | 1.4 us | 1.64 ms |
 | array_sum_100 | 85.1 us | 2.1 us | 1.06 ms |
 | array_sum_1000 | 767.2 us | 9.9 us | 1.15 ms |

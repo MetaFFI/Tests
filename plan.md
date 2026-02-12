@@ -476,17 +476,21 @@ Full entity specification: `sdk/test_modules/guest_modules/guest_modules_doc.md`
 
 ## Known Issues
 
-### [BLOCKING] cgo Crashes on Windows (3 tests)
+### [RESOLVED] cgo VEH/SEH Crashes on Windows
 
-All Go-host tests using cgo to invoke foreign runtimes crash with `Exception 0xc0000005` (access violation):
+Go's Vectored Exception Handler (VEH) intercepts JVM's internal SEH exceptions (null-check probes at addresses like `0xcafebabe`, `0x8`), causing `Exception 0xc0000005` crashes. This affects **any** cgo call that enters JVM or CPython code from a Go goroutine.
 
-| Test | Crash Location | Missing Result |
-|------|---------------|----------------|
-| Go -> Java MetaFFI | `xllr_load_runtime_plugin("jvm")` | `go_to_java_metaffi.json` |
-| Go -> Java cgo+JNI | `jvm_initialize()` (JNI_CreateJavaVM) | `go_to_java_jni.json` |
-| Go -> Python3 cgo+CPython | `bench_void_call()` (CPython C API) | `go_to_python3_cpython.json` |
+**Root cause**: Go issues [#47576](https://github.com/golang/go/issues/47576) and [#58542](https://github.com/golang/go/issues/58542) (both still open as of Go 1.24).
 
-Not affected: gRPC tests (no cgo), Go -> Python3 MetaFFI (xllr.python3.dll works).
+**Fix applied**: Run JNI_CreateJavaVM and load_entity on dedicated Windows threads via `CreateThread`. Go's VEH checks `getg()` which returns NULL on non-Go threads, so it returns `EXCEPTION_CONTINUE_SEARCH`, letting JVM's SEH work correctly.
+
+Files modified:
+- `sdk/runtime_manager/jvm/jvm.cpp` — `JNI_CreateJavaVM` wrapped in `CreateThread` on Windows
+- `lang-plugin-jvm/runtime/jvm_runtime.cpp` — `load_entity` wrapped in `CreateThread` on Windows
+- `tests/go/without_metaffi/call_java_jni/bridge.go` — dynamic JVM loading + `CreateThread` for JVM init + thread attachment per subtest
+- `tests/go/without_metaffi/call_python3_cpython/bridge.go` — GIL save/ensure/release + per-subtest GIL management
+
+**Note**: If `xcall` operations also trigger JVM SEH in the future, the same `CreateThread` approach or a persistent worker thread may be needed. Currently 80,000+ xcall invocations succeed without issue.
 
 ### [KNOWN] xcall_no_params_ret Bug (Python3 Guest)
 
@@ -496,24 +500,44 @@ Affected:
 - Go -> Python3 MetaFFI: `object_method` benchmark FAIL
 - Java -> Python3 MetaFFI: `object_method` benchmark FAIL, 25 correctness tests xfailed
 
-### [KNOWN] Type Mapping Mismatches
+### [KNOWN] Go -> Java MetaFFI: callback Benchmark FAIL
+
+`java.lang.NoSuchMethodException: guest.CoreFunctions.callCallbackAdd(metaffi.api.accessor.Caller)` — the Java guest method expects a functional interface but MetaFFI passes a `Caller` object. The entity loads but the JVM can't find a matching method signature. This is a MetaFFI SDK entity-loading issue for callback parameters.
+
+### [KNOWN] Python3 -> Java MetaFFI: callback Benchmark FAIL
+
+`Failed to load entity` for `callCallbackAdd` — same root cause as above (callback parameter type mismatch in entity loading).
+
+### [KNOWN] Type Mapping Mismatches (Correctness Tests)
 
 - Python3 -> Go: 14 xfailed tests (Go `int` vs `int64`, 2D byte arrays, named types, generics, varargs)
-- Python3 -> Java: 19 xfailed tests + `callback` benchmark FAIL
+- Python3 -> Java: 19 xfailed tests
 - Java -> Go: 2 xfailed tests (Go named function type `StringTransformer`)
 
-### Result File Status (15 of 18)
+### Result File Status (18 of 18 — COMPLETE)
+
+All 18 result files are generated. **176 benchmarks passed, 4 failed**.
 
 | Result File | Status |
 |-------------|--------|
 | `go_to_python3_metaffi.json` | Generated (object_method FAIL, rest PASS) |
+| `go_to_python3_cpython.json` | Generated (all PASS) |
 | `go_to_python3_grpc.json` | Generated (all PASS) |
+| `go_to_java_metaffi.json` | Generated (callback FAIL, rest PASS) |
+| `go_to_java_jni.json` | Generated (all PASS) |
 | `go_to_java_grpc.json` | Generated (all PASS) |
-| `go_to_java_metaffi.json` | **BLOCKED** (cgo JVM crash) |
-| `go_to_python3_cpython.json` | **BLOCKED** (cgo CPython crash) |
-| `go_to_java_jni.json` | **BLOCKED** (cgo JNI crash) |
-| All 6 Python3-host files | Generated |
-| All 6 Java-host files | Generated |
+| `python3_to_go_metaffi.json` | Generated (all PASS) |
+| `python3_to_go_ctypes.json` | Generated (all PASS) |
+| `python3_to_go_grpc.json` | Generated (all PASS) |
+| `python3_to_java_metaffi.json` | Generated (callback FAIL, rest PASS) |
+| `python3_to_java_jpype.json` | Generated (all PASS) |
+| `python3_to_java_grpc.json` | Generated (all PASS) |
+| `java_to_go_metaffi.json` | Generated (all PASS) |
+| `java_to_go_jni.json` | Generated (all PASS) |
+| `java_to_go_grpc.json` | Generated (all PASS) |
+| `java_to_python3_metaffi.json` | Generated (object_method FAIL, rest PASS) |
+| `java_to_python3_jep.json` | Generated (all PASS) |
+| `java_to_python3_grpc.json` | Generated (all PASS) |
 
 ---
 

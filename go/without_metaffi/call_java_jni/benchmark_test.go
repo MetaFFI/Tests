@@ -59,7 +59,9 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 
-	JVMDestroy()
+	// Skip JVMDestroy — DestroyJavaVM hangs waiting for internal JVM
+	// threads to finish, causing go test to hit its timeout.
+	// Process exit cleans up everything.
 	os.Exit(code)
 }
 
@@ -264,6 +266,17 @@ func runBenchmark(
 // Benchmark tests (7 scenarios)
 // ---------------------------------------------------------------------------
 
+// ensureThread locks the goroutine to the current OS thread and attaches
+// it to the JVM. Must be called at the start of each subtest since
+// t.Run() creates new goroutines on potentially different OS threads.
+func ensureThread(t *testing.T) {
+	t.Helper()
+	runtime.LockOSThread()
+	if err := EnsureJVMThread(); err != nil {
+		t.Fatalf("failed to attach thread to JVM: %v", err)
+	}
+}
+
 func TestBenchmarkAll(t *testing.T) {
 	mode := os.Getenv("METAFFI_TEST_MODE")
 	if mode == "correctness" {
@@ -280,6 +293,7 @@ func TestBenchmarkAll(t *testing.T) {
 
 	// --- Scenario 1: Void call ---
 	t.Run("void_call", func(t *testing.T) {
+		ensureThread(t)
 		result := runBenchmark(t, "void_call", nil, warmup, iterations, func() error {
 			return BenchVoidCall()
 		})
@@ -288,6 +302,7 @@ func TestBenchmarkAll(t *testing.T) {
 
 	// --- Scenario 2: Primitive echo ---
 	t.Run("primitive_echo", func(t *testing.T) {
+		ensureThread(t)
 		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, func() error {
 			v, err := BenchPrimitiveEcho()
 			if err != nil {
@@ -303,6 +318,7 @@ func TestBenchmarkAll(t *testing.T) {
 
 	// --- Scenario 3: String echo ---
 	t.Run("string_echo", func(t *testing.T) {
+		ensureThread(t)
 		result := runBenchmark(t, "string_echo", nil, warmup, iterations, func() error {
 			v, err := BenchStringEcho()
 			if err != nil {
@@ -327,6 +343,7 @@ func TestBenchmarkAll(t *testing.T) {
 		}
 
 		t.Run(fmt.Sprintf("array_sum_%d", size), func(t *testing.T) {
+			ensureThread(t)
 			sizePtr := size
 			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, func() error {
 				v, err := BenchArraySum(size)
@@ -344,6 +361,7 @@ func TestBenchmarkAll(t *testing.T) {
 
 	// --- Scenario 5: Object create + method call ---
 	t.Run("object_method", func(t *testing.T) {
+		ensureThread(t)
 		result := runBenchmark(t, "object_method", nil, warmup, iterations, func() error {
 			v, err := BenchObjectMethod()
 			if err != nil {
@@ -359,6 +377,7 @@ func TestBenchmarkAll(t *testing.T) {
 
 	// --- Scenario 6: Callback ---
 	t.Run("callback", func(t *testing.T) {
+		ensureThread(t)
 		result := runBenchmark(t, "callback", nil, warmup, iterations, func() error {
 			v, err := BenchCallback()
 			if err != nil {
@@ -374,6 +393,7 @@ func TestBenchmarkAll(t *testing.T) {
 
 	// --- Scenario 7: Error propagation ---
 	t.Run("error_propagation", func(t *testing.T) {
+		ensureThread(t)
 		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, func() error {
 			return BenchErrorPropagation()
 		})

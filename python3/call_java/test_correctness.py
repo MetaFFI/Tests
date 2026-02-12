@@ -6,6 +6,7 @@ Fail-fast: every assertion is exact (or epsilon-justified for floats).
 
 import pytest
 import metaffi
+import ctypes
 
 T = metaffi.MetaFFITypes
 ti = metaffi.metaffi_type_info
@@ -17,18 +18,6 @@ ti = metaffi.metaffi_type_info
 _XFAIL_NO_PARAMS_RET = pytest.mark.xfail(
     reason="MetaFFI JVM plugin bug: no-params-with-return xcall from Python "
            "host raises 'Index 0 out of bounds (size: 0)'",
-    raises=RuntimeError, strict=True,
-)
-
-_XFAIL_CALLABLE_PARAM = pytest.mark.xfail(
-    reason="MetaFFI JVM plugin bug: entity loading fails for methods that "
-           "accept metaffi_callable_type parameters",
-    raises=RuntimeError, strict=True,
-)
-
-_XFAIL_CALLABLE_RETURN = pytest.mark.xfail(
-    reason="MetaFFI JVM plugin bug: callable return type not supported from "
-           "Python host",
     raises=RuntimeError, strict=True,
 )
 
@@ -169,70 +158,104 @@ class TestCoreFunctions:
 
 class TestCallbacks:
 
-    @_XFAIL_CALLABLE_PARAM
     def test_call_callback_add(self, java_module):
         """Python callback passed to Java: add(1, 2) -> 3"""
+        adapter = java_module.load_entity(
+            "class=metaffi.api.accessor.CallbackAdapters,callable=asInterface",
+            [ti(T.metaffi_callable_type), ti(T.metaffi_string8_type)],
+            [ti(T.metaffi_handle_type)])
+
         fn = java_module.load_entity(
             "class=guest.CoreFunctions,callable=callCallbackAdd",
-            [ti(T.metaffi_callable_type)],
+            [ti(T.metaffi_handle_type,
+                alias="java.util.function.IntBinaryOperator")],
             [ti(T.metaffi_int32_type)])
 
-        def adder(a: int, b: int) -> int:
+        old_c_long_mapping = metaffi.metaffi_types.pytype_to_metaffi_type_dict.get(
+            "c_long")
+        metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"] = (
+            T.metaffi_int32_type.value)
+
+        def adder(a: ctypes.c_long, b: ctypes.c_long) -> ctypes.c_long:
             return a + b
 
         metaffi_adder = metaffi.make_metaffi_callable(adder)
-        result = fn(metaffi_adder)
+        if old_c_long_mapping is None:
+            del metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"]
+        else:
+            metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"] = (
+                old_c_long_mapping)
+        proxy = adapter(metaffi_adder, "java.util.function.IntBinaryOperator")
+        assert proxy is not None
+        result = fn(proxy)
         assert result == 3, f"callCallbackAdd(adder): got {result}, want 3"
-        del fn, metaffi_adder
+        del adapter, fn, metaffi_adder, proxy
 
     @_XFAIL_NO_PARAMS_RET
     def test_return_callback_add(self, java_module):
         """Java returns a callback, Python calls it."""
         fn = java_module.load_entity(
             "class=guest.CoreFunctions,callable=returnCallbackAdd",
-            None, [ti(T.metaffi_callable_type)])
+            None, [ti(T.metaffi_handle_type,
+                      alias="java.util.function.IntBinaryOperator")])
         callback = fn()
         assert callback is not None
 
-        result = callback(3, 4)
-        if isinstance(result, (list, tuple)):
-            assert result[0] == 7, f"callback(3,4)[0] = {result[0]}, want 7"
-        else:
-            assert result == 7, f"callback(3,4) = {result}, want 7"
-        del fn, callback
+        apply_fn = java_module.load_entity(
+            "class=java.util.function.IntBinaryOperator,callable=applyAsInt,"
+            "instance_required",
+            [ti(T.metaffi_handle_type,
+                alias="java.util.function.IntBinaryOperator"),
+             ti(T.metaffi_int32_type),
+             ti(T.metaffi_int32_type)],
+            [ti(T.metaffi_int32_type)])
 
-    @_XFAIL_CALLABLE_PARAM
+        result = apply_fn(callback, 3, 4)
+        assert result == 7, f"applyAsInt(3,4) = {result}, want 7"
+        del fn, callback, apply_fn
+
     def test_call_transformer(self, java_module):
         """callTransformer(transformer, value) -> transformer.transform(value)"""
+        return_transformer = java_module.load_entity(
+            "class=guest.Callbacks,callable=returnTransformer",
+            [ti(T.metaffi_string8_type)],
+            [ti(T.metaffi_handle_type,
+                alias="guest.Callbacks.StringTransformer")])
+
         fn = java_module.load_entity(
             "class=guest.Callbacks,callable=callTransformer",
-            [ti(T.metaffi_callable_type), ti(T.metaffi_string8_type)],
+            [ti(T.metaffi_handle_type,
+                alias="guest.Callbacks.StringTransformer"),
+             ti(T.metaffi_string8_type)],
             [ti(T.metaffi_string8_type)])
 
-        def append_x(s: str) -> str:
-            return s + "_x"
-
-        metaffi_fn = metaffi.make_metaffi_callable(append_x)
-        result = fn(metaffi_fn, "a")
+        transformer = return_transformer("_x")
+        assert transformer is not None
+        result = fn(transformer, "a")
         assert result == "a_x", f"callTransformer(append_x, 'a') = {result!r}"
-        del fn, metaffi_fn
+        del return_transformer, fn, transformer
 
-    @_XFAIL_CALLABLE_RETURN
     def test_return_transformer(self, java_module):
         """returnTransformer(suffix) returns callable that appends suffix."""
         fn = java_module.load_entity(
             "class=guest.Callbacks,callable=returnTransformer",
             [ti(T.metaffi_string8_type)],
-            [ti(T.metaffi_callable_type)])
+            [ti(T.metaffi_handle_type,
+                alias="guest.Callbacks.StringTransformer")])
         transformer = fn("_y")
         assert transformer is not None
 
-        result = transformer("b")
-        if isinstance(result, (list, tuple)):
-            assert result[0] == "b_y"
-        else:
-            assert result == "b_y"
-        del fn, transformer
+        transform_fn = java_module.load_entity(
+            "class=guest.Callbacks.StringTransformer,callable=transform,"
+            "instance_required",
+            [ti(T.metaffi_handle_type,
+                alias="guest.Callbacks.StringTransformer"),
+             ti(T.metaffi_string8_type)],
+            [ti(T.metaffi_string8_type)])
+
+        result = transform_fn(transformer, "b")
+        assert result == "b_y"
+        del fn, transformer, transform_fn
 
 
 # ============================================================================

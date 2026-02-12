@@ -1,24 +1,114 @@
 package call_java_jni
 
 // Build requirements:
-// Set JAVA_HOME to your JDK installation, then:
-//   CGO_CFLAGS="-I$JAVA_HOME/include -I$JAVA_HOME/include/<platform>"
-//   CGO_LDFLAGS="-L$JAVA_HOME/lib/server -ljvm"
-// where <platform> is "win32", "linux", or "darwin".
-//
-// Windows example (PowerShell):
-//   $env:CGO_CFLAGS = "-I$env:JAVA_HOME\include -I$env:JAVA_HOME\include\win32"
-//   $env:CGO_LDFLAGS = "-L$env:JAVA_HOME\lib -L$env:JAVA_HOME\lib\server -ljvm"
+// Set JAVA_HOME to your JDK installation. No -ljvm linking needed;
+// jvm.dll / libjvm.so is loaded dynamically at runtime using
+// LoadLibraryExW (Windows) or dlopen (Linux/macOS).
 
 /*
 #cgo windows CFLAGS: -IC:/PROGRA~1/OpenJDK/JDK-22~1.2/include -IC:/PROGRA~1/OpenJDK/JDK-22~1.2/include/win32
-#cgo windows LDFLAGS: -LC:/PROGRA~1/OpenJDK/JDK-22~1.2/lib -LC:/PROGRA~1/OpenJDK/JDK-22~1.2/lib/server -ljvm
 #cgo !windows CFLAGS: -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux
-#cgo !windows LDFLAGS: -L${JAVA_HOME}/lib/server -ljvm
 
 #include <jni.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
+// ---------------------------------------------------------------------------
+// JNI_CreateJavaVM function pointer (loaded dynamically)
+// ---------------------------------------------------------------------------
+
+typedef jint (JNICALL *JNI_CreateJavaVM_t)(JavaVM**, void**, void*);
+static JNI_CreateJavaVM_t pfn_JNI_CreateJavaVM = NULL;
+
+#ifdef _WIN32
+static HMODULE g_jvm_dll = NULL;
+#else
+static void* g_jvm_dl = NULL;
+#endif
+
+// Dynamically load jvm.dll/libjvm.so and resolve JNI_CreateJavaVM.
+// Returns a malloc'd error string on failure, or NULL on success.
+static char* load_jvm_library(void) {
+	if (pfn_JNI_CreateJavaVM != NULL) {
+		return NULL; // Already loaded
+	}
+
+	const char* java_home = getenv("JAVA_HOME");
+	if (!java_home || java_home[0] == '\0') {
+		return strdup("JAVA_HOME environment variable not set");
+	}
+
+#ifdef _WIN32
+	// Convert JAVA_HOME to wide string
+	wchar_t java_home_w[MAX_PATH];
+	int wlen = MultiByteToWideChar(CP_UTF8, 0, java_home, -1, java_home_w, MAX_PATH);
+	if (wlen == 0) {
+		return strdup("Failed to convert JAVA_HOME to wide string");
+	}
+
+	// Add search directories for jvm.dll and its dependencies.
+	// On Windows JDKs, jvm.dll can be in bin/server/ or lib/server/.
+	wchar_t dir_buf[MAX_PATH];
+
+	SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+
+	swprintf(dir_buf, MAX_PATH, L"%s\\bin", java_home_w);
+	AddDllDirectory(dir_buf);
+
+	swprintf(dir_buf, MAX_PATH, L"%s\\bin\\server", java_home_w);
+	AddDllDirectory(dir_buf);
+
+	swprintf(dir_buf, MAX_PATH, L"%s\\lib", java_home_w);
+	AddDllDirectory(dir_buf);
+
+	swprintf(dir_buf, MAX_PATH, L"%s\\lib\\server", java_home_w);
+	AddDllDirectory(dir_buf);
+
+	g_jvm_dll = LoadLibraryExW(L"jvm.dll", NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+	if (!g_jvm_dll) {
+		char buf[512];
+		snprintf(buf, sizeof(buf),
+			"LoadLibraryExW(jvm.dll) failed (error %lu). JAVA_HOME=%s",
+			GetLastError(), java_home);
+		return strdup(buf);
+	}
+
+	pfn_JNI_CreateJavaVM = (JNI_CreateJavaVM_t)GetProcAddress(g_jvm_dll, "JNI_CreateJavaVM");
+	if (!pfn_JNI_CreateJavaVM) {
+		char buf[256];
+		snprintf(buf, sizeof(buf),
+			"GetProcAddress(JNI_CreateJavaVM) failed (error %lu)", GetLastError());
+		return strdup(buf);
+	}
+#else
+	// Linux/macOS: build path to libjvm.so and dlopen it
+	char libjvm_path[512];
+	snprintf(libjvm_path, sizeof(libjvm_path), "%s/lib/server/libjvm.so", java_home);
+
+	g_jvm_dl = dlopen(libjvm_path, RTLD_NOW | RTLD_GLOBAL);
+	if (!g_jvm_dl) {
+		char buf[1024];
+		snprintf(buf, sizeof(buf), "dlopen(%s) failed: %s", libjvm_path, dlerror());
+		return strdup(buf);
+	}
+
+	pfn_JNI_CreateJavaVM = (JNI_CreateJavaVM_t)dlsym(g_jvm_dl, "JNI_CreateJavaVM");
+	if (!pfn_JNI_CreateJavaVM) {
+		char buf[256];
+		snprintf(buf, sizeof(buf), "dlsym(JNI_CreateJavaVM) failed: %s", dlerror());
+		return strdup(buf);
+	}
+#endif
+
+	return NULL;
+}
 
 // ---------------------------------------------------------------------------
 // Global JVM state
@@ -73,12 +163,97 @@ static char* jni_get_error(void) {
 // JVM lifecycle
 // ---------------------------------------------------------------------------
 
-// Initialize JVM with classpath. Returns error string or NULL.
-static char* jvm_initialize(const char* classpath) {
+// Workaround for Go issues #47576 and #58542:
+// Go's Vectored Exception Handler (VEH) intercepts the JVM's internal SEH
+// exceptions during JNI_CreateJavaVM and terminates the process. Both issues
+// are still open as of Go 1.24.
+//
+// Solution: Run JNI_CreateJavaVM on a pure Windows thread (CreateThread).
+// Go's VEH checks getg() — on a non-Go thread it returns NULL, so the VEH
+// returns EXCEPTION_CONTINUE_SEARCH, letting the JVM's SEH handle its own
+// internal exceptions. After JVM creation, we AttachCurrentThread to get a
+// valid JNIEnv* on the calling (Go) thread.
+
+#ifdef _WIN32
+
+typedef struct {
+	const char* classpath;
+	char* error;       // malloc'd error string, or NULL on success
+} jvm_init_args_t;
+
+static DWORD WINAPI jvm_create_thread_proc(LPVOID param) {
+	jvm_init_args_t* args = (jvm_init_args_t*)param;
+
 	JavaVMInitArgs vm_args;
 	JavaVMOption options[1];
 
 	// Build classpath option
+	size_t cp_len = strlen("-Djava.class.path=") + strlen(args->classpath) + 1;
+	char* cp_opt = (char*)malloc(cp_len);
+	snprintf(cp_opt, cp_len, "-Djava.class.path=%s", args->classpath);
+
+	options[0].optionString = cp_opt;
+	vm_args.version = JNI_VERSION_1_8;
+	vm_args.nOptions = 1;
+	vm_args.options = options;
+	vm_args.ignoreUnrecognized = JNI_FALSE;
+
+	// JNIEnv* from this thread is thread-local; we only need g_jvm.
+	JNIEnv* init_env = NULL;
+	jint rc = pfn_JNI_CreateJavaVM(&g_jvm, (void**)&init_env, &vm_args);
+	free(cp_opt);
+
+	if (rc != JNI_OK) {
+		char buf[64];
+		snprintf(buf, sizeof(buf), "JNI_CreateJavaVM failed with code %d", (int)rc);
+		args->error = strdup(buf);
+	} else {
+		args->error = NULL;
+	}
+
+	return 0;
+}
+
+#endif // _WIN32
+
+// Initialize JVM with classpath. Returns error string or NULL.
+static char* jvm_initialize(const char* classpath) {
+
+	// Dynamically load jvm.dll / libjvm.so
+	char* load_err = load_jvm_library();
+	if (load_err) return load_err;
+
+#ifdef _WIN32
+	// Create JVM on a pure Windows thread to avoid Go VEH/SEH conflict
+	jvm_init_args_t args;
+	args.classpath = classpath;
+	args.error = NULL;
+
+	HANDLE thread = CreateThread(NULL, 0, jvm_create_thread_proc, &args, 0, NULL);
+	if (!thread) {
+		char buf[128];
+		snprintf(buf, sizeof(buf), "CreateThread for JVM init failed (error %lu)", GetLastError());
+		return strdup(buf);
+	}
+
+	WaitForSingleObject(thread, INFINITE);
+	CloseHandle(thread);
+
+	if (args.error) return args.error;
+
+	// Attach the current (Go) thread to the JVM to obtain a valid JNIEnv*
+	jint rc = (*g_jvm)->AttachCurrentThread(g_jvm, (void**)&g_env, NULL);
+	if (rc != JNI_OK) {
+		char buf[64];
+		snprintf(buf, sizeof(buf), "AttachCurrentThread failed with code %d", (int)rc);
+		return strdup(buf);
+	}
+
+#else
+	// Non-Windows: call directly (no VEH/SEH conflict)
+	JavaVMInitArgs vm_args;
+	JavaVMOption options[1];
+
 	size_t cp_len = strlen("-Djava.class.path=") + strlen(classpath) + 1;
 	char* cp_opt = (char*)malloc(cp_len);
 	snprintf(cp_opt, cp_len, "-Djava.class.path=%s", classpath);
@@ -89,7 +264,7 @@ static char* jvm_initialize(const char* classpath) {
 	vm_args.options = options;
 	vm_args.ignoreUnrecognized = JNI_FALSE;
 
-	jint rc = JNI_CreateJavaVM(&g_jvm, (void**)&g_env, &vm_args);
+	jint rc = pfn_JNI_CreateJavaVM(&g_jvm, (void**)&g_env, &vm_args);
 	free(cp_opt);
 
 	if (rc != JNI_OK) {
@@ -97,6 +272,7 @@ static char* jvm_initialize(const char* classpath) {
 		snprintf(buf, sizeof(buf), "JNI_CreateJavaVM failed with code %d", (int)rc);
 		return strdup(buf);
 	}
+#endif
 
 	return NULL;
 }
@@ -112,6 +288,34 @@ static void jvm_destroy(void) {
 // Returns JVM version string
 static const char* jvm_version(void) {
 	return "JNI";
+}
+
+// Ensure the current OS thread is attached to the JVM.
+// Updates g_env to the JNIEnv* for this thread.
+// Must be called from any thread that will make JNI calls.
+static char* ensure_jvm_thread(void) {
+	if (!g_jvm) return strdup("JVM not initialized");
+
+	JNIEnv* env = NULL;
+	jint rc = (*g_jvm)->GetEnv(g_jvm, (void**)&env, JNI_VERSION_1_8);
+	if (rc == JNI_OK) {
+		g_env = env;
+		return NULL;
+	}
+
+	if (rc == JNI_EDETACHED) {
+		rc = (*g_jvm)->AttachCurrentThread(g_jvm, (void**)&g_env, NULL);
+		if (rc != JNI_OK) {
+			char buf[64];
+			snprintf(buf, sizeof(buf), "AttachCurrentThread failed: %d", (int)rc);
+			return strdup(buf);
+		}
+		return NULL;
+	}
+
+	char buf[64];
+	snprintf(buf, sizeof(buf), "GetEnv returned unexpected code: %d", (int)rc);
+	return strdup(buf);
 }
 
 // ---------------------------------------------------------------------------
@@ -287,24 +491,7 @@ static jclass g_adder_cls = NULL;
 static jmethodID g_adder_ctor = NULL;
 static jobject g_adder_instance = NULL;
 
-// We'll define a small Java class at runtime... actually, for simplicity,
-// we create the adder via MethodHandle or use the existing guest module.
-// The cleanest approach: create a Java-side IntBinaryOperator lambda using
-// a helper method, then pass it. But that requires another Java helper.
-//
-// Instead, for the JNI baseline, we measure calling callCallbackAdd with
-// a pre-created Java IntBinaryOperator instance. The callback itself stays
-// in Java (no cross-language callback). This is the fair JNI comparison.
-
 static char* init_callback_helper(void) {
-	// We'll use a dynamic proxy approach. Actually, the simplest:
-	// Create a class that implements IntBinaryOperator via an anonymous inner class
-	// compiled into the JAR. But our JAR doesn't have one.
-	//
-	// Alternative: Use returnCallbackAdd() which returns an IntBinaryOperator
-	// that does (a,b)->a+b. Then pass that to callCallbackAdd.
-	// This measures: JNI call -> Java static method -> callback (Java-to-Java) -> return.
-
 	jmethodID returnCallbackAdd = (*g_env)->GetStaticMethodID(g_env, g_core_cls,
 		"returnCallbackAdd", "()Ljava/util/function/IntBinaryOperator;");
 	if (!returnCallbackAdd) {
@@ -363,6 +550,19 @@ func JVMInitialize(classpath string) error {
 		msg := C.GoString(cerr)
 		C.free(unsafe.Pointer(cerr))
 		return fmt.Errorf("JVM init: %s", msg)
+	}
+	return nil
+}
+
+// EnsureJVMThread attaches the current OS thread to the JVM if needed.
+// Must be called (with runtime.LockOSThread) from any goroutine that
+// will make JNI calls on a different thread than JVMInitialize.
+func EnsureJVMThread() error {
+	cerr := C.ensure_jvm_thread()
+	if cerr != nil {
+		msg := C.GoString(cerr)
+		C.free(unsafe.Pointer(cerr))
+		return fmt.Errorf("ensure JVM thread: %s", msg)
 	}
 	return nil
 }

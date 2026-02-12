@@ -296,6 +296,31 @@ static int bench_callback(PyObject* func, int *match) {
 // Scenario 7: error propagation -- returns_an_error()
 // ============================================================
 
+// ---------------------------------------------------------------------------
+// Thread / GIL management for subtests on different OS threads
+// ---------------------------------------------------------------------------
+
+// Release the GIL so other threads can acquire it.
+// Call from the thread that currently holds the GIL (e.g. TestMain).
+static void py_save_thread(void) {
+	PyEval_SaveThread();
+}
+
+// Acquire the GIL for the current thread (creating a Python thread
+// state if needed). Returns an opaque state for py_release_gil.
+static int py_ensure_gil(void) {
+	return (int)PyGILState_Ensure();
+}
+
+// Release the GIL for the current thread.
+static void py_release_gil(int state) {
+	PyGILState_Release((PyGILState_STATE)state);
+}
+
+// ============================================================
+// Scenario 7: error propagation -- returns_an_error()
+// ============================================================
+
 static int bench_error_propagation(PyObject* func) {
 	PyObject *result = PyObject_CallObject(func, NULL);
 	if (result != NULL) {
@@ -341,6 +366,23 @@ func PyInitialize(modulePath string) error {
 // PyFinalize calls Py_FinalizeEx.
 func PyFinalize() {
 	C.py_finalize()
+}
+
+// PySaveThread releases the GIL so other threads can acquire it.
+// Must be called from the thread that currently holds the GIL.
+func PySaveThread() {
+	C.py_save_thread()
+}
+
+// PyEnsureGIL acquires the GIL for the current thread.
+// Returns a state value that must be passed to PyReleaseGIL.
+func PyEnsureGIL() int {
+	return int(C.py_ensure_gil())
+}
+
+// PyReleaseGIL releases the GIL for the current thread.
+func PyReleaseGIL(state int) {
+	C.py_release_gil(C.int(state))
 }
 
 // PyImportModule imports a Python module by name.

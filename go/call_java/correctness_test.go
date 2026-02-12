@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	api "github.com/MetaFFI/sdk/api/go"
-	goruntime "github.com/MetaFFI/sdk/api/go/metaffi"
 	"github.com/MetaFFI/sdk/idl_entities/go/IDL"
 )
 
@@ -68,6 +67,11 @@ func ti(t IDL.MetaFFIType) IDL.MetaFFITypeInfo {
 // tiArray creates a MetaFFITypeInfo for an array type with given dimensions.
 func tiArray(t IDL.MetaFFIType, dims int) IDL.MetaFFITypeInfo {
 	return IDL.MetaFFITypeInfo{StringType: t, Dimensions: dims}
+}
+
+// tiAlias creates a MetaFFITypeInfo with an alias (e.g., Java interface/class).
+func tiAlias(t IDL.MetaFFIType, alias string) IDL.MetaFFITypeInfo {
+	return IDL.MetaFFITypeInfo{StringType: t, Alias: alias}
 }
 
 // load loads an entity; fatals immediately on error (fail-fast).
@@ -165,14 +169,22 @@ func TestCoreReturnsAnError(t *testing.T) {
 }
 
 func TestCoreCallCallbackAdd(t *testing.T) {
+	adapter := load(t, "class=metaffi.api.accessor.CallbackAdapters,callable=asInterface",
+		[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE), ti(IDL.STRING8)},
+		[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)})
+
+	adder := func(a, b int32) int32 { return a + b }
+	adapterRet := call(t, "CallbackAdapters.asInterface", adapter, adder, "java.util.function.IntBinaryOperator")
+	if adapterRet[0] == nil {
+		t.Fatal("CallbackAdapters.asInterface: got nil proxy")
+	}
+	proxy := adapterRet[0]
+
 	ff := load(t, "class=guest.CoreFunctions,callable=callCallbackAdd",
-		[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE)},
+		[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "java.util.function.IntBinaryOperator")},
 		[]IDL.MetaFFITypeInfo{ti(IDL.INT32)})
 
-	// Provide a Go function as callback: add(a, b) -> a + b
-	adder := func(a, b int32) int32 { return a + b }
-
-	ret := call(t, "callCallbackAdd", ff, adder)
+	ret := call(t, "callCallbackAdd", ff, proxy)
 	if v, ok := ret[0].(int32); !ok || v != 3 {
 		t.Fatalf("callCallbackAdd: got %v (%T), want 3", ret[0], ret[0])
 	}
@@ -180,24 +192,24 @@ func TestCoreCallCallbackAdd(t *testing.T) {
 
 func TestCoreReturnCallbackAdd(t *testing.T) {
 	ff := load(t, "class=guest.CoreFunctions,callable=returnCallbackAdd", nil,
-		[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE)})
+		[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "java.util.function.IntBinaryOperator")})
 
 	ret := call(t, "returnCallbackAdd", ff)
 	if ret[0] == nil {
 		t.Fatal("returnCallbackAdd: got nil callable")
 	}
 
-	callable, ok := ret[0].(*goruntime.MetaFFICallable)
-	if !ok {
-		t.Fatalf("returnCallbackAdd: expected *MetaFFICallable, got %T", ret[0])
-	}
+	apply := load(t, "class=java.util.function.IntBinaryOperator,callable=applyAsInt,instance_required",
+		[]IDL.MetaFFITypeInfo{
+			tiAlias(IDL.HANDLE, "java.util.function.IntBinaryOperator"),
+			ti(IDL.INT32),
+			ti(IDL.INT32),
+		},
+		[]IDL.MetaFFITypeInfo{ti(IDL.INT32)})
 
-	result, err := callable.Call(int32(3), int32(4))
-	if err != nil {
-		t.Fatalf("callable.Call(3, 4): %v", err)
-	}
+	result := call(t, "IntBinaryOperator.applyAsInt", apply, ret[0], int32(3), int32(4))
 	if v, ok := result[0].(int32); !ok || v != 7 {
-		t.Fatalf("callable.Call(3, 4): got %v (%T), want 7", result[0], result[0])
+		t.Fatalf("applyAsInt(3, 4): got %v (%T), want 7", result[0], result[0])
 	}
 }
 
@@ -792,12 +804,20 @@ func TestErrorsReturnErrorString(t *testing.T) {
 // ==========================================================================
 
 func TestCallbacksCallTransformer(t *testing.T) {
+	returnTransformer := load(t, "class=guest.Callbacks,callable=returnTransformer",
+		[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)},
+		[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "guest.Callbacks.StringTransformer")})
+
 	ff := load(t, "class=guest.Callbacks,callable=callTransformer",
-		[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE), ti(IDL.STRING8)},
+		[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "guest.Callbacks.StringTransformer"), ti(IDL.STRING8)},
 		[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
 
-	transformer := func(value string) string { return value + "_x" }
-	ret := call(t, "callTransformer", ff, transformer, "a")
+	transformerRet := call(t, "returnTransformer(\"_x\")", returnTransformer, "_x")
+	if transformerRet[0] == nil {
+		t.Fatal("returnTransformer(\"_x\"): got nil transformer")
+	}
+
+	ret := call(t, "callTransformer", ff, transformerRet[0], "a")
 	if v, ok := ret[0].(string); !ok || v != "a_x" {
 		t.Fatalf("callTransformer: got %q, want \"a_x\"", ret[0])
 	}
@@ -806,24 +826,20 @@ func TestCallbacksCallTransformer(t *testing.T) {
 func TestCallbacksReturnTransformer(t *testing.T) {
 	ff := load(t, "class=guest.Callbacks,callable=returnTransformer",
 		[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)},
-		[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE)})
+		[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "guest.Callbacks.StringTransformer")})
 
 	ret := call(t, "returnTransformer(\"_y\")", ff, "_y")
 	if ret[0] == nil {
 		t.Fatal("returnTransformer: got nil callable")
 	}
 
-	callable, ok := ret[0].(*goruntime.MetaFFICallable)
-	if !ok {
-		t.Fatalf("returnTransformer: expected *MetaFFICallable, got %T", ret[0])
-	}
+	transform := load(t, "class=guest.Callbacks.StringTransformer,callable=transform,instance_required",
+		[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "guest.Callbacks.StringTransformer"), ti(IDL.STRING8)},
+		[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
 
-	result, err := callable.Call("b")
-	if err != nil {
-		t.Fatalf("transformer(\"b\"): %v", err)
-	}
+	result := call(t, "StringTransformer.transform", transform, ret[0], "b")
 	if v, ok := result[0].(string); !ok || v != "b_y" {
-		t.Fatalf("transformer(\"b\"): got %v (%T), want \"b_y\"", result[0], result[0])
+		t.Fatalf("transform(\"b\"): got %v (%T), want \"b_y\"", result[0], result[0])
 	}
 }
 

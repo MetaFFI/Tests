@@ -347,14 +347,23 @@ func TestBenchmarkAll(t *testing.T) {
 
 	// --- Scenario 6: Callback invocation ---
 	t.Run("callback", func(t *testing.T) {
+		adapter := load(t, "class=metaffi.api.accessor.CallbackAdapters,callable=asInterface",
+			[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE), ti(IDL.STRING8)},
+			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)})
+
 		ff := load(t, "class=guest.CoreFunctions,callable=callCallbackAdd",
-			[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE)},
+			[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "java.util.function.IntBinaryOperator")},
 			[]IDL.MetaFFITypeInfo{ti(IDL.INT32)})
 
 		adder := func(a, b int32) int32 { return a + b }
+		adapterRet := call(t, "CallbackAdapters.asInterface", adapter, adder, "java.util.function.IntBinaryOperator")
+		if adapterRet[0] == nil {
+			t.Fatal("CallbackAdapters.asInterface: got nil proxy")
+		}
+		proxy := adapterRet[0]
 
 		result := runBenchmark(t, "callback", nil, warmup, iterations, func() error {
-			ret, err := ff(adder)
+			ret, err := ff(proxy)
 			if err != nil {
 				return err
 			}
