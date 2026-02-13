@@ -362,44 +362,25 @@ public class TestBenchmark
 		}
 
 		// --- Scenario 5: Object create + method call ---
-		// NOTE: attribute=TestMap,getter is a no-param call, triggers xcall_no_params_ret bug
-		try
-		{
-			Caller getTestMapClass = pyModule.load("attribute=TestMap,getter", null,
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)});
-			Caller newTestMap = pyModule.load("callable=TestMap.__new__",
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)},
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)});
-			Caller initTestMap = pyModule.load("callable=TestMap.__init__,instance_required",
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)}, null);
-			Caller containsFn = pyModule.load("callable=TestMap.contains,instance_required",
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle), t(MetaFFITypes.MetaFFIString8)},
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIBool)});
-			assertNotNull("Failed to load TestMap class getter", getTestMapClass);
-			assertNotNull("Failed to load TestMap.__new__", newTestMap);
-			assertNotNull("Failed to load TestMap.__init__", initTestMap);
-			assertNotNull("Failed to load TestMap.contains", containsFn);
+		Caller newSomeClass = pyModule.load("callable=SomeClass",
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIString8)},
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)});
+		Caller printFn = pyModule.load("callable=SomeClass.print,instance_required",
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)},
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIString8)});
+		assertNotNull("Failed to load SomeClass ctor", newSomeClass);
+		assertNotNull("Failed to load SomeClass.print", printFn);
 
-			Object[] classResult = getTestMapClass.call();
-			Object testMapClass = classResult[0];
-
-			benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
-				() -> {
-					Object[] instResult = newTestMap.call(testMapClass);
-					MetaFFIHandle inst = (MetaFFIHandle) instResult[0];
-					initTestMap.call(inst);
-					Object[] cResult = containsFn.call(inst, "nonexistent");
-					if ((Boolean) cResult[0])
-					{
-						throw new RuntimeException("TestMap.contains: expected false");
-					}
-				}));
-		}
-		catch (Throwable e)
-		{
-			System.err.println("Object method scenario failed (xcall_no_params_ret bug): " + e.getMessage());
-			benchmarkJsons.add(makeFailedResult("object_method", null, "xcall_no_params_ret bug: " + e.getMessage()));
-		}
+		benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
+			() -> {
+				Object[] instResult = newSomeClass.call("bench");
+				MetaFFIHandle inst = (MetaFFIHandle) instResult[0];
+				Object[] printResult = printFn.call(inst);
+				if (!"Hello from SomeClass bench".equals(printResult[0]))
+				{
+					throw new RuntimeException("SomeClass.print: got " + printResult[0]);
+				}
+			}));
 
 		// --- Scenario 6: Callback invocation ---
 		try

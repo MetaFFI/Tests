@@ -1,0 +1,42 @@
+# Fast smoke configuration to validate end-to-end wiring quickly.
+# Usage:
+#   python tests/run_all_tests.py --config tests/configs/fast_test_config.yml
+
+run:
+  include_benchmarks: true
+  include_correctness: false
+
+  # Single run for speed.
+  repeats: 1
+  # Tiny sample sizes for smoke testing only.
+  warmup_iterations: 1
+  measured_iterations: 10
+
+  # Keep timer-floor mitigation logic enabled.
+  batch_min_elapsed_ns: 10000
+  batch_max_calls: 100000
+
+  heartbeat_seconds: 10
+
+selection:
+  hosts: [go, python3, java]
+  # Small subset to keep smoke runs short.
+  pairs: [go:python3, python3:java]
+  mechanisms: [metaffi, grpc, cpython, jpype]
+
+execution:
+  rerun_existing: true
+  fail_fast: true
+  default_timeout_seconds: 600
+  java_metaffi_timeout_seconds: 3600
+
+outputs:
+  canonical_results_dir: tests/results
+  repeat_root_dir: tests/results/repeats
+  write_repeat_files: true
+
+  # Skip heavy post-processing for smoke by default.
+  run_complexity: false
+  run_consolidation: false
+  run_tables: false
+  run_report: false

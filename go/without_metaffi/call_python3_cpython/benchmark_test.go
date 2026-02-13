@@ -166,6 +166,8 @@ type Environment struct {
 type Config struct {
 	WarmupIterations   int   `json:"warmup_iterations"`
 	MeasuredIterations int   `json:"measured_iterations"`
+	BatchMinElapsedNs  int64 `json:"batch_min_elapsed_ns"`
+	BatchMaxCalls      int   `json:"batch_max_calls"`
 	TimerOverheadNs    int64 `json:"timer_overhead_ns"`
 }
 
@@ -268,6 +270,8 @@ func runBenchmark(
 	dataSize *int,
 	warmup int,
 	iterations int,
+	batchMinElapsedNs int64,
+	batchMaxCalls int,
 	benchFn func() error,
 ) BenchmarkResult {
 	t.Helper()
@@ -284,14 +288,25 @@ func runBenchmark(
 	rawNs := make([]int64, iterations)
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
-		err := benchFn()
-		elapsed := time.Since(start).Nanoseconds()
-
-		if err != nil {
-			t.Fatalf("benchmark %q iteration %d: %v (BENCHMARK INVALIDATED)", scenario, i, err)
-			return BenchmarkResult{Scenario: scenario, DataSize: dataSize, Status: "FAIL"}
+		calls := 0
+		for {
+			err := benchFn()
+			if err != nil {
+				t.Fatalf("benchmark %q iteration %d: %v (BENCHMARK INVALIDATED)", scenario, i, err)
+				return BenchmarkResult{Scenario: scenario, DataSize: dataSize, Status: "FAIL"}
+			}
+			calls++
+			elapsed := time.Since(start).Nanoseconds()
+			if elapsed >= batchMinElapsedNs || calls >= batchMaxCalls {
+				perCall := float64(elapsed) / float64(calls)
+				if perCall > 0.0 && perCall < 1.0 {
+					rawNs[i] = 1
+				} else {
+					rawNs[i] = int64(math.Round(perCall))
+				}
+				break
+			}
 		}
-		rawNs[i] = elapsed
 	}
 
 	// Sort for statistics
@@ -339,6 +354,8 @@ func TestBenchmarkAll(t *testing.T) {
 
 	warmup := getIntEnv("METAFFI_TEST_WARMUP", 100)
 	iterations := getIntEnv("METAFFI_TEST_ITERATIONS", 10000)
+	batchMinElapsedNs := int64(getIntEnv("METAFFI_TEST_BATCH_MIN_ELAPSED_NS", 10000))
+	batchMaxCalls := getIntEnv("METAFFI_TEST_BATCH_MAX_CALLS", 100000)
 
 	timerOverhead := measureTimerOverhead()
 	t.Logf("Timer overhead: %d ns", timerOverhead)
@@ -348,7 +365,7 @@ func TestBenchmarkAll(t *testing.T) {
 	// --- Scenario 1: Void call ---
 	t.Run("void_call", func(t *testing.T) {
 		ensureThread(t)
-		result := runBenchmark(t, "void_call", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			return BenchVoidCall(waitABitFunc)
 		})
 		benchmarks = append(benchmarks, result)
@@ -357,7 +374,7 @@ func TestBenchmarkAll(t *testing.T) {
 	// --- Scenario 2: Primitive echo ---
 	t.Run("primitive_echo", func(t *testing.T) {
 		ensureThread(t)
-		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			return BenchPrimitiveEcho(divIntegersFunc)
 		})
 		benchmarks = append(benchmarks, result)
@@ -366,7 +383,7 @@ func TestBenchmarkAll(t *testing.T) {
 	// --- Scenario 3: String echo ---
 	t.Run("string_echo", func(t *testing.T) {
 		ensureThread(t)
-		result := runBenchmark(t, "string_echo", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			return BenchStringEcho(joinStringsFunc)
 		})
 		benchmarks = append(benchmarks, result)
@@ -383,7 +400,7 @@ func TestBenchmarkAll(t *testing.T) {
 			}
 
 			sizePtr := size
-			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, func() error {
+			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 				return BenchArraySum(acceptsRaggedFn, size, expectedSum)
 			})
 			benchmarks = append(benchmarks, result)
@@ -393,7 +410,7 @@ func TestBenchmarkAll(t *testing.T) {
 	// --- Scenario 5: Object create + method call ---
 	t.Run("object_method", func(t *testing.T) {
 		ensureThread(t)
-		result := runBenchmark(t, "object_method", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			return BenchObjectMethod(someClassObj)
 		})
 		benchmarks = append(benchmarks, result)
@@ -402,7 +419,7 @@ func TestBenchmarkAll(t *testing.T) {
 	// --- Scenario 6: Callback invocation ---
 	t.Run("callback", func(t *testing.T) {
 		ensureThread(t)
-		result := runBenchmark(t, "callback", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			return BenchCallback(callCallbackFn)
 		})
 		benchmarks = append(benchmarks, result)
@@ -411,21 +428,28 @@ func TestBenchmarkAll(t *testing.T) {
 	// --- Scenario 7: Error propagation ---
 	t.Run("error_propagation", func(t *testing.T) {
 		ensureThread(t)
-		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			return BenchErrorPropagation(returnsAnErrFn)
 		})
 		benchmarks = append(benchmarks, result)
 	})
 
 	// --- Write results to JSON ---
-	writeResults(t, benchmarks, timerOverhead, warmup, iterations)
+	writeResults(t, benchmarks, timerOverhead, warmup, iterations, batchMinElapsedNs, batchMaxCalls)
 }
 
 // ---------------------------------------------------------------------------
 // JSON output
 // ---------------------------------------------------------------------------
 
-func writeResults(t *testing.T, benchmarks []BenchmarkResult, timerOverhead int64, warmup, iterations int) {
+func writeResults(
+	t *testing.T,
+	benchmarks []BenchmarkResult,
+	timerOverhead int64,
+	warmup, iterations int,
+	batchMinElapsedNs int64,
+	batchMaxCalls int,
+) {
 	t.Helper()
 
 	resultPath := os.Getenv("METAFFI_TEST_RESULTS_FILE")
@@ -448,6 +472,8 @@ func writeResults(t *testing.T, benchmarks []BenchmarkResult, timerOverhead int6
 			Config: Config{
 				WarmupIterations:   warmup,
 				MeasuredIterations: iterations,
+				BatchMinElapsedNs:  batchMinElapsedNs,
+				BatchMaxCalls:      batchMaxCalls,
 				TimerOverheadNs:    timerOverhead,
 			},
 		},

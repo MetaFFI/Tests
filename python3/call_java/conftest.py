@@ -7,6 +7,7 @@ used by both correctness and benchmark tests.
 import os
 import sys
 import time
+import gc
 
 # --- Ensure metaffi SDK is on the Python path ---
 METAFFI_SOURCE_ROOT = os.environ.get("METAFFI_SOURCE_ROOT")
@@ -60,7 +61,11 @@ def java_runtime():
     init_timing["load_runtime_plugin_ns"] = time.perf_counter_ns() - start
 
     yield rt
-    rt.release_runtime_plugin()
+    # Force Python finalizers while runtime/plugin are still valid.
+    gc.collect()
+    # TEMP diagnostic: see if teardown crash is inside runtime release.
+    # rt.release_runtime_plugin()
+    # gc.collect()
 
 
 @pytest.fixture(scope="session")
@@ -71,3 +76,6 @@ def java_module(java_runtime):
     init_timing["load_module_ns"] = time.perf_counter_ns() - start
 
     yield mod
+    # Ensure module object is dropped before java_runtime teardown.
+    mod = None
+    gc.collect()

@@ -7,20 +7,14 @@ This document describes the cross-language testing, performance benchmarking, an
 ## Quick Start
 
 ```powershell
-# Run all tests (skips tests with existing results)
-python tests/run_all_tests.py
+# Full thesis benchmark run (N=5 uncertainty pass, benchmarks-only)
+python tests/run_all_tests.py --config tests/configs/thesis_config.yml
 
-# Re-run everything from scratch
-python tests/run_all_tests.py --all
+# Fast smoke run (quick pipeline validation)
+python tests/run_all_tests.py --config tests/configs/fast_test_config.yml
 
-# Run only Go-as-host tests
-python tests/run_all_tests.py --host go
-
-# Run only one pair
-python tests/run_all_tests.py --pair go:python3
-
-# Custom iteration count
-python tests/run_all_tests.py --iterations 50000 --warmup 200
+# Correctness-only run (MetaFFI suites)
+python tests/run_all_tests.py --config tests/configs/only_correctness_config.yml
 
 # Consolidate results (run after tests complete)
 python tests/consolidate_results.py
@@ -31,6 +25,32 @@ python tests/generate_tables.py
 # Run complexity analysis
 python tests/analyze_complexity.py
 ```
+
+`run_all_tests.py` is now **strictly config-driven**:
+- `--config` is required.
+- Missing keys and unknown keys are fail-fast errors.
+- Published benchmark protocol is defined in YAML (`tests/configs/*.yml`), not CLI flags.
+
+Published benchmark protocol (`tests/configs/thesis_config.yml`):
+- benchmarks-only
+- repeats: `5`
+- warmup iterations: `100`
+- measured iterations: `10000`
+- aggregation: pooled iterations across all repeats
+
+### Current Continuity Notes (2026-02-13)
+
+- `java->go [metaffi]` array path was heavily optimized in `sdk/runtime_manager/jvm/cdts_java_wrapper.cpp`:
+  - 1D bulk fast paths added for all primitive numeric types, `bool`, and `handle` (both construct and traverse directions).
+  - benchmark impact: wall-time for `tests/java/call_go` with `warmup=100`, `iterations=10000` dropped from prior ~766.6s (runner log baseline) to ~8.1s.
+  - `array_echo[10000]` now measures ~455,760 ns in focused run.
+- Known side effect:
+  - In `tests/java/call_go/src/test/java/TestCorrectness.java`, `testMake3DArray` and `testMakeRaggedArray` are currently flagged as `xfail` but now unexpectedly pass.
+  - This is a test expectation mismatch to resolve (either keep as xfail for phase separation or convert to normal pass assertions).
+- Python serializer also got a targeted optimization:
+  - `sdk/cdts_serializer/cpython3/cdts_python3_serializer.cpp` now has a direct 1D primitive array fill path (`int/uint/float/bool`) with fail-fast range/type checks.
+- Consolidation is now resilient to temp/debug result files:
+  - `tests/consolidate_results.py` only loads canonical expected triple filenames, so `_tmp_*` files do not pollute published tables.
 
 ---
 
@@ -219,6 +239,10 @@ Each test produces a JSON file at `tests/results/<host>_to_<guest>_<mechanism>.j
     "config": {
       "warmup_iterations": 100,
       "measured_iterations": 10000,
+      "batch_min_elapsed_ns": 10000,
+      "batch_max_calls": 100000,
+      "repeat_count": 5,
+      "aggregation_method": "pooled_iterations",
       "timer_overhead_ns": 25
     }
   },
@@ -248,6 +272,13 @@ Each test produces a JSON file at `tests/results/<host>_to_<guest>_<mechanism>.j
           "stddev_ns": 80,
           "ci95_ns": [1190, 1210]
         }
+      },
+      "repeat_analysis": {
+        "repeat_count": 5,
+        "repeat_means_ns": [1180, 1220, 1195, 1210, 1198],
+        "global_mean_ns": 1200,
+        "pooled_sample_count": 50000,
+        "aggregation_method": "pooled_iterations"
       }
     },
     {
@@ -398,7 +429,7 @@ cd c:\src\github.com\MetaFFI\tests\java\without_metaffi\call_python3_grpc
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `run_all_tests.py` | Run all 18 tests, skip existing, report failures | `python run_all_tests.py [--all]` |
+| `run_all_tests.py` | Config-driven benchmark/correctness runner with repeats + fail-fast aggregation | `python run_all_tests.py --config tests/configs/<name>.yml` |
 | `consolidate_results.py` | Merge per-triple JSON files into `consolidated.json` | `python consolidate_results.py` |
 | `generate_tables.py` | Generate markdown tables from consolidated + complexity data | `python generate_tables.py` |
 | `analyze_complexity.py` | Compute SLOC/CC for all 18 implementations | `python analyze_complexity.py` |
@@ -428,8 +459,10 @@ cd c:\src\github.com\MetaFFI\tests\java\without_metaffi\call_python3_grpc
 | `JAVA_HOME` | Yes | JDK installation (e.g., `C:\Program Files\OpenJDK\jdk-22.0.2`) |
 | `METAFFI_TEST_ITERATIONS` | No | Override default 10000 iterations |
 | `METAFFI_TEST_WARMUP` | No | Override default 100 warmup iterations |
+| `METAFFI_TEST_BATCH_MIN_ELAPSED_NS` | No | Adaptive micro-batch target elapsed time per timing sample (ns) |
+| `METAFFI_TEST_BATCH_MAX_CALLS` | No | Safety cap on adaptive micro-batch inner calls |
 | `METAFFI_TEST_RESULTS_FILE` | No | Override output JSON path |
-| `METAFFI_TEST_MODE` | No | `all`, `correctness`, or `benchmarks` |
+| `METAFFI_TEST_MODE` | No | `correctness` or `benchmarks` |
 | `JEP_HOME` | For Jep | Path to Jep package (auto-detected if pip-installed) |
 
 ### Python Packages
@@ -578,7 +611,11 @@ Entity paths are comma-separated key=value pairs (see `sdk/idl_entities/entity_p
 tests/
   plan.md                          # This document
   README.md                        # Brief overview
-  run_all_tests.py                 # Master test runner (skip/rerun/report)
+  run_all_tests.py                 # Config-driven runner (repeats + aggregation + heartbeat)
+  configs/                         # Runner protocol presets
+    thesis_config.yml              # Published benchmark protocol (N=5)
+    fast_test_config.yml           # Quick smoke validation
+    only_correctness_config.yml    # Correctness-only run
   run_tests.py                     # Legacy orchestration script
   consolidate_results.py           # Merge results into consolidated.json
   generate_tables.py               # Generate thesis tables from results

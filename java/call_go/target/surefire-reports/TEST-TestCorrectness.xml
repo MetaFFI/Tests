@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="TestCorrectness" time="0.141" tests="44" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="TestCorrectness" time="0.153" tests="44" errors="0" skipped="0" failures="2">
   <properties>
     <property name="java.specification.version" value="22"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\OpenJDK\jdk-22.0.2\bin"/>
-    <property name="sun.java.command" value="C:\Users\green\AppData\Local\Temp\surefire923641682061287902\surefirebooter-20260210120633143_3.jar C:\Users\green\AppData\Local\Temp\surefire923641682061287902 2026-02-10T12-06-33_020-jvmRun1 surefire-20260210120633143_1tmp surefire_0-20260210120633143_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\green\AppData\Local\Temp\surefire16895090447514677080\surefirebooter-20260213154139439_3.jar C:\Users\green\AppData\Local\Temp\surefire16895090447514677080 2026-02-13T15-41-39_323-jvmRun1 surefire-20260213154139439_1tmp surefire_0-20260213154139439_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="test" value="TestCorrectness"/>
     <property name="surefire.test.class.path" value="C:\src\github.com\MetaFFI\tests\java\call_go\target\test-classes;C:\src\github.com\MetaFFI\tests\java\call_go\target\classes;C:\Users\green\.m2\repository\junit\junit\4.13.1\junit-4.13.1.jar;C:\Users\green\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\src\github.com\MetaFFI\output\windows\x64\debug\sdk\api\jvm\metaffi.api.jar;C:\src\github.com\MetaFFI\output\windows\x64\debug/sdk/api/jvm/metaffi.api.jar;"/>
@@ -32,7 +32,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\green\AppData\Local\Temp\surefire923641682061287902\surefirebooter-20260210120633143_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\green\AppData\Local\Temp\surefire16895090447514677080\surefirebooter-20260213154139439_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="22.0.2+9-70"/>
@@ -60,52 +60,52 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="66.0"/>
   </properties>
-  <testcase name="testReturnMultipleReturnValues" classname="TestCorrectness" time="0.013"/>
+  <testcase name="testReturnMultipleReturnValues" classname="TestCorrectness" time="0.019"/>
   <testcase name="testMake2DArray" classname="TestCorrectness" time="0.006">
     <system-err><![CDATA[XFAIL: Go int != int64: Make2DArray returns [][]int but MetaFFI expects [][]int64 - ClassCastException: class [[Ljava.lang.Object; cannot be cast to class [[J ([[Ljava.lang.Object; and [[J are in module java.base of loader 'bootstrap')
 ]]></system-err>
   </testcase>
-  <testcase name="testSum3DArray" classname="TestCorrectness" time="0.0">
+  <testcase name="testSum3DArray" classname="TestCorrectness" time="0.001">
     <system-err><![CDATA[XFAIL: Go int != int64: Sum3DArray expects [][][]int param - MetaFFIException: Panic in Go function. Panic Data: interface conversion: interface {} is [][][]int64, not [][][]int
 Stack Trace:
 goroutine 17 [running, locked to thread]:
-main.panicHandler(0xef47efe038)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:4798 +0x1a8
-panic({0x7ffdb71b1800?, 0xc000028390?})
+main.panicHandler(0xac5fefe508)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:4798 +0x1a8
+panic({0x7ffdb6fb3800?, 0xc000024390?})
 	C:/Program Files/Go/src/runtime/panic.go:792 +0x132
-main.EntryPoint_Sum3DArray(0xc000012230?, 0x2136e2fde00, 0xef47efe038)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:2139 +0x305
+main.EntryPoint_Sum3DArray(0xc000014150?, 0x1e5c6344270, 0xac5fefe508)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:2139 +0x305
 
 ]]></system-err>
   </testcase>
-  <testcase name="testCallFunction" classname="TestCorrectness" time="0.013"/>
-  <testcase name="testNewTestMap" classname="TestCorrectness" time="0.0"/>
-  <testcase name="testGenericBoxGetSet" classname="TestCorrectness" time="0.0"/>
+  <testcase name="testCallFunction" classname="TestCorrectness" time="0.014"/>
+  <testcase name="testNewTestMap" classname="TestCorrectness" time="0.001"/>
+  <testcase name="testGenericBoxGetSet" classname="TestCorrectness" time="0.001"/>
   <testcase name="testReturnCallbackAdd" classname="TestCorrectness" time="0.001"/>
   <testcase name="testVarargsJoin" classname="TestCorrectness" time="0.002">
     <system-err><![CDATA[XFAIL: Varargs Join - Panic in Go function. Panic Data: interface conversion: interface {} is []string, not string
 Stack Trace:
 goroutine 17 [running, locked to thread]:
-main.panicHandler(0xef47efe178)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:4798 +0x1a8
-panic({0x7ffdb71b1800?, 0xc00010a0f0?})
+main.panicHandler(0xac5fefe648)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:4798 +0x1a8
+panic({0x7ffdb6fb3800?, 0xc000182210?})
 	C:/Program Files/Go/src/runtime/panic.go:792 +0x132
-main.EntryPoint_Join(0xc000012230?, 0x2136e2fdf80, 0xef47efe178)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:369 +0x328
+main.EntryPoint_Join(0xc000014150?, 0x1e5c63443f0, 0xac5fefe648)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:369 +0x328
 
 ]]></system-err>
   </testcase>
   <testcase name="testDivIntegers" classname="TestCorrectness" time="0.0"/>
-  <testcase name="testVarargsSum" classname="TestCorrectness" time="0.002">
+  <testcase name="testVarargsSum" classname="TestCorrectness" time="0.001">
     <system-err><![CDATA[XFAIL: Varargs Sum - Panic in Go function. Panic Data: interface conversion: interface {} is []int64, not int64
 Stack Trace:
 goroutine 17 [running, locked to thread]:
-main.panicHandler(0xef47efe178)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:4798 +0x1a8
-panic({0x7ffdb71b1800?, 0xc00010a120?})
+main.panicHandler(0xac5fefe648)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:4798 +0x1a8
+panic({0x7ffdb6fb3800?, 0xc000182240?})
 	C:/Program Files/Go/src/runtime/panic.go:792 +0x132
-main.EntryPoint_Sum(0xc000012230?, 0x2136e2fe000, 0xef47efe178)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:322 +0x2b5
+main.EntryPoint_Sum(0xc000014150?, 0x1e5c6344470, 0xac5fefe648)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:322 +0x2b5
 
 ]]></system-err>
   </testcase>
@@ -113,67 +113,129 @@ main.EntryPoint_Sum(0xc000012230?, 0x2136e2fe000, 0xef47efe178)
     <system-err><![CDATA[XFAIL: Go int != int64: SumRaggedArray expects [][]int param - MetaFFIException: Panic in Go function. Panic Data: interface conversion: interface {} is [][]int64, not [][]int
 Stack Trace:
 goroutine 17 [running, locked to thread]:
-main.panicHandler(0xef47efe038)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:4798 +0x1a8
-panic({0x7ffdb71b1800?, 0xc00010a150?})
+main.panicHandler(0xac5fefe508)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:4798 +0x1a8
+panic({0x7ffdb6fb3800?, 0xc000182270?})
 	C:/Program Files/Go/src/runtime/panic.go:792 +0x132
-main.EntryPoint_SumRaggedArray(0xc000012230?, 0x2136e2fe040, 0xef47efe038)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:2184 +0x2e5
+main.EntryPoint_SumRaggedArray(0xc000014150?, 0x1e5c63444b0, 0xac5fefe508)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:2184 +0x2e5
 
 ]]></system-err>
   </testcase>
   <testcase name="testJoinStringsSingle" classname="TestCorrectness" time="0.0"/>
-  <testcase name="testMake3DArray" classname="TestCorrectness" time="0.002">
-    <system-err><![CDATA[XFAIL: Go int != int64: Make3DArray returns [][][]int but MetaFFI expects [][][]int64 - MetaFFIException: java.lang.ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 1
-]]></system-err>
+  <testcase name="testMake3DArray" classname="TestCorrectness" time="0.005">
+    <failure message="XFAIL UNEXPECTEDLY PASSED - SDK bug may be fixed: Go int != int64: Make3DArray returns [][][]int but MetaFFI expects [][][]int64" type="java.lang.AssertionError"><![CDATA[java.lang.AssertionError: XFAIL UNEXPECTEDLY PASSED - SDK bug may be fixed: Go int != int64: Make3DArray returns [][][]int but MetaFFI expects [][][]int64
+	at org.junit.Assert.fail(Assert.java:89)
+	at TestCorrectness.xfail(TestCorrectness.java:87)
+	at TestCorrectness.testMake3DArray(TestCorrectness.java:601)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:316)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:240)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:214)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:155)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+]]></failure>
   </testcase>
-  <testcase name="testNewOuterInnerValue" classname="TestCorrectness" time="0.0"/>
+  <testcase name="testNewOuterInnerValue" classname="TestCorrectness" time="0.001"/>
   <testcase name="testReturnTransformer" classname="TestCorrectness" time="0.002">
     <system-err><![CDATA[XFAIL: Go named function type StringTransformer: returned as handle not callable - Expected Caller, got metaffi.api.accessor.MetaFFIHandle
 ]]></system-err>
   </testcase>
   <testcase name="testMakeRaggedArray" classname="TestCorrectness" time="0.0">
-    <system-err><![CDATA[XFAIL: Go int != int64: MakeRaggedArray returns [][]int but MetaFFI expects [][]int64 - MetaFFIException: java.lang.ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 1
-]]></system-err>
+    <failure message="XFAIL UNEXPECTEDLY PASSED - SDK bug may be fixed: Go int != int64: MakeRaggedArray returns [][]int but MetaFFI expects [][]int64" type="java.lang.AssertionError"><![CDATA[java.lang.AssertionError: XFAIL UNEXPECTEDLY PASSED - SDK bug may be fixed: Go int != int64: MakeRaggedArray returns [][]int but MetaFFI expects [][]int64
+	at org.junit.Assert.fail(Assert.java:89)
+	at TestCorrectness.xfail(TestCorrectness.java:87)
+	at TestCorrectness.testMakeRaggedArray(TestCorrectness.java:613)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:316)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:240)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:214)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:155)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+]]></failure>
   </testcase>
-  <testcase name="testReturnErrorTupleFail" classname="TestCorrectness" time="0.0"/>
+  <testcase name="testReturnErrorTupleFail" classname="TestCorrectness" time="0.001"/>
   <testcase name="testReturnAnyString" classname="TestCorrectness" time="0.001"/>
   <testcase name="testJoinStrings" classname="TestCorrectness" time="0.0"/>
-  <testcase name="testDivIntegersFractional" classname="TestCorrectness" time="0.001"/>
+  <testcase name="testDivIntegersFractional" classname="TestCorrectness" time="0.0"/>
   <testcase name="testAddAsync" classname="TestCorrectness" time="0.001"/>
-  <testcase name="testCallCallbackAdd" classname="TestCorrectness" time="0.001"/>
+  <testcase name="testCallCallbackAdd" classname="TestCorrectness" time="0.002"/>
   <testcase name="testSomeClassPrint" classname="TestCorrectness" time="0.001"/>
   <testcase name="testGetThreeBuffers" classname="TestCorrectness" time="0.001"/>
   <testcase name="testGetSomeClasses" classname="TestCorrectness" time="0.0"/>
   <testcase name="testEchoBytes" classname="TestCorrectness" time="0.002"/>
   <testcase name="testFiveSecondsGlobal" classname="TestCorrectness" time="0.001"/>
-  <testcase name="testCallTransformer" classname="TestCorrectness" time="0.001">
+  <testcase name="testCallTransformer" classname="TestCorrectness" time="0.002">
     <system-err><![CDATA[XFAIL: Go named function type StringTransformer: callback type mismatch - MetaFFIException: Panic in Go function. Panic Data: interface conversion: interface {} is *metaffi.MetaFFICallable, not guest.StringTransformer
 Stack Trace:
 goroutine 17 [running, locked to thread]:
-main.panicHandler(0xef47efe038)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:4798 +0x1a8
-panic({0x7ffdb71b1800?, 0xc0000285a0?})
+main.panicHandler(0xac5fefe508)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:4798 +0x1a8
+panic({0x7ffdb6fb3800?, 0xc00020a090?})
 	C:/Program Files/Go/src/runtime/panic.go:792 +0x132
-main.EntryPoint_CallTransformer(0xc000012230?, 0x2136e37f978, 0xef47efe038)
-	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler1035060610/metaffi_guest.go:413 +0x2ff
+main.EntryPoint_CallTransformer(0xc000014150?, 0x1e5c66a08e8, 0xac5fefe508)
+	C:/Users/green/AppData/Local/Temp/metaffi_go_compiler2025510701/metaffi_guest.go:413 +0x2ff
 
 ]]></system-err>
   </testcase>
   <testcase name="testReturnNull" classname="TestCorrectness" time="0.0"/>
   <testcase name="testReturnErrorTupleOk" classname="TestCorrectness" time="0.0"/>
-  <testcase name="testTestMapSetGetContains" classname="TestCorrectness" time="0.002"/>
-  <testcase name="testWaitABit" classname="TestCorrectness" time="0.001"/>
-  <testcase name="testSomeClassGetSetName" classname="TestCorrectness" time="0.001"/>
-  <testcase name="testReturnsAnError" classname="TestCorrectness" time="0.0"/>
+  <testcase name="testTestMapSetGetContains" classname="TestCorrectness" time="0.001"/>
+  <testcase name="testWaitABit" classname="TestCorrectness" time="0.0"/>
+  <testcase name="testSomeClassGetSetName" classname="TestCorrectness" time="0.002"/>
+  <testcase name="testReturnsAnError" classname="TestCorrectness" time="0.001"/>
   <testcase name="testGetSetCounter" classname="TestCorrectness" time="0.001"/>
   <testcase name="testMakeStringList" classname="TestCorrectness" time="0.001"/>
   <testcase name="testGetColorAndColorName" classname="TestCorrectness" time="0.001"/>
   <testcase name="testReturnAnyInt" classname="TestCorrectness" time="0.0"/>
-  <testcase name="testReturnAnyNil" classname="TestCorrectness" time="0.001"/>
+  <testcase name="testReturnAnyNil" classname="TestCorrectness" time="0.0"/>
   <testcase name="testTestMapNameField" classname="TestCorrectness" time="0.001"/>
-  <testcase name="testEchoBytesRoundTrip" classname="TestCorrectness" time="0.002"/>
+  <testcase name="testEchoBytesRoundTrip" classname="TestCorrectness" time="0.001"/>
   <testcase name="testReturnAnyFloat" classname="TestCorrectness" time="0.0"/>
-  <testcase name="testPanics" classname="TestCorrectness" time="0.0"/>
-  <testcase name="testHelloWorld" classname="TestCorrectness" time="0.0"/>
+  <testcase name="testPanics" classname="TestCorrectness" time="0.001"/>
+  <testcase name="testHelloWorld" classname="TestCorrectness" time="0.001"/>
 </testsuite>

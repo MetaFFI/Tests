@@ -1,0 +1,60 @@
+# Thesis-grade full benchmark configuration.
+# Usage:
+#   python tests/run_all_tests.py --config tests/configs/thesis_config.yml
+
+run:
+  # Run benchmark suites and generate publishable performance data.
+  include_benchmarks: true
+  # Correctness is optional; this config keeps benchmark pipeline only.
+  include_correctness: false
+
+  # Uncertainty pass count (N repeats across ALL selected triples).
+  repeats: 5
+  # Warmup iterations per benchmark scenario.
+  warmup_iterations: 100
+  # Measured iterations per benchmark scenario.
+  measured_iterations: 10000
+
+  # Micro-batching controls for timer-floor mitigation in benchmark harnesses.
+  # Benchmarks should keep calling within one sample until at least this elapsed budget.
+  batch_min_elapsed_ns: 10000
+  # Safety cap to avoid runaway batching in pathological cases.
+  batch_max_calls: 100000
+
+  # Runner heartbeat period while child commands execute.
+  heartbeat_seconds: 20
+
+selection:
+  # Host languages to include.
+  hosts: [go, python3, java]
+  # Empty list means all directional pairs from selected hosts.
+  pairs: []
+  # Mechanisms to include. Keep this full for thesis publication data.
+  mechanisms: [metaffi, grpc, cpython, jni, ctypes, jpype, jep]
+
+execution:
+  # true = overwrite existing canonical result files.
+  rerun_existing: true
+  # true = abort on first failure.
+  fail_fast: true
+  # Default timeout per command phase.
+  default_timeout_seconds: 600
+  # Java-host MetaFFI can be long; keep higher timeout.
+  java_metaffi_timeout_seconds: 3600
+
+outputs:
+  # Canonical per-triple output files used by consolidation.
+  canonical_results_dir: tests/results
+  # Repeat outputs are stored under tests/results/repeats/<run_id>/run_XX/
+  repeat_root_dir: tests/results/repeats
+  # Keep all repeat files for reproducibility/audit.
+  write_repeat_files: true
+
+  # Regenerate complexity.json as part of full thesis run.
+  run_complexity: true
+  # consolidate_results.py also regenerates tables/report.
+  run_consolidation: true
+  # Only used when run_consolidation=false.
+  run_tables: false
+  # Only used when run_consolidation=false.
+  run_report: false

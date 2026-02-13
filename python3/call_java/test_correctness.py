@@ -15,12 +15,6 @@ ti = metaffi.metaffi_type_info
 # Common xfail reasons for known MetaFFI SDK bugs
 # ---------------------------------------------------------------------------
 
-_XFAIL_NO_PARAMS_RET = pytest.mark.xfail(
-    reason="MetaFFI JVM plugin bug: no-params-with-return xcall from Python "
-           "host raises 'Index 0 out of bounds (size: 0)'",
-    raises=RuntimeError, strict=True,
-)
-
 _XFAIL_CHAR16 = pytest.mark.xfail(
     reason="MetaFFI JVM plugin bug: char16 type causes access violation "
            "reading 0xFFFFFFFFFFFFFFFF from Python host",
@@ -40,7 +34,6 @@ _XFAIL_3D_ARRAY_INVOKE = pytest.mark.xfail(
 
 class TestCoreFunctions:
 
-    @_XFAIL_NO_PARAMS_RET
     def test_hello_world(self, java_module):
         fn = java_module.load_entity(
             "class=guest.CoreFunctions,callable=helloWorld",
@@ -92,7 +85,6 @@ class TestCoreFunctions:
         fn(0)
         del fn
 
-    @_XFAIL_NO_PARAMS_RET
     def test_return_null(self, java_module):
         fn = java_module.load_entity(
             "class=guest.CoreFunctions,callable=returnNull",
@@ -136,7 +128,6 @@ class TestCoreFunctions:
         assert result is None
         del fn
 
-    @_XFAIL_NO_PARAMS_RET
     def test_return_multiple_return_values(self, java_module):
         """returnMultipleReturnValues() -> Object[] with mixed types."""
         fn = java_module.load_entity(
@@ -179,19 +170,20 @@ class TestCallbacks:
         def adder(a: ctypes.c_long, b: ctypes.c_long) -> ctypes.c_long:
             return a + b
 
-        metaffi_adder = metaffi.make_metaffi_callable(adder)
-        if old_c_long_mapping is None:
-            del metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"]
-        else:
-            metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"] = (
-                old_c_long_mapping)
+        try:
+            metaffi_adder = metaffi.make_metaffi_callable(adder)
+        finally:
+            if old_c_long_mapping is None:
+                del metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"]
+            else:
+                metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"] = (
+                    old_c_long_mapping)
         proxy = adapter(metaffi_adder, "java.util.function.IntBinaryOperator")
         assert proxy is not None
         result = fn(proxy)
         assert result == 3, f"callCallbackAdd(adder): got {result}, want 3"
         del adapter, fn, metaffi_adder, proxy
 
-    @_XFAIL_NO_PARAMS_RET
     def test_return_callback_add(self, java_module):
         """Java returns a callback, Python calls it."""
         fn = java_module.load_entity(
@@ -264,7 +256,6 @@ class TestCallbacks:
 
 class TestObjects:
 
-    @_XFAIL_NO_PARAMS_RET
     def test_some_class_default_constructor(self, java_module):
         new_fn = java_module.load_entity(
             "class=guest.SomeClass,callable=<init>",
@@ -295,7 +286,6 @@ class TestObjects:
         assert name == "test_name", f"getName() = {name!r}"
         del new_fn, name_fn
 
-    @_XFAIL_NO_PARAMS_RET
     def test_test_map_set_get_contains(self, java_module):
         new_map = java_module.load_entity(
             "class=guest.TestMap,callable=<init>",
@@ -323,7 +313,6 @@ class TestObjects:
         assert val == "myvalue", f"get('mykey') = {val!r}"
         del new_map, set_fn, get_fn, contains_fn
 
-    @_XFAIL_NO_PARAMS_RET
     def test_test_map_name_field(self, java_module):
         new_map = java_module.load_entity(
             "class=guest.TestMap,callable=<init>",
@@ -353,7 +342,6 @@ class TestObjects:
 
 class TestArrays:
 
-    @_XFAIL_NO_PARAMS_RET
     def test_make_2d_array(self, java_module):
         fn = java_module.load_entity(
             "class=guest.ArrayFunctions,callable=make2dArray",
@@ -362,7 +350,6 @@ class TestArrays:
         assert result == [[1, 2], [3, 4]], f"make2dArray() = {result}"
         del fn
 
-    @_XFAIL_NO_PARAMS_RET
     def test_make_3d_array(self, java_module):
         fn = java_module.load_entity(
             "class=guest.ArrayFunctions,callable=make3dArray",
@@ -371,7 +358,6 @@ class TestArrays:
         assert result == [[[1], [2]], [[3], [4]]], f"make3dArray() = {result}"
         del fn
 
-    @_XFAIL_NO_PARAMS_RET
     def test_make_ragged_array(self, java_module):
         fn = java_module.load_entity(
             "class=guest.ArrayFunctions,callable=makeRaggedArray",
@@ -399,7 +385,6 @@ class TestArrays:
         assert result == 10, f"sum3dArray = {result}, want 10"
         del fn
 
-    @_XFAIL_NO_PARAMS_RET
     def test_get_some_classes(self, java_module):
         fn = java_module.load_entity(
             "class=guest.ArrayFunctions,callable=getSomeClasses",
@@ -410,7 +395,6 @@ class TestArrays:
             assert h is not None
         del fn
 
-    @_XFAIL_NO_PARAMS_RET
     def test_make_string_list(self, java_module):
         fn = java_module.load_entity(
             "class=guest.CollectionFunctions,callable=makeStringList",
@@ -453,7 +437,6 @@ class TestPrimitives:
 
 class TestState:
 
-    @_XFAIL_NO_PARAMS_RET
     def test_five_seconds_constant(self, java_module):
         getter = java_module.load_entity(
             "class=guest.StaticState,field=FIVE_SECONDS,getter",
@@ -462,7 +445,6 @@ class TestState:
         assert val == 5, f"FIVE_SECONDS = {val}, want 5"
         del getter
 
-    @_XFAIL_NO_PARAMS_RET
     def test_counter_operations(self, java_module):
         get_fn = java_module.load_entity(
             "class=guest.StaticState,callable=getCounter",

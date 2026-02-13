@@ -14,6 +14,7 @@ Explicitly reports:
 """
 
 import json
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -52,7 +53,12 @@ class ConsolidationError(Exception):
 def load_result_files() -> list[dict[str, Any]]:
     """Load all per-pair JSON files from the results directory."""
 
-    result_files = sorted(RESULTS_DIR.glob("*_to_*.json"))
+    # Strictly load only canonical triple filenames and ignore temp/debug artifacts.
+    expected_files = [
+        RESULTS_DIR / f"{host}_to_{guest}_{mechanism}.json"
+        for host, guest, mechanism in ALL_EXPECTED_TRIPLES
+    ]
+    result_files = [p for p in expected_files if p.exists()]
     if not result_files:
         raise ConsolidationError(f"No result files found in {RESULTS_DIR}")
 
@@ -167,6 +173,53 @@ def compute_comparison_table(results: list[dict[str, Any]]) -> list[dict[str, An
     return comparisons
 
 
+def compute_mechanism_averages_by_pair(comparisons: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Compute mean latency averages per (host, guest, mechanism) across scenarios.
+
+    Uses scenario-level `mean_ns` values from the comparison table and includes only
+    rows with explicit numeric means.
+    """
+
+    aggregates: dict[tuple[str, str, str], list[float]] = {}
+
+    for row in comparisons:
+        host = row["host"]
+        guest = row["guest"]
+        for key, val in row.items():
+            if key in ("host", "guest", "scenario"):
+                continue
+            if not isinstance(val, dict):
+                continue
+            if val.get("status") != "PASS":
+                continue
+            if "mean_ns" not in val or val["mean_ns"] is None:
+                continue
+
+            try:
+                mean_ns = float(val["mean_ns"])
+            except (TypeError, ValueError):
+                raise ConsolidationError(
+                    f"Invalid mean_ns for {host}->{guest} [{key}] scenario {row['scenario']}"
+                )
+
+            aggregates.setdefault((host, guest, key), []).append(mean_ns)
+
+    result: list[dict[str, Any]] = []
+    for (host, guest, mechanism), values in sorted(aggregates.items()):
+        if not values:
+            continue
+        result.append({
+            "host": host,
+            "guest": guest,
+            "mechanism": mechanism,
+            "scenario_count": len(values),
+            "average_mean_ns": sum(values) / len(values),
+        })
+
+    return result
+
+
 def find_missing_triples(results: list[dict[str, Any]]) -> list[dict[str, str]]:
     """Identify expected triples with no result file."""
 
@@ -264,6 +317,7 @@ def main() -> int:
 
     comparisons = compute_comparison_table(results)
     summary = build_summary(results, missing_triples, failed_benchmarks)
+    mechanism_averages_by_pair = compute_mechanism_averages_by_pair(comparisons)
 
     consolidated = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -271,6 +325,7 @@ def main() -> int:
         "missing_triples": missing_triples,
         "failed_benchmarks": failed_benchmarks,
         "comparisons": comparisons,
+        "mechanism_averages_by_pair": mechanism_averages_by_pair,
         "results": results,
     }
 
@@ -323,12 +378,19 @@ def main() -> int:
                   or summary["correctness"]["failed"] > 0
                   or summary["benchmarks"]["failed"] > 0)
 
-    # Generate tables
+    # Generate tables and report (fail-fast on any generation error)
     tables_script = Path(__file__).resolve().parent / "generate_tables.py"
+    report_script = Path(__file__).resolve().parent / "generate_report.py"
+    print()
     if tables_script.is_file():
-        print()
-        import subprocess
-        subprocess.run([sys.executable, str(tables_script)], cwd=str(tables_script.parent))
+        subprocess.run([sys.executable, str(tables_script)], cwd=str(tables_script.parent), check=True)
+    else:
+        raise FileNotFoundError(f"Missing required script: {tables_script}")
+
+    if report_script.is_file():
+        subprocess.run([sys.executable, str(report_script)], cwd=str(report_script.parent), check=True)
+    else:
+        raise FileNotFoundError(f"Missing required script: {report_script}")
 
     if has_issues:
         print()

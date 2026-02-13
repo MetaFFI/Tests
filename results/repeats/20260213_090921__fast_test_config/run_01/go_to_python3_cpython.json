@@ -1,0 +1,328 @@
+{
+  "metadata": {
+    "host": "go",
+    "guest": "python3",
+    "mechanism": "cpython",
+    "timestamp": "2026-02-13T07:09:30Z",
+    "environment": {
+      "os": "windows",
+      "arch": "amd64",
+      "go_version": "go1.24.4",
+      "python_version": "3.12.5"
+    },
+    "config": {
+      "warmup_iterations": 1,
+      "measured_iterations": 10,
+      "batch_min_elapsed_ns": 10000,
+      "batch_max_calls": 100000,
+      "timer_overhead_ns": 0
+    }
+  },
+  "correctness": null,
+  "initialization": {
+    "python_init_ns": 11345400,
+    "module_load_ns": 16391100
+  },
+  "benchmarks": [
+    {
+      "scenario": "void_call",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        127,
+        87,
+        90,
+        90,
+        90,
+        90,
+        87,
+        88,
+        87,
+        87
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 88.44444444444444,
+          "median_ns": 88,
+          "p95_ns": 90,
+          "p99_ns": 90,
+          "stddev_ns": 1.4229164972072998,
+          "ci95_ns": [
+            87.51480566626901,
+            89.37408322261987
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "primitive_echo",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        208,
+        115,
+        118,
+        118,
+        118,
+        116,
+        121,
+        118,
+        118,
+        119
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 118.16666666666667,
+          "median_ns": 118,
+          "p95_ns": 119,
+          "p99_ns": 119,
+          "stddev_ns": 0.3726779962499649,
+          "ci95_ns": [
+            117.86846216313609,
+            118.46487117019726
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "string_echo",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        223,
+        185,
+        186,
+        193,
+        191,
+        193,
+        199,
+        215,
+        213,
+        218
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 201.6,
+          "median_ns": 196,
+          "p95_ns": 223,
+          "p99_ns": 223,
+          "stddev_ns": 13.499629624548964,
+          "ci95_ns": [
+            193.23284287227733,
+            209.96715712772266
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 10,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        710,
+        548,
+        531,
+        510,
+        421,
+        436,
+        431,
+        434,
+        440,
+        444
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 466.1111111111111,
+          "median_ns": 440,
+          "p95_ns": 548,
+          "p99_ns": 548,
+          "stddev_ns": 46.2107357522625,
+          "ci95_ns": [
+            435.92009708629956,
+            496.3021251359226
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 100,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        1772,
+        1150,
+        1191,
+        1129,
+        963,
+        951,
+        1142,
+        971,
+        958,
+        968
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 1047,
+          "median_ns": 971,
+          "p95_ns": 1191,
+          "p99_ns": 1191,
+          "stddev_ns": 96.20810776644555,
+          "ci95_ns": [
+            984.1440362592556,
+            1109.8559637407445
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 1000,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        14106,
+        9821,
+        10530,
+        9895,
+        10600,
+        10524,
+        11705,
+        12169,
+        12070,
+        12341
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 11376.1,
+          "median_ns": 11152.5,
+          "p95_ns": 14106,
+          "p99_ns": 14106,
+          "stddev_ns": 1275.069915730114,
+          "ci95_ns": [
+            10585.80347850544,
+            12166.39652149456
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "array_sum",
+      "data_size": 10000,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        258467,
+        130350,
+        130080,
+        125440,
+        119283,
+        119000,
+        102257,
+        119867,
+        114320,
+        97700
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 117588.55555555556,
+          "median_ns": 119283,
+          "p95_ns": 130350,
+          "p99_ns": 130350,
+          "stddev_ns": 10707.656389613214,
+          "ci95_ns": [
+            110592.8867143416,
+            124584.22439676952
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "object_method",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        565,
+        328,
+        337,
+        317,
+        313,
+        319,
+        318,
+        325,
+        322,
+        326
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 322.77777777777777,
+          "median_ns": 322,
+          "p95_ns": 337,
+          "p99_ns": 337,
+          "stddev_ns": 6.762277357645751,
+          "ci95_ns": [
+            318.35975657078257,
+            327.195798984773
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "callback",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        463,
+        268,
+        271,
+        304,
+        299,
+        290,
+        289,
+        288,
+        294,
+        295
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 294.14285714285717,
+          "median_ns": 294,
+          "p95_ns": 304,
+          "p99_ns": 304,
+          "stddev_ns": 5.383269623261936,
+          "ci95_ns": [
+            290.1548751970605,
+            298.13083908865383
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "error_propagation",
+      "data_size": null,
+      "status": "PASS",
+      "raw_iterations_ns": [
+        286,
+        201,
+        202,
+        249,
+        184,
+        186,
+        190,
+        183,
+        183,
+        184
+      ],
+      "phases": {
+        "total": {
+          "mean_ns": 189.125,
+          "median_ns": 185,
+          "p95_ns": 202,
+          "p99_ns": 202,
+          "stddev_ns": 7.457169369137327,
+          "ci95_ns": [
+            183.95744527121386,
+            194.29255472878614
+          ]
+        }
+      }
+    }
+  ]
+}

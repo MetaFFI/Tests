@@ -76,6 +76,8 @@ type Environment struct {
 type Config struct {
 	WarmupIterations   int   `json:"warmup_iterations"`
 	MeasuredIterations int   `json:"measured_iterations"`
+	BatchMinElapsedNs  int64 `json:"batch_min_elapsed_ns"`
+	BatchMaxCalls      int   `json:"batch_max_calls"`
 	TimerOverheadNs    int64 `json:"timer_overhead_ns"`
 }
 
@@ -168,6 +170,8 @@ func runBenchmark(
 	dataSize *int,
 	warmup int,
 	iterations int,
+	batchMinElapsedNs int64,
+	batchMaxCalls int,
 	benchFn func() error,
 ) BenchmarkResult {
 	t.Helper()
@@ -184,14 +188,25 @@ func runBenchmark(
 	rawNs := make([]int64, iterations)
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
-		err := benchFn()
-		elapsed := time.Since(start).Nanoseconds()
-
-		if err != nil {
-			t.Fatalf("benchmark %q iteration %d: %v (BENCHMARK INVALIDATED)", scenario, i, err)
-			return BenchmarkResult{Scenario: scenario, DataSize: dataSize, Status: "FAIL"}
+		calls := 0
+		for {
+			err := benchFn()
+			if err != nil {
+				t.Fatalf("benchmark %q iteration %d: %v (BENCHMARK INVALIDATED)", scenario, i, err)
+				return BenchmarkResult{Scenario: scenario, DataSize: dataSize, Status: "FAIL"}
+			}
+			calls++
+			elapsed := time.Since(start).Nanoseconds()
+			if elapsed >= batchMinElapsedNs || calls >= batchMaxCalls {
+				perCall := float64(elapsed) / float64(calls)
+				if perCall > 0.0 && perCall < 1.0 {
+					rawNs[i] = 1
+				} else {
+					rawNs[i] = int64(math.Round(perCall))
+				}
+				break
+			}
 		}
-		rawNs[i] = elapsed
 	}
 
 	sortedNs := make([]int64, len(rawNs))
@@ -224,6 +239,8 @@ func TestBenchmarkAll(t *testing.T) {
 
 	warmup := getIntEnv("METAFFI_TEST_WARMUP", 100)
 	iterations := getIntEnv("METAFFI_TEST_ITERATIONS", 10000)
+	batchMinElapsedNs := int64(getIntEnv("METAFFI_TEST_BATCH_MIN_ELAPSED_NS", 10000))
+	batchMaxCalls := getIntEnv("METAFFI_TEST_BATCH_MAX_CALLS", 100000)
 
 	timerOverhead := measureTimerOverhead()
 	t.Logf("Timer overhead: %d ns", timerOverhead)
@@ -235,7 +252,7 @@ func TestBenchmarkAll(t *testing.T) {
 		ff := load(t, "class=guest.CoreFunctions,callable=waitABit",
 			[]IDL.MetaFFITypeInfo{ti(IDL.INT64)}, nil)
 
-		result := runBenchmark(t, "void_call", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			_, err := ff(int64(0))
 			return err
 		})
@@ -248,7 +265,7 @@ func TestBenchmarkAll(t *testing.T) {
 			[]IDL.MetaFFITypeInfo{ti(IDL.INT64), ti(IDL.INT64)},
 			[]IDL.MetaFFITypeInfo{ti(IDL.FLOAT64)})
 
-		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			ret, err := ff(int64(10), int64(2))
 			if err != nil {
 				return err
@@ -268,7 +285,7 @@ func TestBenchmarkAll(t *testing.T) {
 			[]IDL.MetaFFITypeInfo{tiArray(IDL.STRING8_ARRAY, 1)},
 			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
 
-		result := runBenchmark(t, "string_echo", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			ret, err := ff([]string{"hello", "world"})
 			if err != nil {
 				return err
@@ -300,7 +317,7 @@ func TestBenchmarkAll(t *testing.T) {
 			arr := [][]int32{row}
 
 			sizePtr := size
-			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, func() error {
+			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 				ret, err := ff(arr)
 				if err != nil {
 					return err
@@ -314,7 +331,44 @@ func TestBenchmarkAll(t *testing.T) {
 		})
 	}
 
-	// --- Scenario 5: Object create + method call ---
+	// --- Scenario 5: Callback invocation ---
+	t.Run("callback", func(t *testing.T) {
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+
+		adapter := load(t, "class=metaffi.api.accessor.CallbackAdapters,callable=asInterface",
+			[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE), ti(IDL.STRING8)},
+			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)})
+
+		ff := load(t, "class=guest.CoreFunctions,callable=callCallbackAdd",
+			[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "java.util.function.IntBinaryOperator")},
+			[]IDL.MetaFFITypeInfo{ti(IDL.INT32)})
+
+		adder := func(a, b int32) int32 { return a + b }
+		adapterRet := call(t, "CallbackAdapters.asInterface", adapter, adder, "java.util.function.IntBinaryOperator")
+		if adapterRet[0] == nil {
+			t.Fatal("CallbackAdapters.asInterface: got nil proxy")
+		}
+		proxy := adapterRet[0]
+
+		result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+			ret, err := ff(proxy)
+			if err != nil {
+				return err
+			}
+			if v, ok := ret[0].(int32); !ok || v != 3 {
+				return fmt.Errorf("callCallbackAdd: got %v, want 3", ret[0])
+			}
+			return nil
+		})
+		benchmarks = append(benchmarks, result)
+		// Keep callback/proxy reachable for the entire benchmark run.
+		// Without this, long runs can trigger GC and crash in callback dispatch.
+		runtime.KeepAlive(adder)
+		runtime.KeepAlive(proxy)
+	})
+
+	// --- Scenario 6: Object create + method call ---
 	t.Run("object_method", func(t *testing.T) {
 		newEntity := load(t, "class=guest.SomeClass,callable=<init>",
 			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)},
@@ -324,7 +378,7 @@ func TestBenchmarkAll(t *testing.T) {
 			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)},
 			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
 
-		result := runBenchmark(t, "object_method", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			// Create instance
 			instanceRet, err := newEntity("bench")
 			if err != nil {
@@ -345,41 +399,11 @@ func TestBenchmarkAll(t *testing.T) {
 		benchmarks = append(benchmarks, result)
 	})
 
-	// --- Scenario 6: Callback invocation ---
-	t.Run("callback", func(t *testing.T) {
-		adapter := load(t, "class=metaffi.api.accessor.CallbackAdapters,callable=asInterface",
-			[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE), ti(IDL.STRING8)},
-			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)})
-
-		ff := load(t, "class=guest.CoreFunctions,callable=callCallbackAdd",
-			[]IDL.MetaFFITypeInfo{tiAlias(IDL.HANDLE, "java.util.function.IntBinaryOperator")},
-			[]IDL.MetaFFITypeInfo{ti(IDL.INT32)})
-
-		adder := func(a, b int32) int32 { return a + b }
-		adapterRet := call(t, "CallbackAdapters.asInterface", adapter, adder, "java.util.function.IntBinaryOperator")
-		if adapterRet[0] == nil {
-			t.Fatal("CallbackAdapters.asInterface: got nil proxy")
-		}
-		proxy := adapterRet[0]
-
-		result := runBenchmark(t, "callback", nil, warmup, iterations, func() error {
-			ret, err := ff(proxy)
-			if err != nil {
-				return err
-			}
-			if v, ok := ret[0].(int32); !ok || v != 3 {
-				return fmt.Errorf("callCallbackAdd: got %v, want 3", ret[0])
-			}
-			return nil
-		})
-		benchmarks = append(benchmarks, result)
-	})
-
 	// --- Scenario 7: Error propagation ---
 	t.Run("error_propagation", func(t *testing.T) {
 		ff := load(t, "class=guest.CoreFunctions,callable=returnsAnError", nil, nil)
 
-		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			_, err := ff()
 			if err == nil {
 				return fmt.Errorf("expected error but got nil")
@@ -391,10 +415,23 @@ func TestBenchmarkAll(t *testing.T) {
 	})
 
 	// --- Write results to JSON ---
-	writeResults(t, benchmarks, timerOverhead, warmup, iterations)
+	writeResults(t, benchmarks, timerOverhead, warmup, iterations, batchMinElapsedNs, batchMaxCalls)
+
+	// Benchmark scenarios can leave the JVM/plugin in unstable state for
+	// subsequent correctness tests in the same package run. Refresh runtime/module.
+	if err := reloadRuntimeModule(); err != nil {
+		t.Fatalf("failed to reload runtime after benchmarks: %v", err)
+	}
 }
 
-func writeResults(t *testing.T, benchmarks []BenchmarkResult, timerOverhead int64, warmup, iterations int) {
+func writeResults(
+	t *testing.T,
+	benchmarks []BenchmarkResult,
+	timerOverhead int64,
+	warmup, iterations int,
+	batchMinElapsedNs int64,
+	batchMaxCalls int,
+) {
 	t.Helper()
 
 	resultPath := os.Getenv("METAFFI_TEST_RESULTS_FILE")
@@ -416,6 +453,8 @@ func writeResults(t *testing.T, benchmarks []BenchmarkResult, timerOverhead int6
 			Config: Config{
 				WarmupIterations:   warmup,
 				MeasuredIterations: iterations,
+				BatchMinElapsedNs:  batchMinElapsedNs,
+				BatchMaxCalls:      batchMaxCalls,
 				TimerOverheadNs:    timerOverhead,
 			},
 		},

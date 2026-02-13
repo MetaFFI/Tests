@@ -19,7 +19,31 @@ import (
 var (
 	metaffiRT *api.MetaFFIRuntime
 	module    *api.MetaFFIModule
+	jarPath   string
 )
+
+func reloadRuntimeModule() error {
+	if metaffiRT != nil {
+		_ = metaffiRT.ReleaseRuntimePlugin()
+		metaffiRT = nil
+		module = nil
+	}
+
+	metaffiRT = api.NewMetaFFIRuntime("jvm")
+	if err := metaffiRT.LoadRuntimePlugin(); err != nil {
+		return fmt.Errorf("failed to load jvm runtime plugin: %w", err)
+	}
+
+	mod, err := metaffiRT.LoadModule(jarPath)
+	if err != nil {
+		_ = metaffiRT.ReleaseRuntimePlugin()
+		metaffiRT = nil
+		return fmt.Errorf("failed to load module %s: %w", jarPath, err)
+	}
+	module = mod
+
+	return nil
+}
 
 func TestMain(m *testing.M) {
 	home := os.Getenv("METAFFI_HOME")
@@ -35,18 +59,10 @@ func TestMain(m *testing.M) {
 	}
 
 	// Path to guest_java.jar
-	jarPath := filepath.Join(srcRoot, "sdk", "test_modules", "guest_modules", "java", "test_bin", "guest_java.jar")
+	jarPath = filepath.Join(srcRoot, "sdk", "test_modules", "guest_modules", "java", "test_bin", "guest_java.jar")
 
-	metaffiRT = api.NewMetaFFIRuntime("jvm")
-	if err := metaffiRT.LoadRuntimePlugin(); err != nil {
-		fmt.Fprintf(os.Stderr, "FATAL: Failed to load jvm runtime plugin: %v\n", err)
-		os.Exit(1)
-	}
-
-	var err error
-	module, err = metaffiRT.LoadModule(jarPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "FATAL: Failed to load module %s: %v\n", jarPath, err)
+	if err := reloadRuntimeModule(); err != nil {
+		fmt.Fprintf(os.Stderr, "FATAL: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -165,7 +181,7 @@ func TestCoreReturnNull(t *testing.T) {
 
 func TestCoreReturnsAnError(t *testing.T) {
 	ff := load(t, "class=guest.CoreFunctions,callable=returnsAnError", nil, nil)
-	callExpectError(t, "returnsAnError", ff, "Error")
+	callExpectError(t, "returnsAnError", ff, "InvocationTargetException")
 }
 
 func TestCoreCallCallbackAdd(t *testing.T) {

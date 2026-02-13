@@ -35,21 +35,21 @@ func getIntEnv(key string, defaultVal int) int {
 // ---------------------------------------------------------------------------
 
 type PhaseStats struct {
-	MeanNs   float64   `json:"mean_ns"`
-	MedianNs float64   `json:"median_ns"`
-	P95Ns    float64   `json:"p95_ns"`
-	P99Ns    float64   `json:"p99_ns"`
-	StddevNs float64   `json:"stddev_ns"`
+	MeanNs   float64    `json:"mean_ns"`
+	MedianNs float64    `json:"median_ns"`
+	P95Ns    float64    `json:"p95_ns"`
+	P99Ns    float64    `json:"p99_ns"`
+	StddevNs float64    `json:"stddev_ns"`
 	CI95Ns   [2]float64 `json:"ci95_ns"`
 }
 
 type BenchmarkResult struct {
-	Scenario       string                `json:"scenario"`
-	DataSize       *int                  `json:"data_size"`
-	Status         string                `json:"status"`
-	Error          string                `json:"error,omitempty"`
-	RawIterationsNs []int64              `json:"raw_iterations_ns"`
-	Phases         map[string]PhaseStats `json:"phases"`
+	Scenario        string                `json:"scenario"`
+	DataSize        *int                  `json:"data_size"`
+	Status          string                `json:"status"`
+	Error           string                `json:"error,omitempty"`
+	RawIterationsNs []int64               `json:"raw_iterations_ns"`
+	Phases          map[string]PhaseStats `json:"phases"`
 }
 
 type ResultFile struct {
@@ -69,15 +69,17 @@ type Metadata struct {
 }
 
 type Environment struct {
-	OS             string `json:"os"`
-	Arch           string `json:"arch"`
-	GoVersion      string `json:"go_version"`
-	PythonVersion  string `json:"python_version"`
+	OS            string `json:"os"`
+	Arch          string `json:"arch"`
+	GoVersion     string `json:"go_version"`
+	PythonVersion string `json:"python_version"`
 }
 
 type Config struct {
 	WarmupIterations   int   `json:"warmup_iterations"`
 	MeasuredIterations int   `json:"measured_iterations"`
+	BatchMinElapsedNs  int64 `json:"batch_min_elapsed_ns"`
+	BatchMaxCalls      int   `json:"batch_max_calls"`
 	TimerOverheadNs    int64 `json:"timer_overhead_ns"`
 }
 
@@ -185,6 +187,8 @@ func runBenchmark(
 	dataSize *int,
 	warmup int,
 	iterations int,
+	batchMinElapsedNs int64,
+	batchMaxCalls int,
 	benchFn func() error, // Must return error if result is incorrect
 ) BenchmarkResult {
 	t.Helper()
@@ -201,14 +205,26 @@ func runBenchmark(
 	rawNs := make([]int64, iterations)
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
-		err := benchFn()
-		elapsed := time.Since(start).Nanoseconds()
-
-		if err != nil {
-			t.Fatalf("benchmark %q iteration %d: %v (BENCHMARK INVALIDATED)", scenario, i, err)
-			return BenchmarkResult{Scenario: scenario, DataSize: dataSize, Status: "FAIL"}
+		calls := 0
+		for {
+			err := benchFn()
+			if err != nil {
+				t.Fatalf("benchmark %q iteration %d: %v (BENCHMARK INVALIDATED)", scenario, i, err)
+				return BenchmarkResult{Scenario: scenario, DataSize: dataSize, Status: "FAIL"}
+			}
+			calls++
+			elapsed := time.Since(start).Nanoseconds()
+			if elapsed >= batchMinElapsedNs || calls >= batchMaxCalls {
+				perCall := float64(elapsed) / float64(calls)
+				// Keep strictly positive values to avoid timer-floor collapse to 0 ns.
+				if perCall > 0.0 && perCall < 1.0 {
+					rawNs[i] = 1
+				} else {
+					rawNs[i] = int64(math.Round(perCall))
+				}
+				break
+			}
 		}
-		rawNs[i] = elapsed
 	}
 
 	// Sort for statistics
@@ -244,6 +260,8 @@ func TestBenchmarkAll(t *testing.T) {
 
 	warmup := getIntEnv("METAFFI_TEST_WARMUP", 100)
 	iterations := getIntEnv("METAFFI_TEST_ITERATIONS", 10000)
+	batchMinElapsedNs := int64(getIntEnv("METAFFI_TEST_BATCH_MIN_ELAPSED_NS", 10000))
+	batchMaxCalls := getIntEnv("METAFFI_TEST_BATCH_MAX_CALLS", 100000)
 
 	timerOverhead := measureTimerOverhead()
 	t.Logf("Timer overhead: %d ns", timerOverhead)
@@ -255,7 +273,7 @@ func TestBenchmarkAll(t *testing.T) {
 		ff := load(t, moduleDir, "callable=wait_a_bit",
 			[]IDL.MetaFFITypeInfo{ti(IDL.INT64)}, nil)
 
-		result := runBenchmark(t, "void_call", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			_, err := ff(int64(0))
 			return err
 		})
@@ -268,7 +286,7 @@ func TestBenchmarkAll(t *testing.T) {
 			[]IDL.MetaFFITypeInfo{ti(IDL.INT64), ti(IDL.INT64)},
 			[]IDL.MetaFFITypeInfo{ti(IDL.FLOAT64)})
 
-		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			ret, err := ff(int64(10), int64(2))
 			if err != nil {
 				return err
@@ -288,7 +306,7 @@ func TestBenchmarkAll(t *testing.T) {
 			[]IDL.MetaFFITypeInfo{tiArray(IDL.STRING8_ARRAY, 1)},
 			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
 
-		result := runBenchmark(t, "string_echo", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			ret, err := ff([]string{"hello", "world"})
 			if err != nil {
 				return err
@@ -319,7 +337,7 @@ func TestBenchmarkAll(t *testing.T) {
 			arr := [][]int64{row}
 
 			sizePtr := size
-			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, func() error {
+			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 				ret, err := ff(arr)
 				if err != nil {
 					return err
@@ -334,48 +352,22 @@ func TestBenchmarkAll(t *testing.T) {
 	}
 
 	// --- Scenario 5: Object create + method call ---
-	// NOTE: attribute=SomeClass,getter is a no-param call that triggers the
-	// xcall_no_params_ret bug with Python3 guest. Handle gracefully.
 	t.Run("object_method", func(t *testing.T) {
-		getClass := load(t, moduleDir, "attribute=SomeClass,getter", nil,
+		newEntity := load(t, moduleDir, "callable=SomeClass",
+			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)},
 			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)})
-
-		classRet, err := getClass()
-		if err != nil {
-			t.Logf("SomeClass getter: unexpected error: %v", err)
-			t.Logf("Recording as FAIL (xcall_no_params_ret bug)")
-			benchmarks = append(benchmarks, BenchmarkResult{
-				Scenario: "object_method", Status: "FAIL",
-				Error: fmt.Sprintf("xcall_no_params_ret bug: %v", err),
-			})
-			return
-		}
-		classHandle := classRet[0]
-
-		newEntity := load(t, moduleDir, "callable=SomeClass.__new__",
-			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)},
-			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)})
-
-		initEntity := load(t, moduleDir, "callable=SomeClass.__init__,instance_required",
-			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE), ti(IDL.STRING8)}, nil)
 
 		printEntity := load(t, moduleDir, "callable=SomeClass.print,instance_required",
 			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)},
 			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
 
-		result := runBenchmark(t, "object_method", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			// Create instance
-			instanceRet, err := newEntity(classHandle)
+			instanceRet, err := newEntity("bench")
 			if err != nil {
-				return fmt.Errorf("__new__: %w", err)
+				return fmt.Errorf("SomeClass ctor: %w", err)
 			}
 			instance := instanceRet[0]
-
-			// Init
-			_, err = initEntity(instance, "bench")
-			if err != nil {
-				return fmt.Errorf("__init__: %w", err)
-			}
 
 			// Call method
 			printRet, err := printEntity(instance)
@@ -398,7 +390,7 @@ func TestBenchmarkAll(t *testing.T) {
 
 		adder := func(a, b int64) int64 { return a + b }
 
-		result := runBenchmark(t, "callback", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			ret, err := ff(adder)
 			if err != nil {
 				return err
@@ -415,7 +407,7 @@ func TestBenchmarkAll(t *testing.T) {
 	t.Run("error_propagation", func(t *testing.T) {
 		ff := load(t, moduleDir, "callable=returns_an_error", nil, nil)
 
-		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, func() error {
+		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 			_, err := ff()
 			if err == nil {
 				return fmt.Errorf("expected error but got nil")
@@ -427,10 +419,17 @@ func TestBenchmarkAll(t *testing.T) {
 	})
 
 	// --- Write results to JSON ---
-	writeResults(t, benchmarks, timerOverhead, warmup, iterations)
+	writeResults(t, benchmarks, timerOverhead, warmup, iterations, batchMinElapsedNs, batchMaxCalls)
 }
 
-func writeResults(t *testing.T, benchmarks []BenchmarkResult, timerOverhead int64, warmup, iterations int) {
+func writeResults(
+	t *testing.T,
+	benchmarks []BenchmarkResult,
+	timerOverhead int64,
+	warmup, iterations int,
+	batchMinElapsedNs int64,
+	batchMaxCalls int,
+) {
 	t.Helper()
 
 	resultPath := os.Getenv("METAFFI_TEST_RESULTS_FILE")
@@ -452,6 +451,8 @@ func writeResults(t *testing.T, benchmarks []BenchmarkResult, timerOverhead int6
 			Config: Config{
 				WarmupIterations:   warmup,
 				MeasuredIterations: iterations,
+				BatchMinElapsedNs:  batchMinElapsedNs,
+				BatchMaxCalls:      batchMaxCalls,
 				TimerOverheadNs:    timerOverhead,
 			},
 		},

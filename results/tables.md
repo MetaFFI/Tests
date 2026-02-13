@@ -4,105 +4,99 @@
 
 - **Result files**: 18 of 18 expected
 - **Missing result files**: 0
-- **Benchmarks passed**: 176
-- **Benchmarks failed**: 3
-
-### Failed Benchmarks
-
-- **go->python3 [metaffi]** object_method: xcall_no_params_ret bug: Index 0 out of bounds (CDTS size: 0)
-- **java->python3 [metaffi]** object_method: xcall_no_params_ret bug: Index 0 out of bounds (CDTS size: 0)
-- **python3->java [metaffi]** callback: Failed to load entity in module C:\src\github.com\MetaFFI\sdk\test_modules\guest_modules\java\test_b
+- **Benchmarks passed**: 180
+- **Benchmarks failed**: 0
 
 
 ## Go -> Java
 
 | Scenario | metaffi (mean) | jni (mean) | grpc (mean) |
 |---|---|---|---|
-| array_sum_10 | 0 ns | 0 ns | 456.7 us |
-| array_sum_100 | 0 ns | 0 ns | 385.5 us |
-| array_sum_1000 | 164.7 us | 0 ns | 622.4 us |
-| array_sum_10000 | 6.46 ms | 0 ns | 698.9 us |
-| callback | MISSING | 0 ns | 807.6 us |
-| error_propagation | 0 ns | 0 ns | 424.7 us |
-| object_method | 194.0 us | 0 ns | 491.0 us |
-| primitive_echo | 0 ns | 0 ns | 653.7 us |
-| string_echo | 0 ns | 0 ns | 663.6 us |
-| void_call | 0 ns | 0 ns | 845.9 us |
+| array_sum_10 | 50.2 µs | 458.1 ns | 0.000 ns |
+| array_sum_100 | 94.3 µs | 647.0 ns | 0.000 ns |
+| array_sum_1000 | 610.4 µs | 1.9 µs | 0.000 ns |
+| array_sum_10000 | 5.93 ms | 11.5 µs | 225.3 µs |
+| callback | 34.7 µs | 137.9 ns | 243.2 µs |
+| error_propagation | 41.4 µs | 562.9 ns | 0.000 ns |
+| object_method | 65.7 µs | 831.6 ns | 0.000 ns |
+| primitive_echo | 39.3 µs | 144.7 ns | 159.1 µs |
+| string_echo | 46.5 µs | 982.9 ns | 152.7 µs |
+| void_call | 34.0 µs | 87.0 ns | 271.3 µs |
 
 ## Go -> Python3
 
 | Scenario | metaffi (mean) | cpython (mean) | grpc (mean) |
 |---|---|---|---|
-| array_sum_10 | 0 ns | 0 ns | 241.2 us |
-| array_sum_100 | 0 ns | 0 ns | 292.6 us |
-| array_sum_1000 | 551.8 us | 0 ns | 320.8 us |
-| array_sum_10000 | 5.99 ms | 0 ns | 854.6 us |
-| callback | 0 ns | 0 ns | 617.7 us |
-| error_propagation | 0 ns | 0 ns | 319.9 us |
-| object_method | FAIL | 0 ns | 355.7 us |
-| primitive_echo | 0 ns | 0 ns | 223.4 us |
-| string_echo | 0 ns | 0 ns | 273.5 us |
-| void_call | 0 ns | 0 ns | 276.6 us |
+| array_sum_10 | 12.5 µs | 466.1 ns | 334.3 µs |
+| array_sum_100 | 62.0 µs | 1.0 µs | 337.1 µs |
+| array_sum_1000 | 576.0 µs | 11.4 µs | 405.1 µs |
+| array_sum_10000 | 6.06 ms | 117.6 µs | 818.0 µs |
+| callback | 23.6 µs | 294.1 ns | 586.5 µs |
+| error_propagation | 16.4 µs | 189.1 ns | 224.8 µs |
+| object_method | 9.8 µs | 322.8 ns | 422.3 µs |
+| primitive_echo | 3.6 µs | 118.2 ns | 433.8 µs |
+| string_echo | 6.7 µs | 201.6 ns | 383.8 µs |
+| void_call | 2.6 µs | 88.4 ns | 387.9 µs |
 
 ## Java -> Go
 
 | Scenario | metaffi (mean) | jni (mean) | grpc (mean) |
 |---|---|---|---|
-| array_echo_10 | 183.3 us | 2.7 us | 1.91 ms |
-| array_echo_100 | 1.30 ms | 2.7 us | 2.52 ms |
-| array_echo_1000 | 12.13 ms | 3.3 us | 1.98 ms |
-| array_echo_10000 | 126.73 ms | 8.8 us | 2.02 ms |
-| callback | 24.4 us | 1.9 us | 3.04 ms |
-| error_propagation | 12.3 us | 2.8 us | 2.86 ms |
-| object_method | 19.8 us | 5.4 us | 8.76 ms |
-| primitive_echo | 19.2 us | 1.1 us | 2.97 ms |
-| string_echo | 49.8 us | 3.3 us | 2.02 ms |
-| void_call | 9.5 us | 1.1 us | 3.31 ms |
+| array_echo_10 | 12.1 µs | 2.7 µs | 1.17 ms |
+| array_echo_100 | 15.5 µs | 2.9 µs | 970.9 µs |
+| array_echo_1000 | 58.4 µs | 2.9 µs | 1.14 ms |
+| array_echo_10000 | 455.8 µs | 4.7 µs | 857.5 µs |
+| callback | 12.4 µs | 1.5 µs | 1.01 ms |
+| error_propagation | 5.6 µs | 2.9 µs | 618.6 µs |
+| object_method | 9.7 µs | 5.1 µs | 902.1 µs |
+| primitive_echo | 8.0 µs | 1.2 µs | 1.12 ms |
+| string_echo | 18.7 µs | 2.8 µs | 1.37 ms |
+| void_call | 4.2 µs | 1.1 µs | 1.19 ms |
 
 ## Java -> Python3
 
 | Scenario | metaffi (mean) | jep (mean) | grpc (mean) |
 |---|---|---|---|
-| array_sum_10 | 116.8 us | 16.6 us | 2.17 ms |
-| array_sum_100 | 1.02 ms | 16.5 us | 1.90 ms |
-| array_sum_1000 | 11.06 ms | 19.2 us | 1.83 ms |
-| array_sum_10000 | 307.52 ms | 43.8 us | 3.00 ms |
-| callback | 51.7 us | 23.3 us | 3.02 ms |
-| error_propagation | 39.9 us | 83.9 us | 1.50 ms |
-| object_method | FAIL | 24.1 us | 1.77 ms |
-| primitive_echo | 11.8 us | 16.5 us | 2.60 ms |
-| string_echo | 29.6 us | 18.4 us | 2.48 ms |
-| void_call | 7.1 us | 8.8 us | 3.35 ms |
+| array_sum_10 | 16.5 µs | 10.7 µs | 343.6 µs |
+| array_sum_100 | 21.7 µs | 13.0 µs | 349.2 µs |
+| array_sum_1000 | 70.2 µs | 16.4 µs | 379.0 µs |
+| array_sum_10000 | 562.3 µs | 43.2 µs | 896.7 µs |
+| callback | 23.9 µs | 11.7 µs | 649.7 µs |
+| error_propagation | 19.3 µs | 63.7 µs | 334.3 µs |
+| object_method | 10.1 µs | 21.6 µs | 336.3 µs |
+| primitive_echo | 6.6 µs | 12.6 µs | 367.5 µs |
+| string_echo | 14.7 µs | 12.9 µs | 378.3 µs |
+| void_call | 3.3 µs | 5.9 µs | 498.7 µs |
 
 ## Python3 -> Go
 
 | Scenario | metaffi (mean) | ctypes (mean) | grpc (mean) |
 |---|---|---|---|
-| array_echo_10 | 43.7 us | 4.4 us | 170.4 us |
-| array_echo_100 | 267.0 us | 3.9 us | 180.2 us |
-| array_echo_1000 | 2.40 ms | 4.4 us | 183.8 us |
-| array_echo_10000 | 20.42 ms | 5.1 us | 202.3 us |
-| callback | 13.2 us | 2.6 us | 1.26 ms |
-| error_propagation | 4.8 us | 4.1 us | 190.8 us |
-| object_method | 14.9 us | 7.2 us | 169.2 us |
-| primitive_echo | 14.5 us | 2.6 us | 172.4 us |
-| string_echo | 14.8 us | 4.7 us | 179.9 us |
-| void_call | 10.3 us | 2.1 us | 171.0 us |
+| array_echo_10 | 27.4 µs | 4.7 µs | 187.3 µs |
+| array_echo_100 | 178.1 µs | 4.8 µs | 187.5 µs |
+| array_echo_1000 | 1.70 ms | 4.6 µs | 202.4 µs |
+| array_echo_10000 | 17.24 ms | 4.9 µs | 230.9 µs |
+| callback | 11.6 µs | 2.4 µs | 1.48 ms |
+| error_propagation | 4.3 µs | 3.8 µs | 213.6 µs |
+| object_method | 13.5 µs | 7.4 µs | 195.5 µs |
+| primitive_echo | 9.2 µs | 2.5 µs | 201.0 µs |
+| string_echo | 9.4 µs | 4.6 µs | 203.0 µs |
+| void_call | 6.2 µs | 1.8 µs | 179.9 µs |
 
 ## Python3 -> Java
 
 | Scenario | metaffi (mean) | jpype (mean) | grpc (mean) |
 |---|---|---|---|
-| array_sum_10 | 20.5 us | 1.4 us | 1.64 ms |
-| array_sum_100 | 85.1 us | 2.1 us | 1.06 ms |
-| array_sum_1000 | 767.2 us | 9.9 us | 1.15 ms |
-| array_sum_10000 | 6.31 ms | 86.5 us | 2.75 ms |
-| callback | FAIL | 10.9 us | 2.36 ms |
-| error_propagation | 15.1 us | 31.3 us | 657.5 us |
-| object_method | 20.6 us | 9.0 us | 1.20 ms |
-| primitive_echo | 11.7 us | 1.2 us | 1.32 ms |
-| string_echo | 12.3 us | 5.3 us | 1.28 ms |
-| void_call | 9.6 us | 920 ns | 1.40 ms |
+| array_sum_10 | 65.5 µs | 1.5 µs | 1.18 ms |
+| array_sum_100 | 109.1 µs | 2.2 µs | 1.07 ms |
+| array_sum_1000 | 685.5 µs | 9.7 µs | 1.46 ms |
+| array_sum_10000 | 7.71 ms | 90.1 µs | 2.28 ms |
+| callback | 69.4 µs | 16.9 µs | 2.25 ms |
+| error_propagation | 51.1 µs | 40.9 µs | 773.3 µs |
+| object_method | 160.8 µs | 6.2 µs | 1.44 ms |
+| primitive_echo | 46.6 µs | 1.2 µs | 1.39 ms |
+| string_echo | 47.4 µs | 5.6 µs | 1.28 ms |
+| void_call | 40.9 µs | 675.0 ns | 1.55 ms |
 
 
 # Code Complexity Comparison

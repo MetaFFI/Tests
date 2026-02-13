@@ -286,12 +286,14 @@ class TestBenchmarks:
         def adder(a: ctypes.c_long, b: ctypes.c_long) -> ctypes.c_long:
             return a + b
 
-        metaffi_adder = metaffi.make_metaffi_callable(adder)
-        if old_c_long_mapping is None:
-            del metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"]
-        else:
-            metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"] = (
-                old_c_long_mapping)
+        try:
+            metaffi_adder = metaffi.make_metaffi_callable(adder)
+        finally:
+            if old_c_long_mapping is None:
+                del metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"]
+            else:
+                metaffi.metaffi_types.pytype_to_metaffi_type_dict["c_long"] = (
+                    old_c_long_mapping)
         proxy = adapter(metaffi_adder, "java.util.function.IntBinaryOperator")
         assert proxy is not None
 

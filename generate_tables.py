@@ -29,10 +29,12 @@ def fmt_ns(ns) -> str:
     if ns is None:
         return "—"
     ns = float(ns)
-    if ns < 1000:
-        return f"{ns:.0f} ns"
+    if ns < 1:
+        return f"{ns:.3f} ns"
+    elif ns < 1000:
+        return f"{ns:.1f} ns"
     elif ns < 1_000_000:
-        return f"{ns/1000:.1f} us"
+        return f"{ns/1000:.1f} µs"
     elif ns < 1_000_000_000:
         return f"{ns/1_000_000:.2f} ms"
     else:
@@ -59,7 +61,7 @@ def get_unit(ns) -> str:
     if ns < 1000:
         return "ns"
     elif ns < 1_000_000:
-        return "us"
+        return "µs"
     else:
         return "ms"
 
@@ -228,7 +230,7 @@ def main() -> int:
 
     # Write to file
     output_path = RESULTS_DIR / "tables.md"
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(output)
 
     print(f"Tables written to {output_path}")

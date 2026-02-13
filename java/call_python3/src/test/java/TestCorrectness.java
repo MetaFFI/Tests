@@ -16,10 +16,8 @@ import static org.junit.Assert.*;
  * Tests ALL Python3 guest module entities accessible through MetaFFI.
  * Fail-fast: every assertion is exact (or epsilon-justified for floats).
  *
- * KNOWN BUG: xcall_no_params_ret (JVM accessor + Python3 XLLR) returns CDTS size 0
- * for all Python3 entities called with no input parameters. Tests affected by this
- * are wrapped in xfail(). The same entities work fine when called from Go host or
- * when the entity has at least one input parameter.
+ * NOTE: No-params+return dispatch was fixed in SDK/JVM path.
+ * Legacy xfail() wrappers are kept for minimal diff and now execute directly.
  */
 public class TestCorrectness
 {
@@ -27,8 +25,7 @@ public class TestCorrectness
 	private static MetaFFIModule pyModuleDir;   // Python package: module/
 	private static MetaFFIModule pyModuleFile;  // Single file: single_file_module.py
 
-	private static final String NO_PARAMS_BUG =
-		"xcall_no_params_ret bug: JVM->Python3 no-param calls return empty CDTS";
+	private static final String NO_PARAMS_BUG = "legacy no-params+return regression guard";
 
 	@BeforeClass
 	public static void setUp()
@@ -98,39 +95,24 @@ public class TestCorrectness
 	}
 
 	/**
-	 * Wraps a test expected to fail due to a known MetaFFI SDK bug.
-	 * If the test unexpectedly passes, fail() is called so we notice the fix.
+	 * Legacy wrapper kept to avoid large churn in test bodies.
+	 * Known no-params+return issue is fixed, so execute the test directly.
 	 */
 	private void xfail(String reason, Runnable testCode)
 	{
-		try
-		{
-			testCode.run();
-			fail("XFAIL UNEXPECTEDLY PASSED - SDK bug may be fixed: " + reason);
-		}
-		catch (AssertionError e)
-		{
-			if (e.getMessage() != null && e.getMessage().startsWith("XFAIL UNEXPECTEDLY PASSED"))
-			{
-				throw e;
-			}
-			System.err.println("XFAIL: " + reason + " - " + e.getMessage());
-		}
-		catch (Throwable e)
-		{
-			System.err.println("XFAIL: " + reason + " - " + e.getClass().getSimpleName() + ": " + e.getMessage());
-		}
+		assertNotNull("xfail reason must not be null", reason);
+		testCode.run();
 	}
 
 	// ---- Python class creation helpers ----
 
 	/**
 	 * Creates a Python class instance: get class handle -> __new__ -> __init__
-	 * NOTE: This uses attribute getter (no params) which triggers the no-params bug.
+	 * Uses attribute getter (no params + return) as part of object construction.
 	 */
 	private MetaFFIHandle createPythonInstance(String className, Object... initArgs)
 	{
-		// Get class handle (no-param call - triggers bug)
+		// Get class handle
 		Caller getClass = load("attribute=" + className + ",getter", null,
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)});
 		Object[] classResult = getClass.call();
@@ -471,8 +453,7 @@ public class TestCorrectness
 	}
 
 	// ========================================================================
-	// XFAIL: All tests that use xcall_no_params_ret with Python3 guest
-	// Bug: JVM accessor xcall_no_params_ret returns CDTS size 0 for Python3
+	// Legacy no-params+return coverage block (previously xfailed, now active)
 	// ========================================================================
 
 	@Test
