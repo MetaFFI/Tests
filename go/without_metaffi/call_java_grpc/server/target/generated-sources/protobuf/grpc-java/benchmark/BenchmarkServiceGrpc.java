@@ -235,6 +235,37 @@ public final class BenchmarkServiceGrpc {
     return getReturnsAnErrorMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<benchmark.BenchmarkProto.AnyEchoRequest,
+      benchmark.BenchmarkProto.AnyEchoResponse> getAnyEchoMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "AnyEcho",
+      requestType = benchmark.BenchmarkProto.AnyEchoRequest.class,
+      responseType = benchmark.BenchmarkProto.AnyEchoResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<benchmark.BenchmarkProto.AnyEchoRequest,
+      benchmark.BenchmarkProto.AnyEchoResponse> getAnyEchoMethod() {
+    io.grpc.MethodDescriptor<benchmark.BenchmarkProto.AnyEchoRequest, benchmark.BenchmarkProto.AnyEchoResponse> getAnyEchoMethod;
+    if ((getAnyEchoMethod = BenchmarkServiceGrpc.getAnyEchoMethod) == null) {
+      synchronized (BenchmarkServiceGrpc.class) {
+        if ((getAnyEchoMethod = BenchmarkServiceGrpc.getAnyEchoMethod) == null) {
+          BenchmarkServiceGrpc.getAnyEchoMethod = getAnyEchoMethod =
+              io.grpc.MethodDescriptor.<benchmark.BenchmarkProto.AnyEchoRequest, benchmark.BenchmarkProto.AnyEchoResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "AnyEcho"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  benchmark.BenchmarkProto.AnyEchoRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  benchmark.BenchmarkProto.AnyEchoResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new BenchmarkServiceMethodDescriptorSupplier("AnyEcho"))
+              .build();
+        }
+      }
+    }
+    return getAnyEchoMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -334,6 +365,13 @@ public final class BenchmarkServiceGrpc {
         io.grpc.stub.StreamObserver<benchmark.BenchmarkProto.Empty> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReturnsAnErrorMethod(), responseObserver);
     }
+
+    /**
+     */
+    default void anyEcho(benchmark.BenchmarkProto.AnyEchoRequest request,
+        io.grpc.stub.StreamObserver<benchmark.BenchmarkProto.AnyEchoResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getAnyEchoMethod(), responseObserver);
+    }
   }
 
   /**
@@ -424,6 +462,14 @@ public final class BenchmarkServiceGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getReturnsAnErrorMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void anyEcho(benchmark.BenchmarkProto.AnyEchoRequest request,
+        io.grpc.stub.StreamObserver<benchmark.BenchmarkProto.AnyEchoResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getAnyEchoMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -485,6 +531,13 @@ public final class BenchmarkServiceGrpc {
     public benchmark.BenchmarkProto.Empty returnsAnError(benchmark.BenchmarkProto.Empty request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getReturnsAnErrorMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public benchmark.BenchmarkProto.AnyEchoResponse anyEcho(benchmark.BenchmarkProto.AnyEchoRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getAnyEchoMethod(), getCallOptions(), request);
     }
   }
 
@@ -554,6 +607,14 @@ public final class BenchmarkServiceGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getReturnsAnErrorMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<benchmark.BenchmarkProto.AnyEchoResponse> anyEcho(
+        benchmark.BenchmarkProto.AnyEchoRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getAnyEchoMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_VOID_CALL = 0;
@@ -562,7 +623,8 @@ public final class BenchmarkServiceGrpc {
   private static final int METHODID_ARRAY_SUM = 3;
   private static final int METHODID_OBJECT_METHOD = 4;
   private static final int METHODID_RETURNS_AN_ERROR = 5;
-  private static final int METHODID_CALLBACK_ADD = 6;
+  private static final int METHODID_ANY_ECHO = 6;
+  private static final int METHODID_CALLBACK_ADD = 7;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -604,6 +666,10 @@ public final class BenchmarkServiceGrpc {
         case METHODID_RETURNS_AN_ERROR:
           serviceImpl.returnsAnError((benchmark.BenchmarkProto.Empty) request,
               (io.grpc.stub.StreamObserver<benchmark.BenchmarkProto.Empty>) responseObserver);
+          break;
+        case METHODID_ANY_ECHO:
+          serviceImpl.anyEcho((benchmark.BenchmarkProto.AnyEchoRequest) request,
+              (io.grpc.stub.StreamObserver<benchmark.BenchmarkProto.AnyEchoResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -675,6 +741,13 @@ public final class BenchmarkServiceGrpc {
               benchmark.BenchmarkProto.Empty,
               benchmark.BenchmarkProto.Empty>(
                 service, METHODID_RETURNS_AN_ERROR)))
+        .addMethod(
+          getAnyEchoMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              benchmark.BenchmarkProto.AnyEchoRequest,
+              benchmark.BenchmarkProto.AnyEchoResponse>(
+                service, METHODID_ANY_ECHO)))
         .build();
   }
 
@@ -730,6 +803,7 @@ public final class BenchmarkServiceGrpc {
               .addMethod(getObjectMethodMethod())
               .addMethod(getCallbackAddMethod())
               .addMethod(getReturnsAnErrorMethod())
+              .addMethod(getAnyEchoMethod())
               .build();
         }
       }

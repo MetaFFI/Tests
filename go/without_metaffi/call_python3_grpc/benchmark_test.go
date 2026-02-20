@@ -19,6 +19,7 @@ import (
 	pb "github.com/MetaFFI/tests/go/without_metaffi/call_python3_grpc/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // ---------------------------------------------------------------------------
@@ -157,6 +158,40 @@ func getIntEnv(key string, defaultVal int) int {
 		return defaultVal
 	}
 	return n
+}
+
+func parseScenarioFilter() map[string]struct{} {
+	raw := strings.TrimSpace(os.Getenv("METAFFI_TEST_SCENARIOS"))
+	if raw == "" {
+		return nil
+	}
+
+	res := make(map[string]struct{})
+	for _, part := range strings.Split(raw, ",") {
+		k := strings.TrimSpace(part)
+		if k != "" {
+			res[k] = struct{}{}
+		}
+	}
+	if len(res) == 0 {
+		return nil
+	}
+	return res
+}
+
+func scenarioFilterKey(name string, dataSize *int) string {
+	if dataSize == nil {
+		return name
+	}
+	return fmt.Sprintf("%s_%d", name, *dataSize)
+}
+
+func shouldRunScenario(filter map[string]struct{}, name string, dataSize *int) bool {
+	if len(filter) == 0 {
+		return true
+	}
+	_, ok := filter[scenarioFilterKey(name, dataSize)]
+	return ok
 }
 
 // ---------------------------------------------------------------------------
@@ -373,51 +408,70 @@ func TestBenchmarkAll(t *testing.T) {
 	t.Logf("Timer overhead: %d ns", timerOverhead)
 
 	var benchmarks []BenchmarkResult
+	scenarioFilter := parseScenarioFilter()
+	selectedCount := 0
+	if len(scenarioFilter) > 0 {
+		t.Logf("Scenario filter enabled: %s", os.Getenv("METAFFI_TEST_SCENARIOS"))
+	}
 
 	// --- Scenario 1: Void call ---
-	t.Run("void_call", func(t *testing.T) {
-		result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			_, err := client.VoidCall(context.Background(), &pb.VoidCallRequest{Secs: 0})
-			return err
+	if shouldRunScenario(scenarioFilter, "void_call", nil) {
+		selectedCount++
+		t.Run("void_call", func(t *testing.T) {
+			result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				_, err := client.VoidCall(context.Background(), &pb.VoidCallRequest{})
+				return err
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 2: Primitive echo ---
-	t.Run("primitive_echo", func(t *testing.T) {
-		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			resp, err := client.DivIntegers(context.Background(), &pb.DivIntegersRequest{X: 10, Y: 2})
-			if err != nil {
-				return err
-			}
-			if math.Abs(resp.Result-5.0) > 1e-10 {
-				return fmt.Errorf("div_integers: got %v, want 5.0", resp.Result)
-			}
-			return nil
+	if shouldRunScenario(scenarioFilter, "primitive_echo", nil) {
+		selectedCount++
+		t.Run("primitive_echo", func(t *testing.T) {
+			result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				resp, err := client.DivIntegers(context.Background(), &pb.DivIntegersRequest{X: 10, Y: 2})
+				if err != nil {
+					return err
+				}
+				if math.Abs(resp.Result-5.0) > 1e-10 {
+					return fmt.Errorf("div_integers: got %v, want 5.0", resp.Result)
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 3: String echo ---
-	t.Run("string_echo", func(t *testing.T) {
-		result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			resp, err := client.JoinStrings(context.Background(), &pb.JoinStringsRequest{
-				Values: []string{"hello", "world"},
+	if shouldRunScenario(scenarioFilter, "string_echo", nil) {
+		selectedCount++
+		t.Run("string_echo", func(t *testing.T) {
+			result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				resp, err := client.JoinStrings(context.Background(), &pb.JoinStringsRequest{
+					Values: []string{"hello", "world"},
+				})
+				if err != nil {
+					return err
+				}
+				if resp.Result != "hello,world" {
+					return fmt.Errorf("join_strings: got %q, want \"hello,world\"", resp.Result)
+				}
+				return nil
 			})
-			if err != nil {
-				return err
-			}
-			if resp.Result != "hello,world" {
-				return fmt.Errorf("join_strings: got %q, want \"hello,world\"", resp.Result)
-			}
-			return nil
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 4: Array sum (varying sizes) ---
 	for _, size := range []int{10, 100, 1000, 10000} {
 		size := size
+		sizePtr := size
+		if !shouldRunScenario(scenarioFilter, "array_sum", &sizePtr) {
+			continue
+		}
+		selectedCount++
 		t.Run(fmt.Sprintf("array_sum_%d", size), func(t *testing.T) {
 			// Pre-build the values slice
 			values := make([]int64, size)
@@ -427,7 +481,6 @@ func TestBenchmarkAll(t *testing.T) {
 				expectedSum += int64(i + 1)
 			}
 
-			sizePtr := size
 			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 				resp, err := client.ArraySum(context.Background(), &pb.ArraySumRequest{
 					Values: values,
@@ -444,83 +497,130 @@ func TestBenchmarkAll(t *testing.T) {
 		})
 	}
 
-	// --- Scenario 5: Object create + method call ---
-	t.Run("object_method", func(t *testing.T) {
-		result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			resp, err := client.ObjectMethod(context.Background(), &pb.ObjectMethodRequest{
-				Name: "bench",
+	// --- Scenario: Dynamic any echo (mixed array payload) ---
+	{
+		anyEchoSize := 100
+		if shouldRunScenario(scenarioFilter, "any_echo", &anyEchoSize) {
+			selectedCount++
+			t.Run("any_echo_100", func(t *testing.T) {
+				values := &structpb.ListValue{Values: make([]*structpb.Value, 0, anyEchoSize)}
+				for i := 0; i < anyEchoSize; i++ {
+					switch i % 3 {
+					case 0:
+						values.Values = append(values.Values, structpb.NewNumberValue(1))
+					case 1:
+						values.Values = append(values.Values, structpb.NewStringValue("two"))
+					default:
+						values.Values = append(values.Values, structpb.NewNumberValue(3.0))
+					}
+				}
+				req := &pb.AnyEchoRequest{Values: values}
+				sizePtr := anyEchoSize
+				result := runBenchmark(t, "any_echo", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+					resp, err := client.AnyEcho(context.Background(), req)
+					if err != nil {
+						return err
+					}
+					if resp.GetValues() == nil || len(resp.GetValues().GetValues()) != anyEchoSize {
+						return fmt.Errorf("AnyEcho: got len %d, want %d", len(resp.GetValues().GetValues()), anyEchoSize)
+					}
+					return nil
+				})
+				benchmarks = append(benchmarks, result)
 			})
-			if err != nil {
-				return err
-			}
-			if resp.Result != "Hello from SomeClass bench" {
-				return fmt.Errorf("object_method: got %q, want \"Hello from SomeClass bench\"", resp.Result)
-			}
-			return nil
+		}
+	}
+
+	// --- Scenario 5: Object create + method call ---
+	if shouldRunScenario(scenarioFilter, "object_method", nil) {
+		selectedCount++
+		t.Run("object_method", func(t *testing.T) {
+			result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				resp, err := client.ObjectMethod(context.Background(), &pb.ObjectMethodRequest{
+					Name: "bench",
+				})
+				if err != nil {
+					return err
+				}
+				if resp.Result != "Hello from SomeClass bench" {
+					return fmt.Errorf("object_method: got %q, want \"Hello from SomeClass bench\"", resp.Result)
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 6: Callback (bidirectional streaming) ---
-	t.Run("callback", func(t *testing.T) {
-		result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			stream, err := client.CallbackAdd(context.Background())
-			if err != nil {
-				return fmt.Errorf("open stream: %w", err)
-			}
+	if shouldRunScenario(scenarioFilter, "callback", nil) {
+		selectedCount++
+		t.Run("callback", func(t *testing.T) {
+			result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				stream, err := client.CallbackAdd(context.Background())
+				if err != nil {
+					return fmt.Errorf("open stream: %w", err)
+				}
 
-			// Send invoke
-			if err := stream.Send(&pb.CallbackClientMsg{
-				Msg: &pb.CallbackClientMsg_Invoke{Invoke: true},
-			}); err != nil {
-				return fmt.Errorf("send invoke: %w", err)
-			}
+				// Send invoke
+				if err := stream.Send(&pb.CallbackClientMsg{
+					Msg: &pb.CallbackClientMsg_Invoke{Invoke: true},
+				}); err != nil {
+					return fmt.Errorf("send invoke: %w", err)
+				}
 
-			// Receive compute request
-			resp, err := stream.Recv()
-			if err != nil {
-				return fmt.Errorf("recv compute: %w", err)
-			}
-			compute := resp.GetCompute()
-			if compute == nil {
-				return fmt.Errorf("expected compute message, got %v", resp)
-			}
+				// Receive compute request
+				resp, err := stream.Recv()
+				if err != nil {
+					return fmt.Errorf("recv compute: %w", err)
+				}
+				compute := resp.GetCompute()
+				if compute == nil {
+					return fmt.Errorf("expected compute message, got %v", resp)
+				}
 
-			// Compute and send result
-			sum := compute.A + compute.B
-			if err := stream.Send(&pb.CallbackClientMsg{
-				Msg: &pb.CallbackClientMsg_AddResult{AddResult: sum},
-			}); err != nil {
-				return fmt.Errorf("send result: %w", err)
-			}
+				// Compute and send result
+				sum := compute.A + compute.B
+				if err := stream.Send(&pb.CallbackClientMsg{
+					Msg: &pb.CallbackClientMsg_AddResult{AddResult: sum},
+				}); err != nil {
+					return fmt.Errorf("send result: %w", err)
+				}
 
-			// Receive final result
-			resp, err = stream.Recv()
-			if err != nil {
-				return fmt.Errorf("recv final: %w", err)
-			}
-			if resp.GetFinalResult() != 3 {
-				return fmt.Errorf("callback: got %d, want 3", resp.GetFinalResult())
-			}
+				// Receive final result
+				resp, err = stream.Recv()
+				if err != nil {
+					return fmt.Errorf("recv final: %w", err)
+				}
+				if resp.GetFinalResult() != 3 {
+					return fmt.Errorf("callback: got %d, want 3", resp.GetFinalResult())
+				}
 
-			stream.CloseSend()
-			return nil
+				stream.CloseSend()
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 7: Error propagation ---
-	t.Run("error_propagation", func(t *testing.T) {
-		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			_, err := client.ReturnsAnError(context.Background(), &pb.Empty{})
-			if err == nil {
-				return fmt.Errorf("expected gRPC error but got nil")
-			}
-			// Error IS expected -- this is the successful path
-			return nil
+	if shouldRunScenario(scenarioFilter, "error_propagation", nil) {
+		selectedCount++
+		t.Run("error_propagation", func(t *testing.T) {
+			result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				_, err := client.ReturnsAnError(context.Background(), &pb.Empty{})
+				if err == nil {
+					return fmt.Errorf("expected gRPC error but got nil")
+				}
+				// Error IS expected -- this is the successful path
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
+
+	if len(scenarioFilter) > 0 && selectedCount == 0 {
+		t.Fatalf("METAFFI_TEST_SCENARIOS selected no benchmark scenarios: %q", os.Getenv("METAFFI_TEST_SCENARIOS"))
+	}
 
 	// --- Write results ---
 	writeResults(t, benchmarks, timerOverhead, warmup, iterations, batchMinElapsedNs, batchMaxCalls)

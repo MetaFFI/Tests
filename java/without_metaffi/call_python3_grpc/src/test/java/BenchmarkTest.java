@@ -1,5 +1,7 @@
 import benchmark.BenchmarkProto.*;
 import benchmark.BenchmarkServiceGrpc;
+import com.google.protobuf.ListValue;
+import com.google.protobuf.Value;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -11,7 +13,9 @@ import org.junit.Test;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -99,6 +103,36 @@ public class BenchmarkTest
 		String val = System.getenv(name);
 		if (val == null || val.isEmpty()) return defaultValue;
 		return Integer.parseInt(val);
+	}
+
+	private static Set<String> parseScenarioFilter()
+	{
+		String raw = System.getenv("METAFFI_TEST_SCENARIOS");
+		if (raw == null || raw.trim().isEmpty())
+		{
+			return new HashSet<>();
+		}
+
+		Set<String> out = new HashSet<>();
+		for (String part : raw.split(","))
+		{
+			String s = part.trim();
+			if (!s.isEmpty())
+			{
+				out.add(s);
+			}
+		}
+		return out;
+	}
+
+	private static String scenarioKey(String scenario, Integer dataSize)
+	{
+		return dataSize == null ? scenario : scenario + "_" + dataSize;
+	}
+
+	private static boolean shouldRunScenario(Set<String> filter, String scenario, Integer dataSize)
+	{
+		return filter.isEmpty() || filter.contains(scenarioKey(scenario, dataSize));
 	}
 
 	// ---- Statistical helpers ----
@@ -250,36 +284,60 @@ public class BenchmarkTest
 		System.err.println("Timer overhead: " + timerOverhead + " ns");
 
 		List<String> benchmarkJsons = new ArrayList<>();
+		Set<String> scenarioFilter = parseScenarioFilter();
+		int selectedCount = 0;
+		if (!scenarioFilter.isEmpty())
+		{
+			System.err.println("Scenario filter enabled: " + System.getenv("METAFFI_TEST_SCENARIOS"));
+		}
 
 		// --- Scenario 1: Void call ---
-		benchmarkJsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
-			() -> blockingStub.voidCall(VoidCallRequest.newBuilder().setSecs(0).build())));
+		if (shouldRunScenario(scenarioFilter, "void_call", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
+				() -> blockingStub.voidCall(VoidCallRequest.getDefaultInstance())));
+		}
 
 		// --- Scenario 2: Primitive echo ---
-		benchmarkJsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
-			() -> {
-				DivIntegersResponse resp = blockingStub.divIntegers(
-					DivIntegersRequest.newBuilder().setX(10).setY(2).build());
-				if (Math.abs(resp.getResult() - 5.0) > 1e-10)
-				{
-					throw new RuntimeException("DivIntegers: got " + resp.getResult() + ", want 5.0");
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "primitive_echo", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
+				() -> {
+					DivIntegersResponse resp = blockingStub.divIntegers(
+						DivIntegersRequest.newBuilder().setX(10).setY(2).build());
+					if (Math.abs(resp.getResult() - 5.0) > 1e-10)
+					{
+						throw new RuntimeException("DivIntegers: got " + resp.getResult() + ", want 5.0");
+					}
+				}));
+		}
 
 		// --- Scenario 3: String echo ---
-		benchmarkJsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
-			() -> {
-				JoinStringsResponse resp = blockingStub.joinStrings(
-					JoinStringsRequest.newBuilder().addValues("hello").addValues("world").build());
-				if (!"hello,world".equals(resp.getResult()))
-				{
-					throw new RuntimeException("JoinStrings: got " + resp.getResult());
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "string_echo", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
+				() -> {
+					JoinStringsResponse resp = blockingStub.joinStrings(
+						JoinStringsRequest.newBuilder().addValues("hello").addValues("world").build());
+					if (!"hello,world".equals(resp.getResult()))
+					{
+						throw new RuntimeException("JoinStrings: got " + resp.getResult());
+					}
+				}));
+		}
 
 		// --- Scenario 4: Array sum (varying sizes) ---
 		for (int size : new int[]{10, 100, 1000, 10000})
 		{
+			if (!shouldRunScenario(scenarioFilter, "array_sum", size))
+			{
+				continue;
+			}
+			selectedCount++;
+
 			ArraySumRequest.Builder reqBuilder = ArraySumRequest.newBuilder();
 			long expectedSum = 0;
 			for (int i = 1; i <= size; i++)
@@ -300,83 +358,139 @@ public class BenchmarkTest
 				}));
 		}
 
-		// --- Scenario 5: Object method ---
-		benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
-			() -> {
-				ObjectMethodResponse resp = blockingStub.objectMethod(
-					ObjectMethodRequest.newBuilder().setName("bench").build());
-				if (resp.getResult() == null || resp.getResult().isEmpty())
-				{
-					throw new RuntimeException("ObjectMethod: empty result");
-				}
-			}));
-
-		// --- Scenario 6: Callback via bidirectional streaming ---
-		try
+		// --- Scenario: Dynamic Any echo (mixed array payload) ---
 		{
-			benchmarkJsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
-				() -> {
-					CountDownLatch doneLatch = new CountDownLatch(1);
-					AtomicLong finalResult = new AtomicLong(-1);
-					AtomicReference<Throwable> error = new AtomicReference<>();
-					AtomicReference<StreamObserver<CallbackClientMsg>> reqHolder = new AtomicReference<>();
-
-					StreamObserver<CallbackClientMsg> requestObserver = asyncStub.callbackAdd(
-						new StreamObserver<CallbackServerMsg>()
-						{
-							@Override
-							public void onNext(CallbackServerMsg msg)
-							{
-								if (msg.hasCompute())
-								{
-									long result = msg.getCompute().getA() + msg.getCompute().getB();
-									StreamObserver<CallbackClientMsg> req = reqHolder.get();
-									req.onNext(CallbackClientMsg.newBuilder().setAddResult(result).build());
-									req.onCompleted();
-								}
-								else if (msg.hasFinalResult())
-								{
-									finalResult.set(msg.getFinalResult());
-								}
-							}
-
-							@Override
-							public void onError(Throwable t) { error.set(t); doneLatch.countDown(); }
-
-							@Override
-							public void onCompleted() { doneLatch.countDown(); }
-						});
-
-					reqHolder.set(requestObserver);
-					requestObserver.onNext(CallbackClientMsg.newBuilder().setInvoke(true).build());
-
-					assertTrue("Callback timed out", doneLatch.await(10, TimeUnit.SECONDS));
-					if (error.get() != null) throw error.get();
-					if (finalResult.get() != 3L)
+			int anyEchoSize = 100;
+			if (shouldRunScenario(scenarioFilter, "any_echo", anyEchoSize))
+			{
+				selectedCount++;
+				ListValue.Builder listBuilder = ListValue.newBuilder();
+				for (int i = 0; i < anyEchoSize; i++)
+				{
+					int mod = i % 3;
+					if (mod == 0)
 					{
-						throw new RuntimeException("Callback: got " + finalResult.get() + ", want 3");
+						listBuilder.addValues(Value.newBuilder().setNumberValue(1.0).build());
+					}
+					else if (mod == 1)
+					{
+						listBuilder.addValues(Value.newBuilder().setStringValue("two").build());
+					}
+					else
+					{
+						listBuilder.addValues(Value.newBuilder().setNumberValue(3.0).build());
+					}
+				}
+				final AnyEchoRequest req = AnyEchoRequest.newBuilder()
+					.setValues(listBuilder.build())
+					.build();
+				final int expectedLen = anyEchoSize;
+
+				benchmarkJsons.add(runBenchmark("any_echo", anyEchoSize, WARMUP, ITERATIONS,
+					() -> {
+						AnyEchoResponse resp = blockingStub.anyEcho(req);
+						if (resp.getValues().getValuesCount() != expectedLen)
+						{
+							throw new RuntimeException("AnyEcho: got len " + resp.getValues().getValuesCount() + ", want " + expectedLen);
+						}
+					}));
+			}
+		}
+
+		// --- Scenario 5: Object method ---
+		if (shouldRunScenario(scenarioFilter, "object_method", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
+				() -> {
+					ObjectMethodResponse resp = blockingStub.objectMethod(
+						ObjectMethodRequest.newBuilder().setName("bench").build());
+					if (resp.getResult() == null || resp.getResult().isEmpty())
+					{
+						throw new RuntimeException("ObjectMethod: empty result");
 					}
 				}));
 		}
-		catch (Throwable e)
+
+		// --- Scenario 6: Callback via bidirectional streaming ---
+		if (shouldRunScenario(scenarioFilter, "callback", null))
 		{
-			System.err.println("Callback scenario failed: " + e.getMessage());
-			benchmarkJsons.add(makeFailedResult("callback", null, e.getMessage()));
+			selectedCount++;
+			try
+			{
+				benchmarkJsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
+					() -> {
+						CountDownLatch doneLatch = new CountDownLatch(1);
+						AtomicLong finalResult = new AtomicLong(-1);
+						AtomicReference<Throwable> error = new AtomicReference<>();
+						AtomicReference<StreamObserver<CallbackClientMsg>> reqHolder = new AtomicReference<>();
+
+						StreamObserver<CallbackClientMsg> requestObserver = asyncStub.callbackAdd(
+							new StreamObserver<CallbackServerMsg>()
+							{
+								@Override
+								public void onNext(CallbackServerMsg msg)
+								{
+									if (msg.hasCompute())
+									{
+										long result = msg.getCompute().getA() + msg.getCompute().getB();
+										StreamObserver<CallbackClientMsg> req = reqHolder.get();
+										req.onNext(CallbackClientMsg.newBuilder().setAddResult(result).build());
+										req.onCompleted();
+									}
+									else if (msg.hasFinalResult())
+									{
+										finalResult.set(msg.getFinalResult());
+									}
+								}
+
+								@Override
+								public void onError(Throwable t) { error.set(t); doneLatch.countDown(); }
+
+								@Override
+								public void onCompleted() { doneLatch.countDown(); }
+							});
+
+						reqHolder.set(requestObserver);
+						requestObserver.onNext(CallbackClientMsg.newBuilder().setInvoke(true).build());
+
+						assertTrue("Callback timed out", doneLatch.await(10, TimeUnit.SECONDS));
+						if (error.get() != null) throw error.get();
+						if (finalResult.get() != 3L)
+						{
+							throw new RuntimeException("Callback: got " + finalResult.get() + ", want 3");
+						}
+					}));
+			}
+			catch (Throwable e)
+			{
+				System.err.println("Callback scenario failed: " + e.getMessage());
+				benchmarkJsons.add(makeFailedResult("callback", null, e.getMessage()));
+			}
 		}
 
 		// --- Scenario 7: Error propagation ---
-		benchmarkJsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
-			() -> {
-				try
-				{
-					blockingStub.returnsAnError(Empty.newBuilder().build());
-					throw new RuntimeException("ReturnsAnError did not throw");
-				}
-				catch (StatusRuntimeException e)
-				{
-					// Expected: gRPC INTERNAL error
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "error_propagation", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
+				() -> {
+					try
+					{
+						blockingStub.returnsAnError(Empty.newBuilder().build());
+						throw new RuntimeException("ReturnsAnError did not throw");
+					}
+					catch (StatusRuntimeException e)
+					{
+						// Expected: gRPC INTERNAL error
+					}
+				}));
+		}
+
+		if (!scenarioFilter.isEmpty() && selectedCount == 0)
+		{
+			fail("METAFFI_TEST_SCENARIOS selected no benchmark scenarios: " + System.getenv("METAFFI_TEST_SCENARIOS"));
+		}
 
 		// --- Write results ---
 		writeResults(benchmarkJsons, timerOverhead);

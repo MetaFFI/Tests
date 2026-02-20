@@ -62,3 +62,34 @@ go.sum
 # Dependency directories (remove the comment below to include it)
 vendor/
 Guests/Python3/Test_MetaFFIGuest.py
+
+# ----------- Test artifacts -----------
+
+# JVM crash logs
+hs_err_pid*.log
+
+# Surefire JVM dump streams
+*.dumpstream
+
+# Temporary configs and results
+configs/_tmp_*
+configs/tmp_*
+results/_tmp_*
+results/_test_*
+
+# Repeat run raw data (consolidated results are in results/*.json)
+results/repeats/
+
+# Temporary captured output
+_py_stderr.txt
+_py_stdout.txt
+
+# Copied JNI headers (build artifact)
+.java_include/
+
+*.dump
+java/without_metaffi/call_go_grpc/target*
+results/**
+results/report_figures/*
+*.class
+

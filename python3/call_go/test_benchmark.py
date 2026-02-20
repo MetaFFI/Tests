@@ -26,6 +26,24 @@ WARMUP = int(os.environ.get("METAFFI_TEST_WARMUP", "100"))
 ITERATIONS = int(os.environ.get("METAFFI_TEST_ITERATIONS", "10000"))
 
 
+def _parse_scenario_filter() -> set[str] | None:
+    raw = os.environ.get("METAFFI_TEST_SCENARIOS", "").strip()
+    if not raw:
+        return None
+    items = {part.strip() for part in raw.split(",") if part.strip()}
+    return items or None
+
+
+def _scenario_key(name: str, data_size: int | None) -> str:
+    return f"{name}_{data_size}" if data_size is not None else name
+
+
+def _should_run(filter_set: set[str] | None, name: str, data_size: int | None) -> bool:
+    if not filter_set:
+        return True
+    return _scenario_key(name, data_size) in filter_set
+
+
 # ---------------------------------------------------------------------------
 # Statistical helpers (matching Go implementation)
 # ---------------------------------------------------------------------------
@@ -202,125 +220,177 @@ class TestBenchmarks:
 
         timer_overhead = measure_timer_overhead()
         print(f"Timer overhead: {timer_overhead} ns", file=sys.stderr)
+        scenario_filter = _parse_scenario_filter()
+        if scenario_filter:
+            print(
+                "Scenario filter enabled: "
+                + ",".join(sorted(scenario_filter)),
+                file=sys.stderr,
+            )
 
         benchmarks = []
 
         # --- Scenario 1: Void call ---
-        wait_fn = go_module.load_entity("callable=WaitABit",
-            [ti(T.metaffi_int64_type)], None)
-
-        benchmarks.append(run_benchmark(
-            "void_call", None, WARMUP, ITERATIONS,
-            lambda: wait_fn(0)
-        ))
-        del wait_fn
-
-        # --- Scenario 2: Primitive echo (int64 -> float64) ---
-        div_fn = go_module.load_entity("callable=DivIntegers",
-            [ti(T.metaffi_int64_type), ti(T.metaffi_int64_type)],
-            [ti(T.metaffi_float64_type)])
-
-        def bench_primitive():
-            result = div_fn(10, 2)
-            if abs(result - 5.0) > 1e-10:
-                raise RuntimeError(f"DivIntegers(10,2) = {result}, want 5.0")
-
-        benchmarks.append(run_benchmark(
-            "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
-        ))
-        del div_fn
-
-        # --- Scenario 3: String echo ---
-        join_fn = go_module.load_entity("callable=JoinStrings",
-            [ti(T.metaffi_string8_array_type, dims=1)],
-            [ti(T.metaffi_string8_type)])
-
-        def bench_string():
-            result = join_fn(["hello", "world"])
-            if result != "hello,world":
-                raise RuntimeError(f"JoinStrings = {result!r}, want 'hello,world'")
-
-        benchmarks.append(run_benchmark(
-            "string_echo", None, WARMUP, ITERATIONS, bench_string
-        ))
-        del join_fn
-
-        # --- Scenario 4: Array echo (varying sizes) ---
-        # Note: SumRaggedArray unusable due to Go int!=int64 type mismatch.
-        # Using EchoBytes (uint8 round-trip) to benchmark array marshaling.
-        echo_fn = go_module.load_entity("callable=EchoBytes",
-            [ti(T.metaffi_uint8_array_type, dims=1)],
-            [ti(T.metaffi_uint8_array_type, dims=1)])
-
-        for size in [10, 100, 1000, 10000]:
-            data = [i % 256 for i in range(size)]
-
-            # Capture loop vars with default args
-            def bench_array(d=data, sz=size):
-                result = echo_fn(d)
-                if len(result) != sz:
-                    raise RuntimeError(
-                        f"EchoBytes({sz}): got len {len(result)}, want {sz}"
-                    )
+        if _should_run(scenario_filter, "void_call", None):
+            noop_fn = go_module.load_entity("callable=NoOp",
+                None, None)
 
             benchmarks.append(run_benchmark(
-                "array_echo", size, WARMUP, ITERATIONS, bench_array
+                "void_call", None, WARMUP, ITERATIONS,
+                lambda: noop_fn()
             ))
+            del noop_fn
 
-        del echo_fn
+        # --- Scenario 2: Primitive echo (int64 -> float64) ---
+        if _should_run(scenario_filter, "primitive_echo", None):
+            div_fn = go_module.load_entity("callable=DivIntegers",
+                [ti(T.metaffi_int64_type), ti(T.metaffi_int64_type)],
+                [ti(T.metaffi_float64_type)])
+
+            def bench_primitive():
+                result = div_fn(10, 2)
+                if abs(result - 5.0) > 1e-10:
+                    raise RuntimeError(f"DivIntegers(10,2) = {result}, want 5.0")
+
+            benchmarks.append(run_benchmark(
+                "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
+            ))
+            del div_fn
+
+        # --- Scenario 3: String echo ---
+        if _should_run(scenario_filter, "string_echo", None):
+            join_fn = go_module.load_entity("callable=JoinStrings",
+                [ti(T.metaffi_string8_array_type, dims=1)],
+                [ti(T.metaffi_string8_type)])
+
+            def bench_string():
+                result = join_fn(["hello", "world"])
+                if result != "hello,world":
+                    raise RuntimeError(f"JoinStrings = {result!r}, want 'hello,world'")
+
+            benchmarks.append(run_benchmark(
+                "string_echo", None, WARMUP, ITERATIONS, bench_string
+            ))
+            del join_fn
+
+        # --- Scenario 4: Array echo (varying sizes, packed uint8[]) ---
+        if any(_should_run(scenario_filter, "array_echo", size) for size in [10, 100, 1000, 10000]):
+            echo_fn = go_module.load_entity("callable=EchoBytes",
+                [ti(T.metaffi_uint8_packed_array_type, dims=1)],
+                [ti(T.metaffi_uint8_packed_array_type, dims=1)])
+
+            for size in [10, 100, 1000, 10000]:
+                if not _should_run(scenario_filter, "array_echo", size):
+                    continue
+                data = bytes(i % 256 for i in range(size))
+
+                # Capture loop vars with default args
+                def bench_array(d=data, sz=size):
+                    result = echo_fn(d)
+                    if len(result) != sz:
+                        raise RuntimeError(
+                            f"EchoBytes({sz}): got len {len(result)}, want {sz}"
+                        )
+
+                benchmarks.append(run_benchmark(
+                    "array_echo", size, WARMUP, ITERATIONS, bench_array
+                ))
+
+            del echo_fn
+
+        # --- Scenario: Dynamic any echo (mixed array payload) ---
+        any_echo_size = 100
+        if _should_run(scenario_filter, "any_echo", any_echo_size):
+            new_testmap = go_module.load_entity("callable=NewTestMap", None,
+                [ti(T.metaffi_handle_type)])
+            set_fn = go_module.load_entity("callable=TestMap.Set",
+                [ti(T.metaffi_handle_type), ti(T.metaffi_string8_type), ti(T.metaffi_any_type)],
+                None)
+            get_fn = go_module.load_entity("callable=TestMap.Get",
+                [ti(T.metaffi_handle_type), ti(T.metaffi_string8_type)],
+                [ti(T.metaffi_any_type)])
+
+            handle = new_testmap()
+            key = "any_echo_payload"
+            pattern = [1, "two", 3.0]
+            payload = [pattern[i % len(pattern)] for i in range(any_echo_size)]
+
+            def bench_any_echo(h=handle, k=key, data=payload, expected_len=any_echo_size):
+                set_fn(h, k, data)
+                echoed = get_fn(h, k)
+                if echoed is None:
+                    raise RuntimeError("TestMap.Get(any_echo_payload): got null")
+                if not isinstance(echoed, (list, tuple)):
+                    raise RuntimeError(f"any_echo: expected list/tuple, got {type(echoed)}")
+                if len(echoed) != expected_len:
+                    raise RuntimeError(f"any_echo: got len {len(echoed)}, want {expected_len}")
+
+            benchmarks.append(run_benchmark(
+                "any_echo", any_echo_size, WARMUP, ITERATIONS, bench_any_echo
+            ))
+            del new_testmap, set_fn, get_fn
 
         # --- Scenario 5: Object create + method call ---
-        new_testmap = go_module.load_entity("callable=NewTestMap", None,
-            [ti(T.metaffi_handle_type)])
-        name_getter = go_module.load_entity("callable=TestMap.GetName",
-            [ti(T.metaffi_handle_type)],
-            [ti(T.metaffi_string8_type)])
+        if _should_run(scenario_filter, "object_method", None):
+            new_testmap = go_module.load_entity("callable=NewTestMap", None,
+                [ti(T.metaffi_handle_type)])
+            name_getter = go_module.load_entity("callable=TestMap.GetName",
+                [ti(T.metaffi_handle_type)],
+                [ti(T.metaffi_string8_type)])
 
-        def bench_object():
-            handle = new_testmap()
-            name = name_getter(handle)
-            if name != "name1":
-                raise RuntimeError(f"TestMap.Name = {name!r}, want 'name1'")
+            def bench_object():
+                handle = new_testmap()
+                name = name_getter(handle)
+                if name != "name1":
+                    raise RuntimeError(f"TestMap.Name = {name!r}, want 'name1'")
 
-        benchmarks.append(run_benchmark(
-            "object_method", None, WARMUP, ITERATIONS, bench_object
-        ))
-        del new_testmap, name_getter
+            benchmarks.append(run_benchmark(
+                "object_method", None, WARMUP, ITERATIONS, bench_object
+            ))
+            del new_testmap, name_getter
 
         # --- Scenario 6: Callback invocation ---
-        call_cb = go_module.load_entity("callable=CallCallbackAdd",
-            [ti(T.metaffi_callable_type)],
-            [ti(T.metaffi_int64_type)])
+        if _should_run(scenario_filter, "callback", None):
+            call_cb = go_module.load_entity("callable=CallCallbackAdd",
+                [ti(T.metaffi_callable_type)],
+                [ti(T.metaffi_int64_type)])
 
-        def adder(a: int, b: int) -> int:
-            return a + b
+            def adder(a: int, b: int) -> int:
+                return a + b
 
-        metaffi_adder = metaffi.make_metaffi_callable(adder)
+            metaffi_adder = metaffi.make_metaffi_callable(adder)
 
-        def bench_callback():
-            result = call_cb(metaffi_adder)
-            if result != 3:
-                raise RuntimeError(f"CallCallbackAdd: got {result}, want 3")
+            def bench_callback():
+                result = call_cb(metaffi_adder)
+                if result != 3:
+                    raise RuntimeError(f"CallCallbackAdd: got {result}, want 3")
 
-        benchmarks.append(run_benchmark(
-            "callback", None, WARMUP, ITERATIONS, bench_callback
-        ))
-        del call_cb, metaffi_adder
+            benchmarks.append(run_benchmark(
+                "callback", None, WARMUP, ITERATIONS, bench_callback
+            ))
+            del call_cb, metaffi_adder
 
         # --- Scenario 7: Error propagation ---
-        err_fn = go_module.load_entity("callable=ReturnsAnError", None, None)
+        if _should_run(scenario_filter, "error_propagation", None):
+            err_fn = go_module.load_entity("callable=ReturnsAnError", None, None)
 
-        def bench_error():
-            try:
-                err_fn()
-                raise RuntimeError("ReturnsAnError did not raise")
-            except RuntimeError:
-                pass  # Expected: Go error -> Python RuntimeError
+            def bench_error():
+                try:
+                    err_fn()
+                    raise RuntimeError("ReturnsAnError did not raise")
+                except RuntimeError:
+                    pass  # Expected: Go error -> Python RuntimeError
 
-        benchmarks.append(run_benchmark(
-            "error_propagation", None, WARMUP, ITERATIONS, bench_error
-        ))
-        del err_fn
+            benchmarks.append(run_benchmark(
+                "error_propagation", None, WARMUP, ITERATIONS, bench_error
+            ))
+            del err_fn
+
+        if not benchmarks:
+            raise RuntimeError(
+                "METAFFI_TEST_SCENARIOS selected no benchmark scenarios: "
+                + os.environ.get("METAFFI_TEST_SCENARIOS", "")
+            )
 
         # --- Write results ---
         write_results(benchmarks, timer_overhead)

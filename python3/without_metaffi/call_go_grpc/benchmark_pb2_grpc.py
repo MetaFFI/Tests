@@ -71,6 +71,11 @@ class BenchmarkServiceStub(object):
                 request_serializer=benchmark__pb2.Empty.SerializeToString,
                 response_deserializer=benchmark__pb2.Empty.FromString,
                 _registered_method=True)
+        self.AnyEcho = channel.unary_unary(
+                '/benchmark.BenchmarkService/AnyEcho',
+                request_serializer=benchmark__pb2.AnyEchoRequest.SerializeToString,
+                response_deserializer=benchmark__pb2.AnyEchoResponse.FromString,
+                _registered_method=True)
 
 
 class BenchmarkServiceServicer(object):
@@ -127,6 +132,13 @@ class BenchmarkServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def AnyEcho(self, request, context):
+        """Scenario: dynamic any echo (mixed array payload)
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_BenchmarkServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -164,6 +176,11 @@ def add_BenchmarkServiceServicer_to_server(servicer, server):
                     servicer.ReturnsAnError,
                     request_deserializer=benchmark__pb2.Empty.FromString,
                     response_serializer=benchmark__pb2.Empty.SerializeToString,
+            ),
+            'AnyEcho': grpc.unary_unary_rpc_method_handler(
+                    servicer.AnyEcho,
+                    request_deserializer=benchmark__pb2.AnyEchoRequest.FromString,
+                    response_serializer=benchmark__pb2.AnyEchoResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -357,6 +374,33 @@ class BenchmarkService(object):
             '/benchmark.BenchmarkService/ReturnsAnError',
             benchmark__pb2.Empty.SerializeToString,
             benchmark__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AnyEcho(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/benchmark.BenchmarkService/AnyEcho',
+            benchmark__pb2.AnyEchoRequest.SerializeToString,
+            benchmark__pb2.AnyEchoResponse.FromString,
             options,
             channel_credentials,
             insecure,

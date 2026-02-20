@@ -122,11 +122,24 @@ static jclass g_core_cls = NULL;
 static jclass g_someclass_cls = NULL;
 static jclass g_arrayfunctions_cls = NULL;
 
+// Cached class refs used by hot-path benchmark functions.
+// In real-world JNI code, these would be resolved once at init, not per-call.
+static jclass g_string_cls = NULL;       // java/lang/String
+static jclass g_int_array_cls = NULL;    // [I
+static jclass g_object_cls = NULL;       // java/lang/Object
+static jclass g_integer_cls = NULL;      // java/lang/Integer
+static jclass g_double_cls = NULL;       // java/lang/Double
+static jclass g_object_array_cls = NULL; // [Ljava/lang/Object;
+static jmethodID g_int_valueOf = NULL;   // Integer.valueOf(int)
+static jmethodID g_dbl_valueOf = NULL;   // Double.valueOf(double)
+
 static jmethodID g_waitABit = NULL;
+static jmethodID g_noOp = NULL;
 static jmethodID g_divIntegers = NULL;
 static jmethodID g_joinStrings = NULL;
 static jmethodID g_returnsAnError = NULL;
 static jmethodID g_callCallbackAdd = NULL;
+static jmethodID g_echoAny = NULL;
 static jmethodID g_someclass_ctor = NULL;
 static jmethodID g_someclass_print = NULL;
 static jmethodID g_sumRaggedArray = NULL;
@@ -334,6 +347,9 @@ static char* jni_load_classes(void) {
 	g_waitABit = (*g_env)->GetStaticMethodID(g_env, g_core_cls, "waitABit", "(J)V");
 	if (!g_waitABit) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find waitABit"); }
 
+	g_noOp = (*g_env)->GetStaticMethodID(g_env, g_core_cls, "noOp", "()V");
+	if (!g_noOp) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find noOp"); }
+
 	g_divIntegers = (*g_env)->GetStaticMethodID(g_env, g_core_cls, "divIntegers", "(JJ)D");
 	if (!g_divIntegers) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find divIntegers"); }
 
@@ -345,6 +361,9 @@ static char* jni_load_classes(void) {
 
 	g_callCallbackAdd = (*g_env)->GetStaticMethodID(g_env, g_core_cls, "callCallbackAdd", "(Ljava/util/function/IntBinaryOperator;)I");
 	if (!g_callCallbackAdd) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find callCallbackAdd"); }
+
+	g_echoAny = (*g_env)->GetStaticMethodID(g_env, g_core_cls, "echoAny", "(Ljava/lang/Object;)Ljava/lang/Object;");
+	if (!g_echoAny) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find echoAny"); }
 
 	// SomeClass
 	g_someclass_cls = (*g_env)->FindClass(g_env, "guest/SomeClass");
@@ -365,6 +384,46 @@ static char* jni_load_classes(void) {
 	g_sumRaggedArray = (*g_env)->GetStaticMethodID(g_env, g_arrayfunctions_cls, "sumRaggedArray", "([[I)I");
 	if (!g_sumRaggedArray) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find sumRaggedArray"); }
 
+	// Cache common class refs used by hot-path benchmark functions.
+	// In real-world JNI code, these are resolved once at startup.
+	jclass lc;
+
+	lc = (*g_env)->FindClass(g_env, "java/lang/String");
+	if (!lc) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find java.lang.String"); }
+	g_string_cls = (jclass)(*g_env)->NewGlobalRef(g_env, lc);
+	(*g_env)->DeleteLocalRef(g_env, lc);
+
+	lc = (*g_env)->FindClass(g_env, "[I");
+	if (!lc) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find [I"); }
+	g_int_array_cls = (jclass)(*g_env)->NewGlobalRef(g_env, lc);
+	(*g_env)->DeleteLocalRef(g_env, lc);
+
+	lc = (*g_env)->FindClass(g_env, "java/lang/Object");
+	if (!lc) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find java.lang.Object"); }
+	g_object_cls = (jclass)(*g_env)->NewGlobalRef(g_env, lc);
+	(*g_env)->DeleteLocalRef(g_env, lc);
+
+	lc = (*g_env)->FindClass(g_env, "java/lang/Integer");
+	if (!lc) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find java.lang.Integer"); }
+	g_integer_cls = (jclass)(*g_env)->NewGlobalRef(g_env, lc);
+	(*g_env)->DeleteLocalRef(g_env, lc);
+
+	lc = (*g_env)->FindClass(g_env, "java/lang/Double");
+	if (!lc) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find java.lang.Double"); }
+	g_double_cls = (jclass)(*g_env)->NewGlobalRef(g_env, lc);
+	(*g_env)->DeleteLocalRef(g_env, lc);
+
+	lc = (*g_env)->FindClass(g_env, "[Ljava/lang/Object;");
+	if (!lc) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find [Ljava.lang.Object;"); }
+	g_object_array_cls = (jclass)(*g_env)->NewGlobalRef(g_env, lc);
+	(*g_env)->DeleteLocalRef(g_env, lc);
+
+	g_int_valueOf = (*g_env)->GetStaticMethodID(g_env, g_integer_cls, "valueOf", "(I)Ljava/lang/Integer;");
+	if (!g_int_valueOf) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find Integer.valueOf"); }
+
+	g_dbl_valueOf = (*g_env)->GetStaticMethodID(g_env, g_double_cls, "valueOf", "(D)Ljava/lang/Double;");
+	if (!g_dbl_valueOf) { (*g_env)->ExceptionClear(g_env); return strdup("Cannot find Double.valueOf"); }
+
 	return NULL;
 }
 
@@ -374,7 +433,7 @@ static char* jni_load_classes(void) {
 
 // Scenario 1: void call
 static char* bench_void_call(void) {
-	(*g_env)->CallStaticVoidMethod(g_env, g_core_cls, g_waitABit, (jlong)0);
+	(*g_env)->CallStaticVoidMethod(g_env, g_core_cls, g_noOp);
 	return jni_get_error();
 }
 
@@ -391,9 +450,8 @@ static char* bench_primitive_echo(double* out) {
 // Scenario 3: string echo (joinStrings)
 // Writes result to *out (caller must free).
 static char* bench_string_echo(char** out) {
-	// Build String[] {"hello", "world"}
-	jclass strCls = (*g_env)->FindClass(g_env, "java/lang/String");
-	jobjectArray arr = (*g_env)->NewObjectArray(g_env, 2, strCls, NULL);
+	// Build String[] {"hello", "world"} — uses cached g_string_cls
+	jobjectArray arr = (*g_env)->NewObjectArray(g_env, 2, g_string_cls, NULL);
 	jstring s1 = (*g_env)->NewStringUTF(g_env, "hello");
 	jstring s2 = (*g_env)->NewStringUTF(g_env, "world");
 	(*g_env)->SetObjectArrayElement(g_env, arr, 0, s1);
@@ -402,7 +460,6 @@ static char* bench_string_echo(char** out) {
 	jstring result = (jstring)(*g_env)->CallStaticObjectMethod(g_env, g_core_cls, g_joinStrings, arr);
 	char* err = jni_get_error();
 	if (err) {
-		(*g_env)->DeleteLocalRef(g_env, strCls);
 		(*g_env)->DeleteLocalRef(g_env, arr);
 		(*g_env)->DeleteLocalRef(g_env, s1);
 		(*g_env)->DeleteLocalRef(g_env, s2);
@@ -413,7 +470,6 @@ static char* bench_string_echo(char** out) {
 	*out = strdup(chars);
 	(*g_env)->ReleaseStringUTFChars(g_env, result, chars);
 
-	(*g_env)->DeleteLocalRef(g_env, strCls);
 	(*g_env)->DeleteLocalRef(g_env, arr);
 	(*g_env)->DeleteLocalRef(g_env, s1);
 	(*g_env)->DeleteLocalRef(g_env, s2);
@@ -424,7 +480,7 @@ static char* bench_string_echo(char** out) {
 
 // Scenario 4: array sum (sumRaggedArray with single-row int[][])
 static char* bench_array_sum(int size, int* out) {
-	// Build int[][]{int[size]{1, 2, ..., size}}
+	// Build int[][]{int[size]{1, 2, ..., size}} — uses cached g_int_array_cls
 	jintArray innerArr = (*g_env)->NewIntArray(g_env, size);
 	jint* elems = (*g_env)->GetIntArrayElements(g_env, innerArr, NULL);
 	for (int i = 0; i < size; i++) {
@@ -432,22 +488,19 @@ static char* bench_array_sum(int size, int* out) {
 	}
 	(*g_env)->ReleaseIntArrayElements(g_env, innerArr, elems, 0);
 
-	jclass intArrCls = (*g_env)->FindClass(g_env, "[I");
-	jobjectArray outerArr = (*g_env)->NewObjectArray(g_env, 1, intArrCls, NULL);
+	jobjectArray outerArr = (*g_env)->NewObjectArray(g_env, 1, g_int_array_cls, NULL);
 	(*g_env)->SetObjectArrayElement(g_env, outerArr, 0, innerArr);
 
 	jint result = (*g_env)->CallStaticIntMethod(g_env, g_arrayfunctions_cls, g_sumRaggedArray, outerArr);
 	char* err = jni_get_error();
 	if (err) {
 		(*g_env)->DeleteLocalRef(g_env, innerArr);
-		(*g_env)->DeleteLocalRef(g_env, intArrCls);
 		(*g_env)->DeleteLocalRef(g_env, outerArr);
 		return err;
 	}
 	*out = (int)result;
 
 	(*g_env)->DeleteLocalRef(g_env, innerArr);
-	(*g_env)->DeleteLocalRef(g_env, intArrCls);
 	(*g_env)->DeleteLocalRef(g_env, outerArr);
 
 	return NULL;
@@ -477,6 +530,56 @@ static char* bench_object_method(char** out) {
 
 	(*g_env)->DeleteLocalRef(g_env, name);
 	(*g_env)->DeleteLocalRef(g_env, instance);
+	(*g_env)->DeleteLocalRef(g_env, result);
+
+	return NULL;
+}
+
+// Scenario: dynamic any echo (mixed array payload)
+// Uses cached class refs and method IDs (g_object_cls, g_integer_cls, etc.)
+static char* bench_any_echo(int size, int* out_len) {
+	jobjectArray arr = (*g_env)->NewObjectArray(g_env, size, g_object_cls, NULL);
+	if (!arr) {
+		return strdup("Failed to allocate Object[] for any echo");
+	}
+
+	for (int i = 0; i < size; i++) {
+		jobject elem = NULL;
+		switch (i % 3) {
+			case 0:
+				elem = (*g_env)->CallStaticObjectMethod(g_env, g_integer_cls, g_int_valueOf, (jint)1);
+				break;
+			case 1:
+				elem = (*g_env)->NewStringUTF(g_env, "two");
+				break;
+			default:
+				elem = (*g_env)->CallStaticObjectMethod(g_env, g_double_cls, g_dbl_valueOf, (jdouble)3.0);
+				break;
+		}
+		(*g_env)->SetObjectArrayElement(g_env, arr, i, elem);
+		if (elem) {
+			(*g_env)->DeleteLocalRef(g_env, elem);
+		}
+	}
+
+	jobject result = (*g_env)->CallStaticObjectMethod(g_env, g_core_cls, g_echoAny, arr);
+	char* err = jni_get_error();
+	if (err) {
+		(*g_env)->DeleteLocalRef(g_env, arr);
+		return err;
+	}
+
+	if (!result || !(*g_env)->IsInstanceOf(g_env, result, g_object_array_cls)) {
+		(*g_env)->DeleteLocalRef(g_env, arr);
+		if (result) {
+			(*g_env)->DeleteLocalRef(g_env, result);
+		}
+		return strdup("echoAny returned non-array value");
+	}
+
+	*out_len = (int)(*g_env)->GetArrayLength(g_env, (jarray)result);
+
+	(*g_env)->DeleteLocalRef(g_env, arr);
 	(*g_env)->DeleteLocalRef(g_env, result);
 
 	return NULL;
@@ -660,6 +763,18 @@ func BenchObjectMethod() (string, error) {
 	result := C.GoString(cstr)
 	C.free(unsafe.Pointer(cstr))
 	return result, nil
+}
+
+// BenchAnyEcho executes the dynamic any echo scenario and returns the echoed length.
+func BenchAnyEcho(size int) (int, error) {
+	var outLen C.int
+	cerr := C.bench_any_echo(C.int(size), &outLen)
+	if cerr != nil {
+		msg := C.GoString(cerr)
+		C.free(unsafe.Pointer(cerr))
+		return 0, fmt.Errorf("%s", msg)
+	}
+	return int(outLen), nil
 }
 
 // BenchCallback executes scenario 6.

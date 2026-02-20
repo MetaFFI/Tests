@@ -3,6 +3,7 @@ syntax = "proto3";
 package benchmark;
 
 option go_package = "./pb";
+import "google/protobuf/struct.proto";
 
 // BenchmarkService wraps the Go guest module for cross-language benchmarking.
 // Each RPC maps to one of the 7 benchmark scenarios.
@@ -27,6 +28,9 @@ service BenchmarkService {
 
   // Scenario 7: error propagation (ReturnsAnError() -> gRPC INTERNAL error)
   rpc ReturnsAnError(Empty) returns (Empty);
+
+  // Scenario: dynamic any echo (mixed array payload)
+  rpc AnyEcho(AnyEchoRequest) returns (AnyEchoResponse);
 }
 
 // --- Scenario 1 ---
@@ -88,3 +92,11 @@ message CallbackArgs {
 
 // --- Scenario 7 ---
 message Empty {}
+
+// --- Scenario: dynamic any echo ---
+message AnyEchoRequest {
+  google.protobuf.ListValue values = 1;
+}
+message AnyEchoResponse {
+  google.protobuf.ListValue values = 1;
+}

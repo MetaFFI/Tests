@@ -27,6 +27,24 @@ WARMUP = int(os.environ.get("METAFFI_TEST_WARMUP", "100"))
 ITERATIONS = int(os.environ.get("METAFFI_TEST_ITERATIONS", "10000"))
 
 
+def _parse_scenario_filter() -> set[str] | None:
+    raw = os.environ.get("METAFFI_TEST_SCENARIOS", "").strip()
+    if not raw:
+        return None
+    items = {part.strip() for part in raw.split(",") if part.strip()}
+    return items or None
+
+
+def _scenario_key(name: str, data_size: int | None) -> str:
+    return f"{name}_{data_size}" if data_size is not None else name
+
+
+def _should_run(filter_set: set[str] | None, name: str, data_size: int | None) -> bool:
+    if not filter_set:
+        return True
+    return _scenario_key(name, data_size) in filter_set
+
+
 # ---------------------------------------------------------------------------
 # Statistical helpers (matching Go implementation)
 # ---------------------------------------------------------------------------
@@ -165,32 +183,37 @@ def write_results(benchmarks: list[dict], timer_overhead: int):
 # Benchmark tests (7 scenarios)
 # ---------------------------------------------------------------------------
 
+def _validate_any_echo_result(result, expected_len: int) -> None:
+    """Validate that an any_echo result has the expected collection length."""
+    if not isinstance(result, (list, tuple)):
+        raise RuntimeError(f"echoAny: expected list/tuple, got {type(result)}")
+    if len(result) != expected_len:
+        raise RuntimeError(
+            f"echoAny: expected len {expected_len}, got {len(result)}"
+        )
+
+
 class TestBenchmarks:
 
-    def test_all_benchmarks(self, java_module):
-        """Run all 7 benchmark scenarios and write results to JSON."""
+    # ---- Individual scenario benchmarks ----
 
-        mode = os.environ.get("METAFFI_TEST_MODE", "")
-        if mode == "correctness":
-            pytest.skip("Skipping benchmarks: METAFFI_TEST_MODE=correctness")
+    def _bench_void_call(self, java_module, filt, benchmarks):
+        if not _should_run(filt, "void_call", None):
+            return
 
-        timer_overhead = measure_timer_overhead()
-        print(f"Timer overhead: {timer_overhead} ns", file=sys.stderr)
-
-        benchmarks = []
-
-        # --- Scenario 1: Void call ---
-        wait_fn = java_module.load_entity(
-            "class=guest.CoreFunctions,callable=waitABit",
-            [ti(T.metaffi_int64_type)], None)
+        noop_fn = java_module.load_entity(
+            "class=guest.CoreFunctions,callable=noOp",
+            None, None)
 
         benchmarks.append(run_benchmark(
             "void_call", None, WARMUP, ITERATIONS,
-            lambda: wait_fn(0)
+            lambda: noop_fn()
         ))
-        del wait_fn
 
-        # --- Scenario 2: Primitive echo (int64, int64 -> float64) ---
+    def _bench_primitive_echo(self, java_module, filt, benchmarks):
+        if not _should_run(filt, "primitive_echo", None):
+            return
+
         div_fn = java_module.load_entity(
             "class=guest.CoreFunctions,callable=divIntegers",
             [ti(T.metaffi_int64_type), ti(T.metaffi_int64_type)],
@@ -204,9 +227,11 @@ class TestBenchmarks:
         benchmarks.append(run_benchmark(
             "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
         ))
-        del div_fn
 
-        # --- Scenario 3: String echo ---
+    def _bench_string_echo(self, java_module, filt, benchmarks):
+        if not _should_run(filt, "string_echo", None):
+            return
+
         join_fn = java_module.load_entity(
             "class=guest.CoreFunctions,callable=joinStrings",
             [ti(T.metaffi_string8_array_type, dims=1)],
@@ -220,33 +245,58 @@ class TestBenchmarks:
         benchmarks.append(run_benchmark(
             "string_echo", None, WARMUP, ITERATIONS, bench_string
         ))
-        del join_fn
 
-        # --- Scenario 4: Array sum (varying sizes, int32 2D) ---
+    def _bench_array_sum(self, java_module, filt, benchmarks):
+        if not any(_should_run(filt, "array_sum", size) for size in [10, 100, 1000, 10000]):
+            return
+
         sum_fn = java_module.load_entity(
-            "class=guest.ArrayFunctions,callable=sumRaggedArray",
-            [ti(T.metaffi_int32_array_type, dims=2)],
+            "class=guest.ArrayFunctions,callable=sumInt1dArray",
+            [ti(T.metaffi_int32_packed_array_type, dims=1)],
             [ti(T.metaffi_int32_type)])
 
         for size in [10, 100, 1000, 10000]:
+            if not _should_run(filt, "array_sum", size):
+                continue
             row = list(range(1, size + 1))
             expected = size * (size + 1) // 2
-            arr = [row]
 
-            def bench_array(a=arr, e=expected):
+            def bench_array(a=row, e=expected):
                 result = sum_fn(a)
                 if result != e:
                     raise RuntimeError(
-                        f"sumRaggedArray({len(a[0])}): got {result}, want {e}"
+                        f"sumInt1dArray({len(a)}): got {result}, want {e}"
                     )
 
             benchmarks.append(run_benchmark(
                 "array_sum", size, WARMUP, ITERATIONS, bench_array
             ))
 
-        del sum_fn
+    def _bench_any_echo(self, java_module, filt, benchmarks):
+        any_echo_size = 100
+        if not _should_run(filt, "any_echo", any_echo_size):
+            return
 
-        # --- Scenario 5: Object create + method call ---
+        echo_fn = java_module.load_entity(
+            "class=guest.CoreFunctions,callable=echoAny",
+            [ti(T.metaffi_any_type)],
+            [ti(T.metaffi_any_type)])
+
+        pattern = [1, "two", 3.0]
+        payload = [pattern[i % len(pattern)] for i in range(any_echo_size)]
+
+        def bench_any_echo(data=payload, expected_len=any_echo_size):
+            result = echo_fn(data)
+            _validate_any_echo_result(result, expected_len)
+
+        benchmarks.append(run_benchmark(
+            "any_echo", any_echo_size, WARMUP, ITERATIONS, bench_any_echo
+        ))
+
+    def _bench_object_method(self, java_module, filt, benchmarks):
+        if not _should_run(filt, "object_method", None):
+            return
+
         new_class = java_module.load_entity(
             "class=guest.SomeClass,callable=<init>",
             [ti(T.metaffi_string8_type)],
@@ -265,9 +315,11 @@ class TestBenchmarks:
         benchmarks.append(run_benchmark(
             "object_method", None, WARMUP, ITERATIONS, bench_object
         ))
-        del new_class, print_fn
 
-        # --- Scenario 6: Callback invocation ---
+    def _bench_callback(self, java_module, filt, benchmarks):
+        if not _should_run(filt, "callback", None):
+            return
+
         adapter = java_module.load_entity(
             "class=metaffi.api.accessor.CallbackAdapters,callable=asInterface",
             [ti(T.metaffi_callable_type), ti(T.metaffi_string8_type)],
@@ -306,9 +358,11 @@ class TestBenchmarks:
         benchmarks.append(run_benchmark(
             "callback", None, WARMUP, ITERATIONS, bench_callback
         ))
-        del adapter, call_cb, metaffi_adder, proxy
 
-        # --- Scenario 7: Error propagation ---
+    def _bench_error_propagation(self, java_module, filt, benchmarks):
+        if not _should_run(filt, "error_propagation", None):
+            return
+
         err_fn = java_module.load_entity(
             "class=guest.CoreFunctions,callable=returnsAnError",
             None, None)
@@ -323,9 +377,45 @@ class TestBenchmarks:
         benchmarks.append(run_benchmark(
             "error_propagation", None, WARMUP, ITERATIONS, bench_error
         ))
-        del err_fn
 
-        # --- Write results ---
+    # ---- Main benchmark test ----
+
+    def test_all_benchmarks(self, java_module):
+        """Run all 7 benchmark scenarios and write results to JSON."""
+
+        mode = os.environ.get("METAFFI_TEST_MODE", "")
+        if mode == "correctness":
+            pytest.skip("Skipping benchmarks: METAFFI_TEST_MODE=correctness")
+
+        timer_overhead = measure_timer_overhead()
+        print(f"Timer overhead: {timer_overhead} ns", file=sys.stderr)
+        scenario_filter = _parse_scenario_filter()
+        if scenario_filter:
+            print(
+                "Scenario filter enabled: "
+                + ",".join(sorted(scenario_filter)),
+                file=sys.stderr,
+            )
+
+        benchmarks = []
+
+        # Run each scenario (each method handles its own filter check)
+        self._bench_void_call(java_module, scenario_filter, benchmarks)
+        self._bench_primitive_echo(java_module, scenario_filter, benchmarks)
+        self._bench_string_echo(java_module, scenario_filter, benchmarks)
+        self._bench_array_sum(java_module, scenario_filter, benchmarks)
+        self._bench_any_echo(java_module, scenario_filter, benchmarks)
+        self._bench_object_method(java_module, scenario_filter, benchmarks)
+        self._bench_callback(java_module, scenario_filter, benchmarks)
+        self._bench_error_propagation(java_module, scenario_filter, benchmarks)
+
+        if not benchmarks:
+            raise RuntimeError(
+                "METAFFI_TEST_SCENARIOS selected no benchmark scenarios: "
+                + os.environ.get("METAFFI_TEST_SCENARIOS", "")
+            )
+
+        # Write results
         write_results(benchmarks, timer_overhead)
 
         # Report any failed scenarios

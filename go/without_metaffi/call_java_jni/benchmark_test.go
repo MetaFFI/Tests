@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 )
@@ -80,6 +81,40 @@ func getIntEnv(key string, defaultVal int) int {
 		return defaultVal
 	}
 	return n
+}
+
+func parseScenarioFilter() map[string]struct{} {
+	raw := strings.TrimSpace(os.Getenv("METAFFI_TEST_SCENARIOS"))
+	if raw == "" {
+		return nil
+	}
+
+	res := make(map[string]struct{})
+	for _, part := range strings.Split(raw, ",") {
+		k := strings.TrimSpace(part)
+		if k != "" {
+			res[k] = struct{}{}
+		}
+	}
+	if len(res) == 0 {
+		return nil
+	}
+	return res
+}
+
+func scenarioFilterKey(name string, dataSize *int) string {
+	if dataSize == nil {
+		return name
+	}
+	return fmt.Sprintf("%s_%d", name, *dataSize)
+}
+
+func shouldRunScenario(filter map[string]struct{}, name string, dataSize *int) bool {
+	if len(filter) == 0 {
+		return true
+	}
+	_, ok := filter[scenarioFilterKey(name, dataSize)]
+	return ok
 }
 
 // ---------------------------------------------------------------------------
@@ -307,51 +342,70 @@ func TestBenchmarkAll(t *testing.T) {
 	t.Logf("Timer overhead: %d ns", timerOverhead)
 
 	var benchmarks []BenchmarkResult
+	scenarioFilter := parseScenarioFilter()
+	selectedCount := 0
+	if len(scenarioFilter) > 0 {
+		t.Logf("Scenario filter enabled: %s", os.Getenv("METAFFI_TEST_SCENARIOS"))
+	}
 
 	// --- Scenario 1: Void call ---
-	t.Run("void_call", func(t *testing.T) {
-		ensureThread(t)
-		result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			return BenchVoidCall()
+	if shouldRunScenario(scenarioFilter, "void_call", nil) {
+		selectedCount++
+		t.Run("void_call", func(t *testing.T) {
+			ensureThread(t)
+			result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				return BenchVoidCall()
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 2: Primitive echo ---
-	t.Run("primitive_echo", func(t *testing.T) {
-		ensureThread(t)
-		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			v, err := BenchPrimitiveEcho()
-			if err != nil {
-				return err
-			}
-			if math.Abs(v-5.0) > 1e-10 {
-				return fmt.Errorf("divIntegers: got %v, want 5.0", v)
-			}
-			return nil
+	if shouldRunScenario(scenarioFilter, "primitive_echo", nil) {
+		selectedCount++
+		t.Run("primitive_echo", func(t *testing.T) {
+			ensureThread(t)
+			result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				v, err := BenchPrimitiveEcho()
+				if err != nil {
+					return err
+				}
+				if math.Abs(v-5.0) > 1e-10 {
+					return fmt.Errorf("divIntegers: got %v, want 5.0", v)
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 3: String echo ---
-	t.Run("string_echo", func(t *testing.T) {
-		ensureThread(t)
-		result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			v, err := BenchStringEcho()
-			if err != nil {
-				return err
-			}
-			if v != "hello,world" {
-				return fmt.Errorf("joinStrings: got %q, want \"hello,world\"", v)
-			}
-			return nil
+	if shouldRunScenario(scenarioFilter, "string_echo", nil) {
+		selectedCount++
+		t.Run("string_echo", func(t *testing.T) {
+			ensureThread(t)
+			result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				v, err := BenchStringEcho()
+				if err != nil {
+					return err
+				}
+				if v != "hello,world" {
+					return fmt.Errorf("joinStrings: got %q, want \"hello,world\"", v)
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 4: Array sum (varying sizes) ---
 	for _, size := range []int{10, 100, 1000, 10000} {
 		size := size
+		sizePtr := size
+		if !shouldRunScenario(scenarioFilter, "array_sum", &sizePtr) {
+			continue
+		}
+		selectedCount++
 
 		// Compute expected sum
 		expectedSum := 0
@@ -359,9 +413,8 @@ func TestBenchmarkAll(t *testing.T) {
 			expectedSum += i
 		}
 
-		t.Run(fmt.Sprintf("array_sum_%d", size), func(t *testing.T) {
+		t.Run(fmt.Sprintf("array_sum_%d", sizePtr), func(t *testing.T) {
 			ensureThread(t)
-			sizePtr := size
 			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
 				v, err := BenchArraySum(size)
 				if err != nil {
@@ -376,46 +429,82 @@ func TestBenchmarkAll(t *testing.T) {
 		})
 	}
 
+	// --- Scenario: Dynamic any echo (mixed array payload) ---
+	{
+		anyEchoSize := 100
+		if shouldRunScenario(scenarioFilter, "any_echo", &anyEchoSize) {
+			selectedCount++
+			t.Run("any_echo_100", func(t *testing.T) {
+				ensureThread(t)
+				sizePtr := anyEchoSize
+				result := runBenchmark(t, "any_echo", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+					gotLen, err := BenchAnyEcho(anyEchoSize)
+					if err != nil {
+						return err
+					}
+					if gotLen != anyEchoSize {
+						return fmt.Errorf("echoAny: got len %d, want %d", gotLen, anyEchoSize)
+					}
+					return nil
+				})
+				benchmarks = append(benchmarks, result)
+			})
+		}
+	}
+
 	// --- Scenario 5: Object create + method call ---
-	t.Run("object_method", func(t *testing.T) {
-		ensureThread(t)
-		result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			v, err := BenchObjectMethod()
-			if err != nil {
-				return err
-			}
-			if v != "Hello from SomeClass bench" {
-				return fmt.Errorf("print: got %q, want \"Hello from SomeClass bench\"", v)
-			}
-			return nil
+	if shouldRunScenario(scenarioFilter, "object_method", nil) {
+		selectedCount++
+		t.Run("object_method", func(t *testing.T) {
+			ensureThread(t)
+			result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				v, err := BenchObjectMethod()
+				if err != nil {
+					return err
+				}
+				if v != "Hello from SomeClass bench" {
+					return fmt.Errorf("print: got %q, want \"Hello from SomeClass bench\"", v)
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 6: Callback ---
-	t.Run("callback", func(t *testing.T) {
-		ensureThread(t)
-		result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			v, err := BenchCallback()
-			if err != nil {
-				return err
-			}
-			if v != 3 {
-				return fmt.Errorf("callCallbackAdd: got %d, want 3", v)
-			}
-			return nil
+	if shouldRunScenario(scenarioFilter, "callback", nil) {
+		selectedCount++
+		t.Run("callback", func(t *testing.T) {
+			ensureThread(t)
+			result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				v, err := BenchCallback()
+				if err != nil {
+					return err
+				}
+				if v != 3 {
+					return fmt.Errorf("callCallbackAdd: got %d, want 3", v)
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 7: Error propagation ---
-	t.Run("error_propagation", func(t *testing.T) {
-		ensureThread(t)
-		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			return BenchErrorPropagation()
+	if shouldRunScenario(scenarioFilter, "error_propagation", nil) {
+		selectedCount++
+		t.Run("error_propagation", func(t *testing.T) {
+			ensureThread(t)
+			result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				return BenchErrorPropagation()
+			})
+			benchmarks = append(benchmarks, result)
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
+
+	if len(scenarioFilter) > 0 && selectedCount == 0 {
+		t.Fatalf("METAFFI_TEST_SCENARIOS selected no benchmark scenarios: %q", os.Getenv("METAFFI_TEST_SCENARIOS"))
+	}
 
 	// --- Write results ---
 	writeResults(t, benchmarks, timerOverhead, warmup, iterations, batchMinElapsedNs, batchMaxCalls)

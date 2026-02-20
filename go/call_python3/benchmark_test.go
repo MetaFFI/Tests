@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"reflect"
 	"runtime"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -28,6 +30,40 @@ func getIntEnv(key string, defaultVal int) int {
 		return defaultVal
 	}
 	return n
+}
+
+func parseScenarioFilter() map[string]struct{} {
+	raw := strings.TrimSpace(os.Getenv("METAFFI_TEST_SCENARIOS"))
+	if raw == "" {
+		return nil
+	}
+
+	res := make(map[string]struct{})
+	for _, part := range strings.Split(raw, ",") {
+		k := strings.TrimSpace(part)
+		if k != "" {
+			res[k] = struct{}{}
+		}
+	}
+	if len(res) == 0 {
+		return nil
+	}
+	return res
+}
+
+func scenarioFilterKey(name string, dataSize *int) string {
+	if dataSize == nil {
+		return name
+	}
+	return fmt.Sprintf("%s_%d", name, *dataSize)
+}
+
+func shouldRunScenario(filter map[string]struct{}, name string, dataSize *int) bool {
+	if len(filter) == 0 {
+		return true
+	}
+	_, ok := filter[scenarioFilterKey(name, dataSize)]
+	return ok
 }
 
 // ---------------------------------------------------------------------------
@@ -262,161 +298,237 @@ func TestBenchmarkAll(t *testing.T) {
 	iterations := getIntEnv("METAFFI_TEST_ITERATIONS", 10000)
 	batchMinElapsedNs := int64(getIntEnv("METAFFI_TEST_BATCH_MIN_ELAPSED_NS", 10000))
 	batchMaxCalls := getIntEnv("METAFFI_TEST_BATCH_MAX_CALLS", 100000)
+	scenarioFilter := parseScenarioFilter()
 
 	timerOverhead := measureTimerOverhead()
 	t.Logf("Timer overhead: %d ns", timerOverhead)
+	if len(scenarioFilter) > 0 {
+		t.Logf("Scenario filter enabled: %s", os.Getenv("METAFFI_TEST_SCENARIOS"))
+	}
 
 	var benchmarks []BenchmarkResult
 
-	// --- Scenario 1: Void call ---
-	t.Run("void_call", func(t *testing.T) {
-		ff := load(t, moduleDir, "callable=wait_a_bit",
-			[]IDL.MetaFFITypeInfo{ti(IDL.INT64)}, nil)
+	// saveProgress writes all results collected so far to disk.
+	// If a later scenario crashes the process (e.g. JVM EXCEPTION_ACCESS_VIOLATION),
+	// results from earlier scenarios are already persisted.
+	saveProgress := func() {
+		if len(benchmarks) > 0 {
+			writeResults(t, benchmarks, timerOverhead, warmup, iterations, batchMinElapsedNs, batchMaxCalls)
+		}
+	}
 
-		result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			_, err := ff(int64(0))
-			return err
+	// --- Scenario 1: Void call ---
+	if shouldRunScenario(scenarioFilter, "void_call", nil) {
+		t.Run("void_call", func(t *testing.T) {
+			ff := load(t, moduleDir, "callable=no_op",
+				nil, nil)
+
+			result := runBenchmark(t, "void_call", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				_, err := ff()
+				return err
+			})
+			benchmarks = append(benchmarks, result)
+			saveProgress()
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 2: Primitive echo (int64 -> int64) ---
-	t.Run("primitive_echo", func(t *testing.T) {
-		ff := load(t, moduleDir, "callable=div_integers",
-			[]IDL.MetaFFITypeInfo{ti(IDL.INT64), ti(IDL.INT64)},
-			[]IDL.MetaFFITypeInfo{ti(IDL.FLOAT64)})
+	if shouldRunScenario(scenarioFilter, "primitive_echo", nil) {
+		t.Run("primitive_echo", func(t *testing.T) {
+			ff := load(t, moduleDir, "callable=div_integers",
+				[]IDL.MetaFFITypeInfo{ti(IDL.INT64), ti(IDL.INT64)},
+				[]IDL.MetaFFITypeInfo{ti(IDL.FLOAT64)})
 
-		result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			ret, err := ff(int64(10), int64(2))
-			if err != nil {
-				return err
-			}
-			v, ok := ret[0].(float64)
-			if !ok || math.Abs(v-5.0) > 1e-10 {
-				return fmt.Errorf("div_integers(10,2): got %v, want 5.0", ret[0])
-			}
-			return nil
+			result := runBenchmark(t, "primitive_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				ret, err := ff(int64(10), int64(2))
+				if err != nil {
+					return err
+				}
+				v, ok := ret[0].(float64)
+				if !ok || math.Abs(v-5.0) > 1e-10 {
+					return fmt.Errorf("div_integers(10,2): got %v, want 5.0", ret[0])
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
+			saveProgress()
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
 	// --- Scenario 3: String echo ---
-	t.Run("string_echo", func(t *testing.T) {
-		ff := load(t, moduleDir, "callable=join_strings",
-			[]IDL.MetaFFITypeInfo{tiArray(IDL.STRING8_ARRAY, 1)},
-			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
+	if shouldRunScenario(scenarioFilter, "string_echo", nil) {
+		t.Run("string_echo", func(t *testing.T) {
+			ff := load(t, moduleDir, "callable=join_strings",
+				[]IDL.MetaFFITypeInfo{tiArray(IDL.STRING8_ARRAY, 1)},
+				[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
 
-		result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			ret, err := ff([]string{"hello", "world"})
-			if err != nil {
-				return err
-			}
-			if v, ok := ret[0].(string); !ok || v != "hello,world" {
-				return fmt.Errorf("join_strings: got %v, want \"hello,world\"", ret[0])
-			}
-			return nil
+			result := runBenchmark(t, "string_echo", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				ret, err := ff([]string{"hello", "world"})
+				if err != nil {
+					return err
+				}
+				if v, ok := ret[0].(string); !ok || v != "hello,world" {
+					return fmt.Errorf("join_strings: got %v, want \"hello,world\"", ret[0])
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
+			saveProgress()
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
-	// --- Scenario 4: Array sum (varying sizes) ---
+	// --- Scenario 4: Array sum (varying sizes, packed 1D int[]) ---
 	for _, size := range []int{10, 100, 1000, 10000} {
 		size := size
+		if !shouldRunScenario(scenarioFilter, "array_sum", &size) {
+			continue
+		}
 		t.Run(fmt.Sprintf("array_sum_%d", size), func(t *testing.T) {
-			ff := load(t, moduleDir, "callable=accepts_ragged_array",
-				[]IDL.MetaFFITypeInfo{tiArray(IDL.INT64_ARRAY, 2)},
+			ff := load(t, moduleDir, "callable=sum_1d_int_array",
+				[]IDL.MetaFFITypeInfo{tiArray(IDL.INT64_PACKED_ARRAY, 1)},
 				[]IDL.MetaFFITypeInfo{ti(IDL.INT64)})
 
-			// Build array: single row of `size` elements [1, 2, ..., size]
 			row := make([]int64, size)
 			var expectedSum int64
 			for i := 0; i < size; i++ {
 				row[i] = int64(i + 1)
 				expectedSum += int64(i + 1)
 			}
-			arr := [][]int64{row}
 
 			sizePtr := size
 			result := runBenchmark(t, "array_sum", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-				ret, err := ff(arr)
+				ret, err := ff(row)
 				if err != nil {
 					return err
 				}
 				if v, ok := ret[0].(int64); !ok || v != expectedSum {
-					return fmt.Errorf("accepts_ragged_array: got %v, want %d", ret[0], expectedSum)
+					return fmt.Errorf("sum_1d_int_array: got %v, want %d", ret[0], expectedSum)
 				}
 				return nil
 			})
 			benchmarks = append(benchmarks, result)
+			saveProgress()
 		})
 	}
 
+	// --- Scenario: Dynamic any echo (mixed array payload) ---
+	{
+		anyEchoSize := 100
+		if shouldRunScenario(scenarioFilter, "any_echo", &anyEchoSize) {
+			t.Run("any_echo_100", func(t *testing.T) {
+				ff := load(t, moduleDir, "callable=echo_any",
+					[]IDL.MetaFFITypeInfo{tiArray(IDL.ANY_ARRAY, 1)},
+					[]IDL.MetaFFITypeInfo{tiArray(IDL.ANY_ARRAY, 1)})
+
+				pattern := []any{int64(1), "two", float64(3.0)}
+				payload := make([]any, anyEchoSize)
+				for i := 0; i < anyEchoSize; i++ {
+					payload[i] = pattern[i%len(pattern)]
+				}
+
+				sizePtr := anyEchoSize
+				result := runBenchmark(t, "any_echo", &sizePtr, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+					ret, err := ff(payload)
+					if err != nil {
+						return err
+					}
+					if len(ret) == 0 || ret[0] == nil {
+						return fmt.Errorf("echo_any: got empty/nil return")
+					}
+					v := reflect.ValueOf(ret[0])
+					if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+						return fmt.Errorf("echo_any: unexpected return type %T", ret[0])
+					}
+					if v.Len() != anyEchoSize {
+						return fmt.Errorf("echo_any: got len %d, want %d", v.Len(), anyEchoSize)
+					}
+					return nil
+				})
+				benchmarks = append(benchmarks, result)
+				saveProgress()
+			})
+		}
+	}
+
 	// --- Scenario 5: Object create + method call ---
-	t.Run("object_method", func(t *testing.T) {
-		newEntity := load(t, moduleDir, "callable=SomeClass",
-			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)},
-			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)})
+	if shouldRunScenario(scenarioFilter, "object_method", nil) {
+		t.Run("object_method", func(t *testing.T) {
+			newEntity := load(t, moduleDir, "callable=SomeClass",
+				[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)},
+				[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)})
 
-		printEntity := load(t, moduleDir, "callable=SomeClass.print,instance_required",
-			[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)},
-			[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
+			printEntity := load(t, moduleDir, "callable=SomeClass.print,instance_required",
+				[]IDL.MetaFFITypeInfo{ti(IDL.HANDLE)},
+				[]IDL.MetaFFITypeInfo{ti(IDL.STRING8)})
 
-		result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			// Create instance
-			instanceRet, err := newEntity("bench")
-			if err != nil {
-				return fmt.Errorf("SomeClass ctor: %w", err)
-			}
-			instance := instanceRet[0]
+			result := runBenchmark(t, "object_method", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				// Create instance
+				instanceRet, err := newEntity("bench")
+				if err != nil {
+					return fmt.Errorf("SomeClass ctor: %w", err)
+				}
+				instance := instanceRet[0]
 
-			// Call method
-			printRet, err := printEntity(instance)
-			if err != nil {
-				return fmt.Errorf("print: %w", err)
-			}
-			if v, ok := printRet[0].(string); !ok || v != "Hello from SomeClass bench" {
-				return fmt.Errorf("print: got %v, want \"Hello from SomeClass bench\"", printRet[0])
-			}
-			return nil
+				// Call method
+				printRet, err := printEntity(instance)
+				if err != nil {
+					return fmt.Errorf("print: %w", err)
+				}
+				if v, ok := printRet[0].(string); !ok || v != "Hello from SomeClass bench" {
+					return fmt.Errorf("print: got %v, want \"Hello from SomeClass bench\"", printRet[0])
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
+			saveProgress()
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
-	// --- Scenario 6: Callback invocation ---
-	t.Run("callback", func(t *testing.T) {
-		ff := load(t, moduleDir, "callable=call_callback_add",
-			[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE)},
-			[]IDL.MetaFFITypeInfo{ti(IDL.INT64)})
+	// --- Scenario 6: Error propagation ---
+	if shouldRunScenario(scenarioFilter, "error_propagation", nil) {
+		t.Run("error_propagation", func(t *testing.T) {
+			ff := load(t, moduleDir, "callable=returns_an_error", nil, nil)
 
-		adder := func(a, b int64) int64 { return a + b }
-
-		result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			ret, err := ff(adder)
-			if err != nil {
-				return err
-			}
-			if v, ok := ret[0].(int64); !ok || v != 3 {
-				return fmt.Errorf("call_callback_add: got %v, want 3", ret[0])
-			}
-			return nil
+			result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				_, err := ff()
+				if err == nil {
+					return fmt.Errorf("expected error but got nil")
+				}
+				// Error IS expected -- this is the successful path
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
+			saveProgress()
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
 
-	// --- Scenario 7: Error propagation ---
-	t.Run("error_propagation", func(t *testing.T) {
-		ff := load(t, moduleDir, "callable=returns_an_error", nil, nil)
+	// --- Scenario 7: Callback invocation (LAST: may crash native runtime on teardown) ---
+	if shouldRunScenario(scenarioFilter, "callback", nil) {
+		t.Run("callback", func(t *testing.T) {
+			ff := load(t, moduleDir, "callable=call_callback_add",
+				[]IDL.MetaFFITypeInfo{ti(IDL.CALLABLE)},
+				[]IDL.MetaFFITypeInfo{ti(IDL.INT64)})
 
-		result := runBenchmark(t, "error_propagation", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
-			_, err := ff()
-			if err == nil {
-				return fmt.Errorf("expected error but got nil")
-			}
-			// Error IS expected -- this is the successful path
-			return nil
+			adder := func(a, b int64) int64 { return a + b }
+
+			result := runBenchmark(t, "callback", nil, warmup, iterations, batchMinElapsedNs, batchMaxCalls, func() error {
+				ret, err := ff(adder)
+				if err != nil {
+					return err
+				}
+				if v, ok := ret[0].(int64); !ok || v != 3 {
+					return fmt.Errorf("call_callback_add: got %v, want 3", ret[0])
+				}
+				return nil
+			})
+			benchmarks = append(benchmarks, result)
+			saveProgress()
 		})
-		benchmarks = append(benchmarks, result)
-	})
+	}
+
+	if len(benchmarks) == 0 {
+		t.Fatalf("METAFFI_TEST_SCENARIOS selected no benchmark scenarios: %q", os.Getenv("METAFFI_TEST_SCENARIOS"))
+	}
 
 	// --- Write results to JSON ---
 	writeResults(t, benchmarks, timerOverhead, warmup, iterations, batchMinElapsedNs, batchMaxCalls)

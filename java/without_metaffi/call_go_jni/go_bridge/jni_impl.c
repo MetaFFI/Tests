@@ -20,6 +20,7 @@
  * ---------------------------------------------------------------------------*/
 
 extern int GoWaitABit(int64_t ms);
+extern void GoNoOp(void);
 extern int GoDivIntegers(int64_t x, int64_t y, double* outResult);
 extern int GoJoinStrings(char** arr, int arrLen, char** outResult);
 extern int GoEchoBytes(void* data, int dataLen, void** outData, int* outLen);
@@ -29,6 +30,7 @@ extern void GoFreeHandle(uint64_t handle);
 extern void GoFreeString(char* str);
 extern void GoFreeBytes(void* ptr);
 extern int GoReturnsAnError(char** outErrMsg);
+extern int GoAnyEchoJSON(char* inJSON, char** outJSON);
 
 typedef int64_t (*AddCallbackFunc)(int64_t, int64_t);
 extern int GoCallCallbackAdd(AddCallbackFunc cb, int64_t* outResult);
@@ -40,6 +42,11 @@ extern int GoCallCallbackAdd(AddCallbackFunc cb, int64_t* outResult);
 JNIEXPORT void JNICALL Java_GoBridge_waitABit(JNIEnv* env, jclass cls, jlong ms)
 {
     GoWaitABit((int64_t)ms);
+}
+
+JNIEXPORT void JNICALL Java_GoBridge_noOp(JNIEnv* env, jclass cls)
+{
+    GoNoOp();
 }
 
 /* ---------------------------------------------------------------------------
@@ -179,4 +186,35 @@ JNIEXPORT jstring JNICALL Java_GoBridge_returnsAnError(JNIEnv* env, jclass cls)
         return jErr;
     }
     return NULL;
+}
+
+/* ---------------------------------------------------------------------------
+ * Scenario: dynamic any echo (JSON-encoded mixed array payload)
+ * ---------------------------------------------------------------------------*/
+
+JNIEXPORT jstring JNICALL Java_GoBridge_anyEchoJson(JNIEnv* env, jclass cls, jstring inJson)
+{
+    if (inJson == NULL)
+    {
+        return NULL;
+    }
+
+    const char* inUtf = (*env)->GetStringUTFChars(env, inJson, NULL);
+    if (inUtf == NULL)
+    {
+        return NULL;
+    }
+
+    char* outJson = NULL;
+    int rc = GoAnyEchoJSON((char*)inUtf, &outJson);
+    (*env)->ReleaseStringUTFChars(env, inJson, inUtf);
+
+    if (rc != 0 || outJson == NULL)
+    {
+        return NULL;
+    }
+
+    jstring jOut = (*env)->NewStringUTF(env, outJson);
+    GoFreeString(outJson);
+    return jOut;
 }

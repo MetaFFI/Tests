@@ -89,6 +89,7 @@ extern "C" {
 #endif
 
 extern __declspec(dllexport) int GoWaitABit(int64_t ms);
+extern __declspec(dllexport) int GoNoOp();
 extern __declspec(dllexport) int GoDivIntegers(int64_t x, int64_t y, double* outResult);
 extern __declspec(dllexport) int GoJoinStrings(char** arr, int arrLen, char** outResult);
 extern __declspec(dllexport) int GoEchoBytes(void* data, int dataLen, void** outData, int* outLen);
@@ -97,6 +98,7 @@ extern __declspec(dllexport) int GoTestMapGetName(uint64_t handle, char** outNam
 extern __declspec(dllexport) int GoFreeHandle(uint64_t handle);
 extern __declspec(dllexport) int GoCallCallbackAdd(AddCallbackFunc cb, int64_t* outResult);
 extern __declspec(dllexport) int GoReturnsAnError(char** outErrMsg);
+extern __declspec(dllexport) int GoAnyEchoJSON(char* inJSON, char** outJSON);
 extern __declspec(dllexport) void GoFreeString(char* str);
 extern __declspec(dllexport) void GoFreeBytes(void* ptr);
 

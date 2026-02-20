@@ -9,10 +9,11 @@ import (
 
 	pb "grpc_go_server/pb"
 
-	guest "metaffi_guest_go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
+	guest "metaffi_guest_go"
 )
 
 // ---------------------------------------------------------------------------
@@ -25,7 +26,7 @@ type benchmarkServer struct {
 
 // Scenario 1: void call
 func (s *benchmarkServer) VoidCall(_ context.Context, req *pb.VoidCallRequest) (*pb.VoidCallResponse, error) {
-	guest.WaitABit(req.Ms)
+	guest.NoOp()
 	return &pb.VoidCallResponse{}, nil
 }
 
@@ -99,6 +100,42 @@ func (s *benchmarkServer) ReturnsAnError(_ context.Context, _ *pb.Empty) (*pb.Em
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 	return &pb.Empty{}, nil
+}
+
+// Scenario: dynamic any echo (mixed array payload)
+func (s *benchmarkServer) AnyEcho(_ context.Context, req *pb.AnyEchoRequest) (*pb.AnyEchoResponse, error) {
+	if req.GetValues() == nil || len(req.GetValues().GetValues()) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "AnyEcho requires non-empty values")
+	}
+	values := req.GetValues().GetValues()
+	expected := []string{"number", "string", "number"}
+	for i := 0; i < len(expected) && i < len(values); i++ {
+		got := "unknown"
+		switch values[i].GetKind().(type) {
+		case *structpb.Value_NumberValue:
+			got = "number"
+		case *structpb.Value_StringValue:
+			got = "string"
+		case *structpb.Value_BoolValue:
+			got = "bool"
+		case *structpb.Value_ListValue:
+			got = "list"
+		case *structpb.Value_StructValue:
+			got = "struct"
+		case *structpb.Value_NullValue:
+			got = "null"
+		}
+		if got != expected[i] {
+			return nil, status.Errorf(
+				codes.InvalidArgument,
+				"AnyEcho type mismatch at index %d: expected %s, got %s",
+				i,
+				expected[i],
+				got,
+			)
+		}
+	}
+	return &pb.AnyEchoResponse{Values: req.GetValues()}, nil
 }
 
 // ---------------------------------------------------------------------------

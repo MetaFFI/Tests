@@ -598,25 +598,38 @@ public class TestCorrectness
 	@Test
 	public void testMake3DArray()
 	{
-		xfail("Go int != int64: Make3DArray returns [][][]int but MetaFFI expects [][][]int64", () ->
-		{
-			Caller fn = load("callable=Make3DArray", null,
-				new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64Array, 3)});
-			Object[] result = fn.call();
-			assertNotNull(result);
-		});
+		Caller fn = load("callable=Make3DArray", null,
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64Array, 3)});
+		Object[] result = fn.call();
+		assertNotNull(result);
+
+		Object[][][] arr3d = (Object[][][]) result[0];
+		assertEquals(2, arr3d.length);
+		assertTrue(arr3d[0][0][0] instanceof MetaFFIHandle);
+		assertTrue(arr3d[0][1][0] instanceof MetaFFIHandle);
+		assertTrue(arr3d[1][0][0] instanceof MetaFFIHandle);
+		assertTrue(arr3d[1][1][0] instanceof MetaFFIHandle);
 	}
 
 	@Test
 	public void testMakeRaggedArray()
 	{
-		xfail("Go int != int64: MakeRaggedArray returns [][]int but MetaFFI expects [][]int64", () ->
-		{
-			Caller fn = load("callable=MakeRaggedArray", null,
-				new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64Array, 2)});
-			Object[] result = fn.call();
-			assertNotNull(result);
-		});
+		Caller fn = load("callable=MakeRaggedArray", null,
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64Array, 2)});
+		Object[] result = fn.call();
+		assertNotNull(result);
+
+		Object[][] ragged = (Object[][]) result[0];
+		assertEquals(3, ragged.length);
+		assertEquals(3, ragged[0].length);
+		assertTrue(ragged[0][0] instanceof MetaFFIHandle);
+		assertTrue(ragged[0][1] instanceof MetaFFIHandle);
+		assertTrue(ragged[0][2] instanceof MetaFFIHandle);
+		assertEquals(1, ragged[1].length);
+		assertTrue(ragged[1][0] instanceof MetaFFIHandle);
+		assertEquals(2, ragged[2].length);
+		assertTrue(ragged[2][0] instanceof MetaFFIHandle);
+		assertTrue(ragged[2][1] instanceof MetaFFIHandle);
 	}
 
 	@Test
@@ -921,5 +934,39 @@ public class TestCorrectness
 		Object[] result = fn.call((Object) data);
 		assertNotNull(result);
 		assertArrayEquals(data, (byte[]) result[0]);
+	}
+
+	// ========================================================================
+	// Packed array correctness (arrays.go - packed CDT path)
+	// ========================================================================
+
+	@Test
+	public void testPackedArrayEchoBytesRoundTrip()
+	{
+		Caller fn = load("callable=EchoBytes",
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8PackedArray, 1)},
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8PackedArray, 1)});
+
+		byte[] data = new byte[256];
+		for (int i = 0; i < 256; i++)
+		{
+			data[i] = (byte) i;
+		}
+		Object[] result = fn.call((Object) data);
+		assertNotNull(result);
+		assertArrayEquals(data, (byte[]) result[0]);
+	}
+
+	@Test
+	public void testPackedArrayEchoBytesSmall()
+	{
+		Caller fn = load("callable=EchoBytes",
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8PackedArray, 1)},
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8PackedArray, 1)});
+
+		byte[] input = new byte[]{1, 2, 3, 4, 5};
+		Object[] result = fn.call((Object) input);
+		assertNotNull(result);
+		assertArrayEquals(input, (byte[]) result[0]);
 	}
 }

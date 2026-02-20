@@ -6,7 +6,7 @@ run:
   # Run benchmark suites and generate publishable performance data.
   include_benchmarks: true
   # Correctness is optional; this config keeps benchmark pipeline only.
-  include_correctness: false
+  include_correctness: true
 
   # Uncertainty pass count (N repeats across ALL selected triples).
   repeats: 5

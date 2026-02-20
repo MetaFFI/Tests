@@ -6,6 +6,8 @@ option go_package = "./pb";
 option java_package = "benchmark";
 option java_outer_classname = "BenchmarkProto";
 
+import "google/protobuf/struct.proto";
+
 // BenchmarkService wraps the Java guest module for cross-language benchmarking.
 service BenchmarkService {
   rpc VoidCall(VoidCallRequest) returns (VoidCallResponse);
@@ -15,6 +17,7 @@ service BenchmarkService {
   rpc ObjectMethod(ObjectMethodRequest) returns (ObjectMethodResponse);
   rpc CallbackAdd(stream CallbackClientMsg) returns (stream CallbackServerMsg);
   rpc ReturnsAnError(Empty) returns (Empty);
+  rpc AnyEcho(AnyEchoRequest) returns (AnyEchoResponse);
 }
 
 message VoidCallRequest { int64 secs = 1; }
@@ -47,3 +50,6 @@ message CallbackServerMsg {
 message CallbackArgs { int64 a = 1; int64 b = 2; }
 
 message Empty {}
+
+message AnyEchoRequest { google.protobuf.ListValue values = 1; }
+message AnyEchoResponse { google.protobuf.ListValue values = 1; }

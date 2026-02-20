@@ -34,6 +34,11 @@
             <version>${grpc.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
             <version>1.3.2</version>
@@ -68,10 +73,50 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>compile-protobuf-java</id>
                         <goals>
                             <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-sources/protobuf/java</outputDirectory>
+                            <clearOutputDirectory>false</clearOutputDirectory>
+                            <temporaryProtoFileDirectory>${java.io.tmpdir}/protoc-deps-${project.artifactId}-java</temporaryProtoFileDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-protobuf-grpc</id>
+                        <goals>
                             <goal>compile-custom</goal>
                         </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-sources/protobuf/grpc-java</outputDirectory>
+                            <clearOutputDirectory>false</clearOutputDirectory>
+                            <temporaryProtoFileDirectory>${java.io.tmpdir}/protoc-deps-${project.artifactId}-grpc</temporaryProtoFileDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Explicitly add gRPC generated sources to the compile path.
+                 protobuf-maven-plugin's compile-custom goal does NOT auto-add
+                 its outputDirectory when a custom path is specified. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>add-protobuf-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/protobuf/java</source>
+                                <source>${project.build.directory}/generated-sources/protobuf/grpc-java</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -83,12 +128,14 @@
                 <configuration>
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
+                    <useSystemClassLoader>true</useSystemClassLoader>
                     <environmentVariables>
                         <METAFFI_HOME>${env.METAFFI_HOME}</METAFFI_HOME>
                         <METAFFI_SOURCE_ROOT>${env.METAFFI_SOURCE_ROOT}</METAFFI_SOURCE_ROOT>
                         <METAFFI_TEST_WARMUP>${env.METAFFI_TEST_WARMUP}</METAFFI_TEST_WARMUP>
                         <METAFFI_TEST_ITERATIONS>${env.METAFFI_TEST_ITERATIONS}</METAFFI_TEST_ITERATIONS>
                         <METAFFI_TEST_MODE>${env.METAFFI_TEST_MODE}</METAFFI_TEST_MODE>
+                        <METAFFI_TEST_SCENARIOS>${env.METAFFI_TEST_SCENARIOS}</METAFFI_TEST_SCENARIOS>
                         <METAFFI_TEST_RESULTS_FILE>${env.METAFFI_TEST_RESULTS_FILE}</METAFFI_TEST_RESULTS_FILE>
                     </environmentVariables>
                 </configuration>

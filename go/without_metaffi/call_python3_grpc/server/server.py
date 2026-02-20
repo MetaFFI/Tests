@@ -25,7 +25,7 @@ class BenchmarkServicer(benchmark_pb2_grpc.BenchmarkServiceServicer):
 
     # --- Scenario 1: void call ---
     def VoidCall(self, request, context):
-        self._mod.wait_a_bit(request.secs)
+        self._mod.no_op()
         return benchmark_pb2.VoidCallResponse()
 
     # --- Scenario 2: primitive echo ---
@@ -78,6 +78,21 @@ class BenchmarkServicer(benchmark_pb2_grpc.BenchmarkServiceServicer):
             return benchmark_pb2.Empty()
         except Exception as e:
             context.abort(grpc.StatusCode.INTERNAL, str(e))
+
+    # --- Scenario: dynamic any echo (mixed-type array payload) ---
+    def AnyEcho(self, request, context):
+        values = request.values.values
+        if not values:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "AnyEcho requires non-empty values")
+        expected_kinds = ["number_value", "string_value", "number_value"]
+        for i, expected in enumerate(expected_kinds):
+            got = values[i].WhichOneof("kind")
+            if got != expected:
+                context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    f"AnyEcho expected {expected} at index {i}, got {got}",
+                )
+        return benchmark_pb2.AnyEchoResponse(values=request.values)
 
 
 def serve(module_path: str, port: int):

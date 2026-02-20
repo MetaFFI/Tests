@@ -13,6 +13,7 @@ public class GoBridge
 
 	// Scenario 1: void call
 	public static native void waitABit(long ms);
+	public static native void noOp();
 
 	// Scenario 2: primitive echo
 	public static native double divIntegers(long x, long y);
@@ -33,6 +34,9 @@ public class GoBridge
 
 	// Scenario 7: error propagation (returns error message, null if no error)
 	public static native String returnsAnError();
+
+	// Scenario: dynamic any echo (JSON-encoded mixed array payload)
+	public static native String anyEchoJson(String payloadJson);
 
 	/** Callback interface for add(a, b) -> result */
 	public interface AddCallback

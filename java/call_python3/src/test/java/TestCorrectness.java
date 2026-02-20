@@ -820,4 +820,53 @@ public class TestCorrectness
 			assertEquals(true, containsFn.call(instance, "k")[0]);
 		});
 	}
+
+	// ========================================================================
+	// Packed array correctness (packed CDT path)
+	// ========================================================================
+
+	@Test
+	public void testPackedArraySum1dInt()
+	{
+		Caller fn = load("callable=sum_1d_int_array",
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64PackedArray, 1)},
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64)});
+		Object[] result = fn.call((Object) new long[]{1L, 2L, 3L, 4L, 5L});
+		assertNotNull(result);
+		assertEquals(15L, result[0]);
+	}
+
+	@Test
+	public void testPackedArrayEcho1dInt()
+	{
+		Caller fn = load("callable=echo_1d_int_array",
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64PackedArray, 1)},
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64PackedArray, 1)});
+		long[] input = new long[]{100L, 200L, 300L};
+		Object[] result = fn.call((Object) input);
+		assertNotNull(result);
+		assertArrayEquals(input, (long[]) result[0]);
+	}
+
+	@Test
+	public void testPackedArrayEcho1dFloat()
+	{
+		Caller fn = load("callable=echo_1d_float_array",
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIFloat64PackedArray, 1)},
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIFloat64PackedArray, 1)});
+		double[] input = new double[]{1.5, 2.5, 3.5};
+		Object[] result = fn.call((Object) input);
+		assertNotNull(result);
+		assertArrayEquals(input, (double[]) result[0], 1e-10);
+	}
+
+	@Test
+	public void testPackedArrayMake1dInt()
+	{
+		Caller fn = load("callable=make_1d_int_array", null,
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64PackedArray, 1)});
+		Object[] result = fn.call();
+		assertNotNull(result);
+		assertArrayEquals(new long[]{10L, 20L, 30L, 40L, 50L}, (long[]) result[0]);
+	}
 }

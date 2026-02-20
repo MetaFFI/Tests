@@ -385,13 +385,27 @@ def measure_complexity_lizard(files: list[Path]) -> dict:
 # ---------------------------------------------------------------------------
 
 def count_languages(files: list[Path]) -> list[str]:
-    """Return sorted list of distinct programming languages in the file set."""
+    """Return sorted list of distinct programming languages in the file set.
+
+    Detects CGo (embedded C code in Go source files via ``import "C"``)
+    and adds "C" to the language set when present.
+    """
     langs = set()
     for f in files:
         ext = f.suffix.lower()
         lang = LANG_MAP.get(ext)
         if lang:
             langs.add(lang)
+
+        # Detect CGo: Go files containing `import "C"` embed C code
+        if ext == ".go":
+            try:
+                content = f.read_text(encoding="utf-8", errors="replace")
+                if 'import "C"' in content:
+                    langs.add("C")
+            except OSError:
+                pass
+
     return sorted(langs)
 
 
@@ -482,6 +496,7 @@ class ImplementationReport:
 
     # Complexity
     complexity: dict = field(default_factory=dict)
+    benchmark_complexity: dict = field(default_factory=dict)  # benchmark + shared files only
 
     # API surface
     api_surface: dict = field(default_factory=dict)
@@ -533,21 +548,27 @@ def analyze_implementation(impl: Implementation) -> ImplementationReport:
     ]
     report.benchmark_only_sloc = count_sloc_cloc(benchmark_files)
 
-    # Complexity
+    # Complexity (all source files)
     print(f"  Measuring complexity...", flush=True)
-    report.complexity = measure_complexity_lizard(impl.source_files)
+    full_complexity = measure_complexity_lizard(impl.source_files)
 
-    # Don't include per-function details in the JSON (too verbose)
-    # Keep only aggregate stats
     report.complexity = {
-        "max_cc": report.complexity["max_cc"],
-        "avg_cc": report.complexity["avg_cc"],
-        "total_functions": report.complexity["total_functions"],
+        "max_cc": full_complexity["max_cc"],
+        "avg_cc": full_complexity["avg_cc"],
+        "total_functions": full_complexity["total_functions"],
         "top_5_complex": sorted(
-            report.complexity["functions"],
+            full_complexity["functions"],
             key=lambda f: f["ccn"],
             reverse=True,
-        )[:5] if report.complexity["functions"] else [],
+        )[:5] if full_complexity["functions"] else [],
+    }
+
+    # Benchmark-only complexity (excludes correctness test files)
+    bench_complexity = measure_complexity_lizard(benchmark_files)
+    report.benchmark_complexity = {
+        "max_cc": bench_complexity["max_cc"],
+        "avg_cc": bench_complexity["avg_cc"],
+        "total_functions": bench_complexity["total_functions"],
     }
 
     # API surface
@@ -597,6 +618,7 @@ def build_comparison_tables(reports: list[ImplementationReport]) -> dict:
                 "language_count": report.language_count,
                 "languages": report.languages,
                 "max_cyclomatic_complexity": report.complexity.get("max_cc", 0),
+                "benchmark_max_cc": report.benchmark_complexity.get("max_cc", 0),
                 "avg_cyclomatic_complexity": report.complexity.get("avg_cc", 0.0),
             }
 
@@ -625,6 +647,7 @@ def build_aggregate_summary(reports: list[ImplementationReport]) -> dict:
         lang_counts = [r.language_count for r in group]
         file_counts = [r.source_file_count for r in group]
         max_ccs = [r.complexity.get("max_cc", 0) for r in group]
+        bench_max_ccs = [r.benchmark_complexity.get("max_cc", 0) for r in group]
 
         summary[mech] = {
             "count": len(group),
@@ -635,6 +658,7 @@ def build_aggregate_summary(reports: list[ImplementationReport]) -> dict:
             "avg_language_count": round(sum(lang_counts) / len(lang_counts), 1) if lang_counts else 0,
             "avg_file_count": round(sum(file_counts) / len(file_counts), 1) if file_counts else 0,
             "avg_max_cc": round(sum(max_ccs) / len(max_ccs), 1) if max_ccs else 0,
+            "avg_benchmark_max_cc": round(sum(bench_max_ccs) / len(bench_max_ccs), 1) if bench_max_ccs else 0,
         }
 
     return summary

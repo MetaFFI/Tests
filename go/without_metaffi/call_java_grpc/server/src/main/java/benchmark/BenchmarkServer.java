@@ -4,6 +4,8 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import com.google.protobuf.ListValue;
+import com.google.protobuf.Value;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,7 +29,7 @@ public class BenchmarkServer extends BenchmarkServiceGrpc.BenchmarkServiceImplBa
     @Override
     public void voidCall(BenchmarkProto.VoidCallRequest request,
                          StreamObserver<BenchmarkProto.VoidCallResponse> responseObserver) {
-        CoreFunctions.waitABit(request.getSecs());
+        CoreFunctions.noOp();
         responseObserver.onNext(BenchmarkProto.VoidCallResponse.getDefaultInstance());
         responseObserver.onCompleted();
     }
@@ -137,6 +139,39 @@ public class BenchmarkServer extends BenchmarkServiceGrpc.BenchmarkServiceImplBa
                     .withDescription(e.getMessage())
                     .asRuntimeException());
         }
+    }
+
+    // --- Scenario: dynamic any echo (mixed-type array payload) ---
+    @Override
+    public void anyEcho(BenchmarkProto.AnyEchoRequest request,
+                        StreamObserver<BenchmarkProto.AnyEchoResponse> responseObserver) {
+        ListValue values = request.getValues();
+        if (values.getValuesCount() == 0) {
+            responseObserver.onError(Status.INVALID_ARGUMENT
+                    .withDescription("AnyEcho requires non-empty values")
+                    .asRuntimeException());
+            return;
+        }
+
+        Value.KindCase[] expected = new Value.KindCase[]{
+                Value.KindCase.NUMBER_VALUE,
+                Value.KindCase.STRING_VALUE,
+                Value.KindCase.NUMBER_VALUE
+        };
+        for (int i = 0; i < expected.length; i++) {
+            Value.KindCase got = values.getValues(i).getKindCase();
+            if (got != expected[i]) {
+                responseObserver.onError(Status.INVALID_ARGUMENT
+                        .withDescription("AnyEcho type mismatch at index " + i + ": expected " + expected[i] + ", got " + got)
+                        .asRuntimeException());
+                return;
+            }
+        }
+
+        responseObserver.onNext(BenchmarkProto.AnyEchoResponse.newBuilder()
+                .setValues(values)
+                .build());
+        responseObserver.onCompleted();
     }
 
     // --- Entry point ---

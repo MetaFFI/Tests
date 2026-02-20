@@ -6,7 +6,9 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -47,6 +49,63 @@ public class BenchmarkTest
 		String val = System.getenv(name);
 		if (val == null || val.isEmpty()) return defaultValue;
 		return Integer.parseInt(val);
+	}
+
+	private static Set<String> parseScenarioFilter()
+	{
+		String raw = System.getenv("METAFFI_TEST_SCENARIOS");
+		if (raw == null || raw.trim().isEmpty())
+		{
+			return new HashSet<>();
+		}
+
+		Set<String> out = new HashSet<>();
+		for (String part : raw.split(","))
+		{
+			String s = part.trim();
+			if (!s.isEmpty())
+			{
+				out.add(s);
+			}
+		}
+		return out;
+	}
+
+	private static String scenarioKey(String scenario, Integer dataSize)
+	{
+		return dataSize == null ? scenario : scenario + "_" + dataSize;
+	}
+
+	private static boolean shouldRunScenario(Set<String> filter, String scenario, Integer dataSize)
+	{
+		return filter.isEmpty() || filter.contains(scenarioKey(scenario, dataSize));
+	}
+
+	private static String buildAnyEchoPayloadJson(int size)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (int i = 0; i < size; i++)
+		{
+			if (i > 0)
+			{
+				sb.append(",");
+			}
+			switch (i % 3)
+			{
+				case 0:
+					sb.append("1");
+					break;
+				case 1:
+					sb.append("\"two\"");
+					break;
+				default:
+					sb.append("3.0");
+					break;
+			}
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 
 	// ---- Statistical helpers ----
@@ -196,35 +255,59 @@ public class BenchmarkTest
 		System.err.println("Timer overhead: " + timerOverhead + " ns");
 
 		List<String> benchmarkJsons = new ArrayList<>();
+		Set<String> scenarioFilter = parseScenarioFilter();
+		int selectedCount = 0;
+		if (!scenarioFilter.isEmpty())
+		{
+			System.err.println("Scenario filter enabled: " + System.getenv("METAFFI_TEST_SCENARIOS"));
+		}
 
 		// --- Scenario 1: Void call ---
-		benchmarkJsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
-			() -> GoBridge.waitABit(0)));
+		if (shouldRunScenario(scenarioFilter, "void_call", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
+				() -> GoBridge.noOp()));
+		}
 
 		// --- Scenario 2: Primitive echo ---
-		benchmarkJsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
-			() -> {
-				double result = GoBridge.divIntegers(10, 2);
-				if (Math.abs(result - 5.0) > 1e-10)
-				{
-					throw new RuntimeException("DivIntegers: got " + result + ", want 5.0");
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "primitive_echo", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
+				() -> {
+					double result = GoBridge.divIntegers(10, 2);
+					if (Math.abs(result - 5.0) > 1e-10)
+					{
+						throw new RuntimeException("DivIntegers: got " + result + ", want 5.0");
+					}
+				}));
+		}
 
 		// --- Scenario 3: String echo ---
 		String[] joinArgs = new String[]{"hello", "world"};
-		benchmarkJsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
-			() -> {
-				String result = GoBridge.joinStrings(joinArgs);
-				if (!"hello,world".equals(result))
-				{
-					throw new RuntimeException("JoinStrings: got " + result);
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "string_echo", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
+				() -> {
+					String result = GoBridge.joinStrings(joinArgs);
+					if (!"hello,world".equals(result))
+					{
+						throw new RuntimeException("JoinStrings: got " + result);
+					}
+				}));
+		}
 
 		// --- Scenario 4: Array echo (varying sizes) ---
 		for (int size : new int[]{10, 100, 1000, 10000})
 		{
+			if (!shouldRunScenario(scenarioFilter, "array_echo", size))
+			{
+				continue;
+			}
+			selectedCount++;
+
 			byte[] data = new byte[size];
 			for (int i = 0; i < size; i++) data[i] = (byte) (i % 256);
 			final byte[] finalData = data;
@@ -241,44 +324,81 @@ public class BenchmarkTest
 		}
 
 		// --- Scenario 5: Object create + method call ---
-		benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
-			() -> {
-				long handle = GoBridge.newTestMap();
-				String name = GoBridge.testMapGetName(handle);
-				GoBridge.freeHandle(handle);
-				if (!"name1".equals(name))
-				{
-					throw new RuntimeException("TestMap.Name: got " + name);
-				}
-			}));
-
-		// --- Scenario 6: Callback ---
-		try
+		if (shouldRunScenario(scenarioFilter, "object_method", null))
 		{
-			benchmarkJsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
 				() -> {
-					long result = GoBridge.callCallbackAdd((a, b) -> a + b);
-					if (result != 3L)
+					long handle = GoBridge.newTestMap();
+					String name = GoBridge.testMapGetName(handle);
+					GoBridge.freeHandle(handle);
+					if (!"name1".equals(name))
 					{
-						throw new RuntimeException("CallCallbackAdd: got " + result + ", want 3");
+						throw new RuntimeException("TestMap.Name: got " + name);
 					}
 				}));
 		}
-		catch (Throwable e)
+
+		// --- Scenario 6: Callback ---
+		if (shouldRunScenario(scenarioFilter, "callback", null))
 		{
-			System.err.println("Callback scenario failed: " + e.getMessage());
-			benchmarkJsons.add(makeFailedResult("callback", null, e.getMessage()));
+			selectedCount++;
+			try
+			{
+				benchmarkJsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
+					() -> {
+						long result = GoBridge.callCallbackAdd((a, b) -> a + b);
+						if (result != 3L)
+						{
+							throw new RuntimeException("CallCallbackAdd: got " + result + ", want 3");
+						}
+					}));
+			}
+			catch (Throwable e)
+			{
+				System.err.println("Callback scenario failed: " + e.getMessage());
+				benchmarkJsons.add(makeFailedResult("callback", null, e.getMessage()));
+			}
 		}
 
 		// --- Scenario 7: Error propagation ---
-		benchmarkJsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
-			() -> {
-				String err = GoBridge.returnsAnError();
-				if (err == null)
-				{
-					throw new RuntimeException("ReturnsAnError did not return error");
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "error_propagation", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
+				() -> {
+					String err = GoBridge.returnsAnError();
+					if (err == null)
+					{
+						throw new RuntimeException("ReturnsAnError did not return error");
+					}
+				}));
+		}
+
+		// --- Scenario: Dynamic any echo (mixed payload) ---
+		int anyEchoSize = 100;
+		if (shouldRunScenario(scenarioFilter, "any_echo", anyEchoSize))
+		{
+			selectedCount++;
+			final String payloadJson = buildAnyEchoPayloadJson(anyEchoSize);
+			benchmarkJsons.add(runBenchmark("any_echo", anyEchoSize, WARMUP, ITERATIONS,
+				() -> {
+					String echoed = GoBridge.anyEchoJson(payloadJson);
+					if (echoed == null)
+					{
+						throw new RuntimeException("anyEchoJson returned null");
+					}
+					if (!payloadJson.equals(echoed))
+					{
+						throw new RuntimeException("anyEchoJson returned mismatched payload");
+					}
+				}));
+		}
+
+		if (!scenarioFilter.isEmpty() && selectedCount == 0)
+		{
+			fail("METAFFI_TEST_SCENARIOS selected no benchmark scenarios: " + System.getenv("METAFFI_TEST_SCENARIOS"));
+		}
 
 		// --- Write results ---
 		writeResults(benchmarkJsons, timerOverhead);

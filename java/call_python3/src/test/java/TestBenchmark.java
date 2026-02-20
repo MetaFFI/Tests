@@ -14,7 +14,9 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -40,6 +42,36 @@ public class TestBenchmark
 		String val = System.getenv(name);
 		if (val == null || val.isEmpty()) return defaultValue;
 		return Integer.parseInt(val);
+	}
+
+	private static Set<String> parseScenarioFilter()
+	{
+		String raw = System.getenv("METAFFI_TEST_SCENARIOS");
+		if (raw == null || raw.trim().isEmpty())
+		{
+			return null;
+		}
+
+		Set<String> filter = new HashSet<>();
+		for (String part : raw.split(","))
+		{
+			String k = part.trim();
+			if (!k.isEmpty())
+			{
+				filter.add(k);
+			}
+		}
+		return filter.isEmpty() ? null : filter;
+	}
+
+	private static String scenarioKey(String scenario, Integer dataSize)
+	{
+		return dataSize == null ? scenario : scenario + "_" + dataSize;
+	}
+
+	private static boolean shouldRunScenario(Set<String> filter, String scenario, Integer dataSize)
+	{
+		return filter == null || filter.contains(scenarioKey(scenario, dataSize));
 	}
 
 	@BeforeClass
@@ -271,38 +303,58 @@ public class TestBenchmark
 		return a + b;
 	}
 
-	// ---- Main benchmark test ----
-
-	@Test
-	public void testAllBenchmarks() throws Throwable
+	/** Validate that an any_echo result has the expected collection length. */
+	private static void validateAnyEchoResult(Object echoed, int expectedSize)
 	{
-		String mode = System.getenv().getOrDefault("METAFFI_TEST_MODE", "");
-		if ("correctness".equals(mode))
+		if (echoed instanceof Object[])
 		{
-			System.err.println("Skipping benchmarks: METAFFI_TEST_MODE=correctness");
-			return;
+			if (((Object[]) echoed).length != expectedSize)
+			{
+				throw new RuntimeException("echo_any: wrong array length");
+			}
 		}
+		else if (echoed instanceof List<?>)
+		{
+			if (((List<?>) echoed).size() != expectedSize)
+			{
+				throw new RuntimeException("echo_any: wrong list length");
+			}
+		}
+		else
+		{
+			if (echoed == null)
+			{
+				throw new RuntimeException("echo_any: got null return");
+			}
+			throw new RuntimeException("echo_any: unexpected return type " + echoed.getClass().getName());
+		}
+	}
 
-		long timerOverhead = measureTimerOverhead();
-		System.err.println("Timer overhead: " + timerOverhead + " ns");
+	// ---- Individual scenario benchmarks ----
 
-		List<String> benchmarkJsons = new ArrayList<>();
+	private void benchVoidCall(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "void_call", null)) return;
 
-		// --- Scenario 1: Void call ---
-		Caller waitFn = pyModule.load("callable=wait_a_bit",
-			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64)}, null);
-		assertNotNull("Failed to load wait_a_bit", waitFn);
+		Caller noopFn = pyModule.load("callable=no_op", null, null);
+		assertNotNull("Failed to load no_op", noopFn);
 
-		benchmarkJsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
-			() -> waitFn.call(0L)));
+		jsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
+			() -> noopFn.call()));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Scenario 2: Primitive echo (int64 -> float64) ---
+	private void benchPrimitiveEcho(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "primitive_echo", null)) return;
+
 		Caller divFn = pyModule.load("callable=div_integers",
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64), t(MetaFFITypes.MetaFFIInt64)},
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIFloat64)});
 		assertNotNull("Failed to load div_integers", divFn);
 
-		benchmarkJsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
+		jsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
 			() -> {
 				Object[] result = divFn.call(10L, 2L);
 				if (Math.abs((Double) result[0] - 5.0) > 1e-10)
@@ -310,15 +362,21 @@ public class TestBenchmark
 					throw new RuntimeException("div_integers: got " + result[0] + ", want 5.0");
 				}
 			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Scenario 3: String echo ---
+	private void benchStringEcho(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "string_echo", null)) return;
+
 		Caller joinFn = pyModule.load("callable=join_strings",
 			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIString8Array, 1)},
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIString8)});
 		assertNotNull("Failed to load join_strings", joinFn);
 
 		String[] joinArgs = new String[]{"hello", "world"};
-		benchmarkJsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
+		jsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
 			() -> {
 				Object[] result = joinFn.call((Object) joinArgs);
 				if (!"hello,world".equals(result[0]))
@@ -326,42 +384,51 @@ public class TestBenchmark
 					throw new RuntimeException("join_strings: got " + result[0]);
 				}
 			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Scenario 4: Array echo (returns_bytes_buffer as baseline; also test with constructed arrays) ---
-		Caller returnsBytesFn = pyModule.load("callable=returns_bytes_buffer", null,
-			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8Array, 1)});
-		assertNotNull("Failed to load returns_bytes_buffer", returnsBytesFn);
+	private void benchArraySum(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		// Check if any array_sum size is requested
+		boolean anyRequested = false;
+		for (int s : new int[]{10, 100, 1000, 10000})
+		{
+			if (shouldRunScenario(filter, "array_sum", s)) anyRequested = true;
+		}
+		if (!anyRequested) return;
 
-		// Python3 guest doesn't have EchoBytes, so use accepts_ragged_array with varying sizes as array benchmark
-		Caller make1d = pyModule.load("callable=make_1d_array", null,
-			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64Array, 1)});
-		assertNotNull("Failed to load make_1d_array", make1d);
-
-		// Use accepts_ragged_array for array passing benchmark
-		Caller acceptsRagged = pyModule.load("callable=accepts_ragged_array",
-			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64Array, 2)},
+		Caller sumFn = pyModule.load("callable=sum_1d_int_array",
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIInt64PackedArray, 1)},
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64)});
-		assertNotNull("Failed to load accepts_ragged_array", acceptsRagged);
+		assertNotNull("Failed to load sum_1d_int_array", sumFn);
 
 		for (int size : new int[]{10, 100, 1000, 10000})
 		{
-			// Build a 2D ragged array of the target total size
-			long[][] data = new long[][]{new long[size]};
-			for (int i = 0; i < size; i++) data[0][i] = (long) (i + 1);
-			final long[][] finalData = data;
+			if (!shouldRunScenario(filter, "array_sum", size)) continue;
+
+			long[] data = new long[size];
+			for (int i = 0; i < size; i++) data[i] = (long) (i + 1);
+			final long[] finalData = data;
 			final long expectedSum = (long) size * (size + 1) / 2;
 
-			benchmarkJsons.add(runBenchmark("array_sum", size, WARMUP, ITERATIONS,
+			jsons.add(runBenchmark("array_sum", size, WARMUP, ITERATIONS,
 				() -> {
-					Object[] result = acceptsRagged.call((Object) finalData);
+					Object[] result = sumFn.call((Object) finalData);
 					if ((Long) result[0] != expectedSum)
 					{
-						throw new RuntimeException("accepts_ragged_array: got " + result[0] + ", want " + expectedSum);
+						throw new RuntimeException("sum_1d_int_array: got " + result[0] + ", want " + expectedSum);
 					}
 				}));
+			writeResults(jsons, timerOverhead);
+			System.gc();
 		}
+	}
 
-		// --- Scenario 5: Object create + method call ---
+	private void benchObjectMethod(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "object_method", null)) return;
+
 		Caller newSomeClass = pyModule.load("callable=SomeClass",
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIString8)},
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)});
@@ -371,7 +438,7 @@ public class TestBenchmark
 		assertNotNull("Failed to load SomeClass ctor", newSomeClass);
 		assertNotNull("Failed to load SomeClass.print", printFn);
 
-		benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
+		jsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
 			() -> {
 				Object[] instResult = newSomeClass.call("bench");
 				MetaFFIHandle inst = (MetaFFIHandle) instResult[0];
@@ -381,38 +448,18 @@ public class TestBenchmark
 					throw new RuntimeException("SomeClass.print: got " + printResult[0]);
 				}
 			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Scenario 6: Callback invocation ---
-		try
-		{
-			Caller callCb = pyModule.load("callable=call_callback_add",
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFICallable)},
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64)});
-			assertNotNull("Failed to load call_callback_add", callCb);
+	private void benchErrorPropagation(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "error_propagation", null)) return;
 
-			Method addMethod = TestBenchmark.class.getMethod("javaAdd", long.class, long.class);
-			Caller javaAdder = MetaFFIRuntime.makeMetaFFICallable(addMethod);
-
-			benchmarkJsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
-				() -> {
-					Object[] result = callCb.call(javaAdder);
-					if ((Long) result[0] != 3L)
-					{
-						throw new RuntimeException("call_callback_add: got " + result[0] + ", want 3");
-					}
-				}));
-		}
-		catch (Throwable e)
-		{
-			System.err.println("Callback scenario failed: " + e.getMessage());
-			benchmarkJsons.add(makeFailedResult("callback", null, e.getMessage()));
-		}
-
-		// --- Scenario 7: Error propagation ---
 		Caller errFn = pyModule.load("callable=returns_an_error", null, null);
 		assertNotNull("Failed to load returns_an_error", errFn);
 
-		benchmarkJsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
+		jsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
 			() -> {
 				try
 				{
@@ -428,8 +475,107 @@ public class TestBenchmark
 					// Expected: Python error -> Java throwable
 				}
 			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Write results ---
+	private void benchCallback(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "callback", null)) return;
+
+		try
+		{
+			Caller callCb = pyModule.load("callable=call_callback_add",
+				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFICallable)},
+				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64)});
+			assertNotNull("Failed to load call_callback_add", callCb);
+
+			Method addMethod = TestBenchmark.class.getMethod("javaAdd", long.class, long.class);
+			Caller javaAdder = MetaFFIRuntime.makeMetaFFICallable(addMethod);
+
+			jsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
+				() -> {
+					Object[] result = callCb.call(javaAdder);
+					if ((Long) result[0] != 3L)
+					{
+						throw new RuntimeException("call_callback_add: got " + result[0] + ", want 3");
+					}
+				}));
+		}
+		catch (Throwable e)
+		{
+			System.err.println("Callback scenario failed: " + e.getMessage());
+			jsons.add(makeFailedResult("callback", null, e.getMessage()));
+		}
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
+
+	private void benchAnyEcho(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		int anyEchoSize = 100;
+		if (!shouldRunScenario(filter, "any_echo", anyEchoSize)) return;
+
+		Caller echoAny = pyModule.load("callable=echo_any",
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIAny)},
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIAny)});
+		assertNotNull("Failed to load echo_any", echoAny);
+
+		Object[] payload = new Object[anyEchoSize];
+		Object[] pattern = new Object[]{1L, "two", 3.0};
+		for (int i = 0; i < anyEchoSize; i++)
+		{
+			payload[i] = pattern[i % pattern.length];
+		}
+
+		final int expectedLen = anyEchoSize;
+		jsons.add(runBenchmark("any_echo", anyEchoSize, WARMUP, ITERATIONS,
+			() -> {
+				Object[] result = echoAny.call((Object) payload);
+				validateAnyEchoResult(result[0], expectedLen);
+			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
+
+	// ---- Main benchmark test ----
+
+	@Test
+	public void testAllBenchmarks() throws Throwable
+	{
+		String mode = System.getenv().getOrDefault("METAFFI_TEST_MODE", "");
+		if ("correctness".equals(mode))
+		{
+			System.err.println("Skipping benchmarks: METAFFI_TEST_MODE=correctness");
+			return;
+		}
+
+		long timerOverhead = measureTimerOverhead();
+		System.err.println("Timer overhead: " + timerOverhead + " ns");
+		Set<String> scenarioFilter = parseScenarioFilter();
+		if (scenarioFilter != null)
+		{
+			System.err.println("Scenario filter enabled: " + String.join(",", scenarioFilter));
+		}
+
+		List<String> benchmarkJsons = new ArrayList<>();
+
+		// Run each scenario (each method handles its own filter check)
+		benchVoidCall(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchPrimitiveEcho(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchStringEcho(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchArraySum(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchObjectMethod(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchErrorPropagation(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchCallback(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchAnyEcho(scenarioFilter, benchmarkJsons, timerOverhead);
+
+		if (benchmarkJsons.isEmpty())
+		{
+			fail("METAFFI_TEST_SCENARIOS selected no benchmark scenarios: " + System.getenv("METAFFI_TEST_SCENARIOS"));
+		}
+
+		// Final write
 		writeResults(benchmarkJsons, timerOverhead);
 	}
 

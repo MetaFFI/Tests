@@ -22,9 +22,10 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x62\x65nchmark.proto\x12\tbenchmark\"\x1f\n\x0fVoidCallRequest\x12\x0c\n\x04secs\x18\x01 \x01(\x03\"\x12\n\x10VoidCallResponse\"*\n\x12\x44ivIntegersRequest\x12\t\n\x01x\x18\x01 \x01(\x03\x12\t\n\x01y\x18\x02 \x01(\x03\"%\n\x13\x44ivIntegersResponse\x12\x0e\n\x06result\x18\x01 \x01(\x01\"$\n\x12JoinStringsRequest\x12\x0e\n\x06values\x18\x01 \x03(\t\"%\n\x13JoinStringsResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"!\n\x0f\x41rraySumRequest\x12\x0e\n\x06values\x18\x01 \x03(\x03\"\x1f\n\x10\x41rraySumResponse\x12\x0b\n\x03sum\x18\x01 \x01(\x03\"#\n\x13ObjectMethodRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"&\n\x14ObjectMethodResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"B\n\x11\x43\x61llbackClientMsg\x12\x10\n\x06invoke\x18\x01 \x01(\x08H\x00\x12\x14\n\nadd_result\x18\x02 \x01(\x03H\x00\x42\x05\n\x03msg\"^\n\x11\x43\x61llbackServerMsg\x12*\n\x07\x63ompute\x18\x01 \x01(\x0b\x32\x17.benchmark.CallbackArgsH\x00\x12\x16\n\x0c\x66inal_result\x18\x02 \x01(\x03H\x00\x42\x05\n\x03msg\"$\n\x0c\x43\x61llbackArgs\x12\t\n\x01\x61\x18\x01 \x01(\x03\x12\t\n\x01\x62\x18\x02 \x01(\x03\"\x07\n\x05\x45mpty2\x8e\x04\n\x10\x42\x65nchmarkService\x12\x43\n\x08VoidCall\x12\x1a.benchmark.VoidCallRequest\x1a\x1b.benchmark.VoidCallResponse\x12L\n\x0b\x44ivIntegers\x12\x1d.benchmark.DivIntegersRequest\x1a\x1e.benchmark.DivIntegersResponse\x12L\n\x0bJoinStrings\x12\x1d.benchmark.JoinStringsRequest\x1a\x1e.benchmark.JoinStringsResponse\x12\x43\n\x08\x41rraySum\x12\x1a.benchmark.ArraySumRequest\x1a\x1b.benchmark.ArraySumResponse\x12O\n\x0cObjectMethod\x12\x1e.benchmark.ObjectMethodRequest\x1a\x1f.benchmark.ObjectMethodResponse\x12M\n\x0b\x43\x61llbackAdd\x12\x1c.benchmark.CallbackClientMsg\x1a\x1c.benchmark.CallbackServerMsg(\x01\x30\x01\x12\x34\n\x0eReturnsAnError\x12\x10.benchmark.Empty\x1a\x10.benchmark.EmptyB!\n\tbenchmarkB\x0e\x42\x65nchmarkProtoZ\x04./pbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x62\x65nchmark.proto\x12\tbenchmark\x1a\x1cgoogle/protobuf/struct.proto\"\x1f\n\x0fVoidCallRequest\x12\x0c\n\x04secs\x18\x01 \x01(\x03\"\x12\n\x10VoidCallResponse\"*\n\x12\x44ivIntegersRequest\x12\t\n\x01x\x18\x01 \x01(\x03\x12\t\n\x01y\x18\x02 \x01(\x03\"%\n\x13\x44ivIntegersResponse\x12\x0e\n\x06result\x18\x01 \x01(\x01\"$\n\x12JoinStringsRequest\x12\x0e\n\x06values\x18\x01 \x03(\t\"%\n\x13JoinStringsResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"!\n\x0f\x41rraySumRequest\x12\x0e\n\x06values\x18\x01 \x03(\x03\"\x1f\n\x10\x41rraySumResponse\x12\x0b\n\x03sum\x18\x01 \x01(\x03\"#\n\x13ObjectMethodRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"&\n\x14ObjectMethodResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"B\n\x11\x43\x61llbackClientMsg\x12\x10\n\x06invoke\x18\x01 \x01(\x08H\x00\x12\x14\n\nadd_result\x18\x02 \x01(\x03H\x00\x42\x05\n\x03msg\"^\n\x11\x43\x61llbackServerMsg\x12*\n\x07\x63ompute\x18\x01 \x01(\x0b\x32\x17.benchmark.CallbackArgsH\x00\x12\x16\n\x0c\x66inal_result\x18\x02 \x01(\x03H\x00\x42\x05\n\x03msg\"$\n\x0c\x43\x61llbackArgs\x12\t\n\x01\x61\x18\x01 \x01(\x03\x12\t\n\x01\x62\x18\x02 \x01(\x03\"\x07\n\x05\x45mpty\"<\n\x0e\x41nyEchoRequest\x12*\n\x06values\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.ListValue\"=\n\x0f\x41nyEchoResponse\x12*\n\x06values\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.ListValue2\xd0\x04\n\x10\x42\x65nchmarkService\x12\x43\n\x08VoidCall\x12\x1a.benchmark.VoidCallRequest\x1a\x1b.benchmark.VoidCallResponse\x12L\n\x0b\x44ivIntegers\x12\x1d.benchmark.DivIntegersRequest\x1a\x1e.benchmark.DivIntegersResponse\x12L\n\x0bJoinStrings\x12\x1d.benchmark.JoinStringsRequest\x1a\x1e.benchmark.JoinStringsResponse\x12\x43\n\x08\x41rraySum\x12\x1a.benchmark.ArraySumRequest\x1a\x1b.benchmark.ArraySumResponse\x12O\n\x0cObjectMethod\x12\x1e.benchmark.ObjectMethodRequest\x1a\x1f.benchmark.ObjectMethodResponse\x12M\n\x0b\x43\x61llbackAdd\x12\x1c.benchmark.CallbackClientMsg\x1a\x1c.benchmark.CallbackServerMsg(\x01\x30\x01\x12\x34\n\x0eReturnsAnError\x12\x10.benchmark.Empty\x1a\x10.benchmark.Empty\x12@\n\x07\x41nyEcho\x12\x19.benchmark.AnyEchoRequest\x1a\x1a.benchmark.AnyEchoResponseB!\n\tbenchmarkB\x0e\x42\x65nchmarkProtoZ\x04./pbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,34 +33,38 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'benchmark_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n\tbenchmarkB\016BenchmarkProtoZ\004./pb'
-  _globals['_VOIDCALLREQUEST']._serialized_start=30
-  _globals['_VOIDCALLREQUEST']._serialized_end=61
-  _globals['_VOIDCALLRESPONSE']._serialized_start=63
-  _globals['_VOIDCALLRESPONSE']._serialized_end=81
-  _globals['_DIVINTEGERSREQUEST']._serialized_start=83
-  _globals['_DIVINTEGERSREQUEST']._serialized_end=125
-  _globals['_DIVINTEGERSRESPONSE']._serialized_start=127
-  _globals['_DIVINTEGERSRESPONSE']._serialized_end=164
-  _globals['_JOINSTRINGSREQUEST']._serialized_start=166
-  _globals['_JOINSTRINGSREQUEST']._serialized_end=202
-  _globals['_JOINSTRINGSRESPONSE']._serialized_start=204
-  _globals['_JOINSTRINGSRESPONSE']._serialized_end=241
-  _globals['_ARRAYSUMREQUEST']._serialized_start=243
-  _globals['_ARRAYSUMREQUEST']._serialized_end=276
-  _globals['_ARRAYSUMRESPONSE']._serialized_start=278
-  _globals['_ARRAYSUMRESPONSE']._serialized_end=309
-  _globals['_OBJECTMETHODREQUEST']._serialized_start=311
-  _globals['_OBJECTMETHODREQUEST']._serialized_end=346
-  _globals['_OBJECTMETHODRESPONSE']._serialized_start=348
-  _globals['_OBJECTMETHODRESPONSE']._serialized_end=386
-  _globals['_CALLBACKCLIENTMSG']._serialized_start=388
-  _globals['_CALLBACKCLIENTMSG']._serialized_end=454
-  _globals['_CALLBACKSERVERMSG']._serialized_start=456
-  _globals['_CALLBACKSERVERMSG']._serialized_end=550
-  _globals['_CALLBACKARGS']._serialized_start=552
-  _globals['_CALLBACKARGS']._serialized_end=588
-  _globals['_EMPTY']._serialized_start=590
-  _globals['_EMPTY']._serialized_end=597
-  _globals['_BENCHMARKSERVICE']._serialized_start=600
-  _globals['_BENCHMARKSERVICE']._serialized_end=1126
+  _globals['_VOIDCALLREQUEST']._serialized_start=60
+  _globals['_VOIDCALLREQUEST']._serialized_end=91
+  _globals['_VOIDCALLRESPONSE']._serialized_start=93
+  _globals['_VOIDCALLRESPONSE']._serialized_end=111
+  _globals['_DIVINTEGERSREQUEST']._serialized_start=113
+  _globals['_DIVINTEGERSREQUEST']._serialized_end=155
+  _globals['_DIVINTEGERSRESPONSE']._serialized_start=157
+  _globals['_DIVINTEGERSRESPONSE']._serialized_end=194
+  _globals['_JOINSTRINGSREQUEST']._serialized_start=196
+  _globals['_JOINSTRINGSREQUEST']._serialized_end=232
+  _globals['_JOINSTRINGSRESPONSE']._serialized_start=234
+  _globals['_JOINSTRINGSRESPONSE']._serialized_end=271
+  _globals['_ARRAYSUMREQUEST']._serialized_start=273
+  _globals['_ARRAYSUMREQUEST']._serialized_end=306
+  _globals['_ARRAYSUMRESPONSE']._serialized_start=308
+  _globals['_ARRAYSUMRESPONSE']._serialized_end=339
+  _globals['_OBJECTMETHODREQUEST']._serialized_start=341
+  _globals['_OBJECTMETHODREQUEST']._serialized_end=376
+  _globals['_OBJECTMETHODRESPONSE']._serialized_start=378
+  _globals['_OBJECTMETHODRESPONSE']._serialized_end=416
+  _globals['_CALLBACKCLIENTMSG']._serialized_start=418
+  _globals['_CALLBACKCLIENTMSG']._serialized_end=484
+  _globals['_CALLBACKSERVERMSG']._serialized_start=486
+  _globals['_CALLBACKSERVERMSG']._serialized_end=580
+  _globals['_CALLBACKARGS']._serialized_start=582
+  _globals['_CALLBACKARGS']._serialized_end=618
+  _globals['_EMPTY']._serialized_start=620
+  _globals['_EMPTY']._serialized_end=627
+  _globals['_ANYECHOREQUEST']._serialized_start=629
+  _globals['_ANYECHOREQUEST']._serialized_end=689
+  _globals['_ANYECHORESPONSE']._serialized_start=691
+  _globals['_ANYECHORESPONSE']._serialized_end=752
+  _globals['_BENCHMARKSERVICE']._serialized_start=755
+  _globals['_BENCHMARKSERVICE']._serialized_end=1347
 # @@protoc_insertion_point(module_scope)

@@ -4,6 +4,7 @@ benchmark\BenchmarkProto$EchoBytesRequest.class
 benchmark\BenchmarkProto$DivIntegersRequest.class
 benchmark\BenchmarkProto$CallbackArgs.class
 benchmark\BenchmarkProto$CallbackClientMsg$Builder.class
+benchmark\BenchmarkProto$AnyEchoResponseOrBuilder.class
 benchmark\BenchmarkProto$CallbackClientMsg$1.class
 benchmark\BenchmarkServiceGrpc$1.class
 benchmark\BenchmarkProto$JoinStringsRequest.class
@@ -14,6 +15,7 @@ benchmark\BenchmarkProto$ObjectMethodRequestOrBuilder.class
 benchmark\BenchmarkProto$DivIntegersRequest$Builder.class
 benchmark\BenchmarkProto$EmptyOrBuilder.class
 benchmark\BenchmarkServiceGrpc$BenchmarkServiceFileDescriptorSupplier.class
+benchmark\BenchmarkProto$AnyEchoRequestOrBuilder.class
 benchmark\BenchmarkProto$CallbackServerMsg$Builder.class
 benchmark\BenchmarkProto$CallbackServerMsg$1.class
 benchmark\BenchmarkServiceGrpc$3.class
@@ -29,8 +31,11 @@ benchmark\BenchmarkProto$DivIntegersRequestOrBuilder.class
 benchmark\BenchmarkProto$VoidCallRequest$Builder.class
 benchmark\BenchmarkServiceGrpc.class
 benchmark\BenchmarkProto$JoinStringsRequest$1.class
+benchmark\BenchmarkProto$AnyEchoRequest$1.class
+benchmark\BenchmarkProto$AnyEchoResponse$Builder.class
 benchmark\BenchmarkProto$ObjectMethodRequest$Builder.class
 benchmark\BenchmarkProto$ObjectMethodResponseOrBuilder.class
+benchmark\BenchmarkProto$AnyEchoResponse$1.class
 benchmark\BenchmarkServiceGrpc$2.class
 benchmark\BenchmarkProto$DivIntegersResponse.class
 benchmark\BenchmarkProto$DivIntegersResponse$Builder.class
@@ -45,6 +50,7 @@ benchmark\BenchmarkProto$CallbackServerMsg$MsgCase.class
 benchmark\BenchmarkProto$EchoBytesRequest$Builder.class
 benchmark\BenchmarkServiceGrpc$BenchmarkServiceImplBase.class
 benchmark\BenchmarkProto$ObjectMethodResponse$Builder.class
+benchmark\BenchmarkProto$AnyEchoRequest.class
 benchmark\BenchmarkProto$Empty$Builder.class
 benchmark\BenchmarkProto$ObjectMethodRequest.class
 benchmark\BenchmarkProto$DivIntegersResponse$1.class
@@ -54,6 +60,7 @@ benchmark\BenchmarkServiceGrpc$BenchmarkServiceBlockingStub.class
 benchmark\BenchmarkProto$EchoBytesRequestOrBuilder.class
 benchmark\BenchmarkProto$VoidCallResponse$1.class
 benchmark\BenchmarkProto$JoinStringsRequest$Builder.class
+benchmark\BenchmarkProto$AnyEchoResponse.class
 benchmark\BenchmarkProto$VoidCallResponse.class
 benchmark\BenchmarkProto$VoidCallResponseOrBuilder.class
 benchmark\BenchmarkServiceGrpc$AsyncService.class
@@ -63,6 +70,7 @@ benchmark\BenchmarkProto$JoinStringsResponseOrBuilder.class
 benchmark\BenchmarkProto$CallbackServerMsgOrBuilder.class
 benchmark\BenchmarkProto$Empty$1.class
 benchmark\BenchmarkProto$EchoBytesResponse$Builder.class
+benchmark\BenchmarkProto$AnyEchoRequest$Builder.class
 benchmark\BenchmarkProto$ObjectMethodResponse$1.class
 benchmark\BenchmarkProto$JoinStringsResponse$1.class
 benchmark\BenchmarkProto$VoidCallRequest$1.class

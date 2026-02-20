@@ -15,6 +15,7 @@ static inline int64_t callAddCallback(AddCallbackFunc cb, int64_t a, int64_t b) 
 import "C"
 
 import (
+	"encoding/json"
 	"sync"
 	"unsafe"
 
@@ -60,6 +61,11 @@ func deleteHandle(h uint64) {
 func GoWaitABit(ms C.int64_t) C.int {
 	guest.WaitABit(int64(ms))
 	return 0
+}
+
+//export GoNoOp
+func GoNoOp() {
+	guest.NoOp()
 }
 
 // ---------------------------------------------------------------------------
@@ -170,6 +176,41 @@ func GoReturnsAnError(outErrMsg **C.char) C.int {
 		return -1
 	}
 	*outErrMsg = nil
+	return 0
+}
+
+// ---------------------------------------------------------------------------
+// Scenario: dynamic any echo (JSON-encoded mixed array payload)
+// ---------------------------------------------------------------------------
+
+//export GoAnyEchoJSON
+func GoAnyEchoJSON(inJSON *C.char, outJSON **C.char) C.int {
+	if inJSON == nil {
+		return -1
+	}
+	raw := C.GoString(inJSON)
+
+	var arr []any
+	if err := json.Unmarshal([]byte(raw), &arr); err != nil {
+		return -1
+	}
+	if len(arr) == 0 {
+		return -1
+	}
+	for i, v := range arr {
+		switch i % 3 {
+		case 0, 2:
+			if _, ok := v.(float64); !ok {
+				return -1
+			}
+		case 1:
+			if _, ok := v.(string); !ok {
+				return -1
+			}
+		}
+	}
+
+	*outJSON = C.CString(raw)
 	return 0
 }
 

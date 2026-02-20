@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="BenchmarkTest" time="12.111" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="BenchmarkTest" time="13.562" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="22"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\OpenJDK\jdk-22.0.2\bin"/>
-    <property name="sun.java.command" value="C:\Users\green\AppData\Local\Temp\surefire12783086809009277613\surefirebooter-20260212090736348_3.jar C:\Users\green\AppData\Local\Temp\surefire12783086809009277613 2026-02-12T09-07-36_218-jvmRun1 surefire-20260212090736348_1tmp surefire_0-20260212090736348_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\green\AppData\Local\Temp\surefire2644044746076308249\surefirebooter-20260218204955969_3.jar C:\Users\green\AppData\Local\Temp\surefire2644044746076308249 2026-02-18T20-49-55_826-jvmRun1 surefire-20260218204955969_1tmp surefire_0-20260218204955969_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="test" value="BenchmarkTest"/>
     <property name="surefire.test.class.path" value="C:\src\github.com\MetaFFI\tests\java\without_metaffi\call_python3_jep\target\test-classes;C:\src\github.com\MetaFFI\tests\java\without_metaffi\call_python3_jep\target\classes;C:\Users\green\AppData\Local\Programs\Python\Python312\Lib\site-packages\jep\jep-4.3.1.jar;C:\Users\green\.m2\repository\junit\junit\4.13.1\junit-4.13.1.jar;C:\Users\green\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\green\AppData\Local\Programs\Python\Python312\Lib\site-packages\jep/jep-4.3.1.jar;"/>
@@ -32,7 +32,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\green\AppData\Local\Temp\surefire12783086809009277613\surefirebooter-20260212090736348_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\green\AppData\Local\Temp\surefire2644044746076308249\surefirebooter-20260218204955969_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="22.0.2+9-70"/>
@@ -60,30 +60,32 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="66.0"/>
   </properties>
-  <testcase name="testAllBenchmarks" classname="BenchmarkTest" time="2.292">
-    <system-err><![CDATA[Jep interpreter started (startup: 9765 ms)
-Timer overhead: 0 ns
+  <testcase name="testAllBenchmarks" classname="BenchmarkTest" time="3.798">
+    <system-err><![CDATA[Jep interpreter started (startup: 9690 ms)
+Timer overhead: 100 ns
   Benchmark: void_call (100 warmup + 10000 iterations)...
-  Done: void_call (mean ~5906 ns)
+  Done: void_call (mean ~8626 ns)
   Benchmark: primitive_echo (100 warmup + 10000 iterations)...
-  Done: primitive_echo (mean ~12602 ns)
+  Done: primitive_echo (mean ~18032 ns)
   Benchmark: string_echo (100 warmup + 10000 iterations)...
-  Done: string_echo (mean ~12937 ns)
+  Done: string_echo (mean ~16306 ns)
   Benchmark: array_sum[10] (100 warmup + 10000 iterations)...
-  Done: array_sum[10] (mean ~10743 ns)
+  Done: array_sum[10] (mean ~17655 ns)
   Benchmark: array_sum[100] (100 warmup + 10000 iterations)...
-  Done: array_sum[100] (mean ~12969 ns)
+  Done: array_sum[100] (mean ~18815 ns)
   Benchmark: array_sum[1000] (100 warmup + 10000 iterations)...
-  Done: array_sum[1000] (mean ~16437 ns)
+  Done: array_sum[1000] (mean ~22390 ns)
   Benchmark: array_sum[10000] (100 warmup + 10000 iterations)...
-  Done: array_sum[10000] (mean ~43152 ns)
+  Done: array_sum[10000] (mean ~54597 ns)
+  Benchmark: any_echo[100] (100 warmup + 10000 iterations)...
+  Done: any_echo[100] (mean ~63595 ns)
   Benchmark: object_method (100 warmup + 10000 iterations)...
-  Done: object_method (mean ~21577 ns)
+  Done: object_method (mean ~28932 ns)
   Benchmark: callback (100 warmup + 10000 iterations)...
-  Done: callback (mean ~11664 ns)
+  Done: callback (mean ~18809 ns)
   Benchmark: error_propagation (100 warmup + 10000 iterations)...
-  Done: error_propagation (mean ~63667 ns)
-Results written to C:\src\github.com\MetaFFI\tests\results\java_to_python3_jep.json
+  Done: error_propagation (mean ~72423 ns)
+Results written to C:\src\github.com\MetaFFI\tests\results\repeats\20260218_194414__thesis_config\run_05\java_to_python3_jep.json
 ]]></system-err>
   </testcase>
 </testsuite>

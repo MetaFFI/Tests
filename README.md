@@ -91,6 +91,7 @@ Each file contains:
 | 2 | Primitive echo (int64) | Single primitive serialization |
 | 3 | String echo | String marshaling |
 | 4 | Array sum (sizes: 10, 100, 1K, 10K) | Array serialization scaling |
+| 4b | Packed array sum (sizes: 10, 100, 1K, 10K) | Packed array (contiguous memory) scaling |
 | 5 | Object create + method call | Object/handle passing |
 | 6 | Callback invocation | Bidirectional crossing |
 | 7 | Error propagation | Error path overhead |

@@ -109,20 +109,11 @@ static const char* py_version(void) {
 }
 
 // ============================================================
-// Scenario 1: void call -- wait_a_bit(0)
+// Scenario 1: void call -- no_op()
 // ============================================================
 
 static int bench_void_call(PyObject* func) {
-	PyObject *arg = PyLong_FromLong(0);
-	if (!arg) return -1;
-
-	PyObject *args = PyTuple_Pack(1, arg);
-	Py_DECREF(arg);
-	if (!args) return -1;
-
-	PyObject *result = PyObject_CallObject(func, args);
-	Py_DECREF(args);
-
+	PyObject *result = PyObject_CallObject(func, NULL);
 	if (!result) return -1;
 	Py_DECREF(result);
 	return 0;
@@ -217,6 +208,38 @@ static int bench_array_sum(PyObject* func, int size, long expected_sum, int *mat
 	Py_DECREF(result);
 
 	if (PyErr_Occurred()) return -1;
+	return 0;
+}
+
+// ============================================================
+// Scenario: dynamic any echo -- echo_any([1,"two",3.0,...])
+// ============================================================
+
+static int bench_any_echo(PyObject* func, int size, int *match) {
+	PyObject *list = PyList_New((Py_ssize_t)size);
+	if (!list) return -1;
+
+	for (int i = 0; i < size; i++) {
+		int mod = i % 3;
+		if (mod == 0) {
+			PyList_SetItem(list, i, PyLong_FromLong(1));
+		} else if (mod == 1) {
+			PyList_SetItem(list, i, PyUnicode_FromString("two"));
+		} else {
+			PyList_SetItem(list, i, PyFloat_FromDouble(3.0));
+		}
+	}
+
+	PyObject *args = PyTuple_Pack(1, list);
+	Py_DECREF(list);
+	if (!args) return -1;
+
+	PyObject *result = PyObject_CallObject(func, args);
+	Py_DECREF(args);
+	if (!result) return -1;
+
+	*match = (PyList_Check(result) && PyList_Size(result) == size) ? 1 : 0;
+	Py_DECREF(result);
 	return 0;
 }
 
@@ -432,10 +455,10 @@ func GoGetPyError() string {
 // Benchmark scenario wrappers
 // ---------------------------------------------------------------------------
 
-// BenchVoidCall calls wait_a_bit(0).
+// BenchVoidCall calls no_op().
 func BenchVoidCall(fn pyObj) error {
 	if C.bench_void_call(fn) != 0 {
-		return fmt.Errorf("wait_a_bit(0) failed: %s", GoGetPyError())
+		return fmt.Errorf("no_op() failed: %s", GoGetPyError())
 	}
 	return nil
 }
@@ -472,6 +495,18 @@ func BenchArraySum(fn pyObj, size int, expectedSum int64) error {
 	}
 	if match == 0 {
 		return fmt.Errorf("accepts_ragged_array(size=%d): sum mismatch (want %d)", size, expectedSum)
+	}
+	return nil
+}
+
+// BenchAnyEcho calls echo_any([1,"two",3.0,...]) and validates result length.
+func BenchAnyEcho(fn pyObj, size int) error {
+	var match C.int
+	if C.bench_any_echo(fn, C.int(size), &match) != 0 {
+		return fmt.Errorf("echo_any(size=%d) failed: %s", size, GoGetPyError())
+	}
+	if match == 0 {
+		return fmt.Errorf("echo_any(size=%d): result mismatch", size)
 	}
 	return nil
 }

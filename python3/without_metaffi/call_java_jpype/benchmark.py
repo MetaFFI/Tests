@@ -22,6 +22,24 @@ import jpype.imports
 WARMUP = int(os.environ.get("METAFFI_TEST_WARMUP", "100"))
 ITERATIONS = int(os.environ.get("METAFFI_TEST_ITERATIONS", "10000"))
 
+
+def _parse_scenario_filter() -> set[str] | None:
+    raw = os.environ.get("METAFFI_TEST_SCENARIOS", "").strip()
+    if not raw:
+        return None
+    items = {part.strip() for part in raw.split(",") if part.strip()}
+    return items or None
+
+
+def _scenario_key(name: str, data_size: int | None) -> str:
+    return f"{name}_{data_size}" if data_size is not None else name
+
+
+def _should_run(filter_set: set[str] | None, name: str, data_size: int | None) -> bool:
+    if not filter_set:
+        return True
+    return _scenario_key(name, data_size) in filter_set
+
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 METAFFI_SOURCE_ROOT = os.environ.get("METAFFI_SOURCE_ROOT")
@@ -206,19 +224,32 @@ def main():
     # Import Java classes
     from guest import CoreFunctions, ArrayFunctions, SomeClass
     from java.util.function import IntBinaryOperator
+    from java.lang import Object as JObject
+    from java.lang import Integer as JInteger
+    from java.lang import Double as JDouble
+    from java.lang import String as JString
 
     timer_overhead = measure_timer_overhead()
     print(f"Timer overhead: {timer_overhead} ns", file=sys.stderr)
 
     benchmarks = []
+    scenario_filter = _parse_scenario_filter()
+    selected_count = 0
+    if scenario_filter:
+        print(
+            "Scenario filter enabled: " + os.environ.get("METAFFI_TEST_SCENARIOS", ""),
+            file=sys.stderr,
+        )
 
     # --- Scenario 1: Void call ---
     def bench_void():
-        CoreFunctions.waitABit(0)
+        CoreFunctions.noOp()
 
-    benchmarks.append(run_benchmark(
-        "void_call", None, WARMUP, ITERATIONS, bench_void
-    ))
+    if _should_run(scenario_filter, "void_call", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "void_call", None, WARMUP, ITERATIONS, bench_void
+        ))
 
     # --- Scenario 2: Primitive echo (long, long -> double) ---
     def bench_primitive():
@@ -226,9 +257,11 @@ def main():
         if abs(float(result) - 5.0) > 1e-10:
             raise RuntimeError(f"divIntegers(10,2) = {result}, want 5.0")
 
-    benchmarks.append(run_benchmark(
-        "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
-    ))
+    if _should_run(scenario_filter, "primitive_echo", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
+        ))
 
     # --- Scenario 3: String echo ---
     def bench_string():
@@ -236,13 +269,18 @@ def main():
         if str(result) != "hello,world":
             raise RuntimeError(f"joinStrings = {result!r}")
 
-    benchmarks.append(run_benchmark(
-        "string_echo", None, WARMUP, ITERATIONS, bench_string
-    ))
+    if _should_run(scenario_filter, "string_echo", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "string_echo", None, WARMUP, ITERATIONS, bench_string
+        ))
 
     # --- Scenario 4: Array sum (varying sizes) ---
     JInt = jpype.JInt
     for size in [10, 100, 1000, 10000]:
+        if not _should_run(scenario_filter, "array_sum", size):
+            continue
+        selected_count += 1
         # Build a Java int[][] with a single row [1..size]
         row = jpype.JArray(JInt)(list(range(1, size + 1)))
         arr = jpype.JArray(jpype.JArray(JInt))([row])
@@ -259,6 +297,26 @@ def main():
             "array_sum", size, WARMUP, ITERATIONS, bench_array
         ))
 
+    # --- Scenario: dynamic any echo (mixed array payload) ---
+    any_echo_size = 100
+    if _should_run(scenario_filter, "any_echo", any_echo_size):
+        selected_count += 1
+        payload = jpype.JArray(JObject)(any_echo_size)
+        pattern = [JInteger(1), JString("two"), JDouble(3.0)]
+        for i in range(any_echo_size):
+            payload[i] = pattern[i % len(pattern)]
+
+        def bench_any_echo(data=payload, expected_len=any_echo_size):
+            result = CoreFunctions.echoAny(data)
+            if result is None:
+                raise RuntimeError("echoAny: got null return")
+            if len(result) != expected_len:
+                raise RuntimeError(f"echoAny: got len {len(result)}, want {expected_len}")
+
+        benchmarks.append(run_benchmark(
+            "any_echo", any_echo_size, WARMUP, ITERATIONS, bench_any_echo
+        ))
+
     # --- Scenario 5: Object create + method call ---
     def bench_object():
         obj = SomeClass("bench")
@@ -266,9 +324,11 @@ def main():
         if result != "Hello from SomeClass bench":
             raise RuntimeError(f"print() = {result!r}")
 
-    benchmarks.append(run_benchmark(
-        "object_method", None, WARMUP, ITERATIONS, bench_object
-    ))
+    if _should_run(scenario_filter, "object_method", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "object_method", None, WARMUP, ITERATIONS, bench_object
+        ))
 
     # --- Scenario 6: Callback invocation ---
     # Create a JPype proxy for IntBinaryOperator
@@ -285,9 +345,11 @@ def main():
         if result != 3:
             raise RuntimeError(f"callCallbackAdd: got {result}, want 3")
 
-    benchmarks.append(run_benchmark(
-        "callback", None, WARMUP, ITERATIONS, bench_callback
-    ))
+    if _should_run(scenario_filter, "callback", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "callback", None, WARMUP, ITERATIONS, bench_callback
+        ))
 
     # --- Scenario 7: Error propagation ---
     def bench_error():
@@ -297,9 +359,17 @@ def main():
         except jpype.JException:
             pass
 
-    benchmarks.append(run_benchmark(
-        "error_propagation", None, WARMUP, ITERATIONS, bench_error
-    ))
+    if _should_run(scenario_filter, "error_propagation", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "error_propagation", None, WARMUP, ITERATIONS, bench_error
+        ))
+
+    if scenario_filter and selected_count == 0:
+        raise RuntimeError(
+            "METAFFI_TEST_SCENARIOS selected no benchmark scenarios: "
+            + os.environ.get("METAFFI_TEST_SCENARIOS", "")
+        )
 
     # --- Write results ---
     write_results(benchmarks, timer_overhead, init_ns)

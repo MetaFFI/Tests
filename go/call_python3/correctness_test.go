@@ -79,16 +79,30 @@ func tiArray(t IDL.MetaFFIType, dims int) IDL.MetaFFITypeInfo {
 }
 
 // load loads an entity; fatals immediately on error (fail-fast).
+// LoadWithInfo now returns specialized function types. This wrapper normalizes
+// them to the generic signature for backward-compatible test callsites.
 func load(t *testing.T, mod *api.MetaFFIModule, entityPath string, params []IDL.MetaFFITypeInfo, retvals []IDL.MetaFFITypeInfo) func(...interface{}) ([]interface{}, error) {
 	t.Helper()
-	ff, err := mod.LoadWithInfo(entityPath, params, retvals)
+	raw, err := mod.LoadWithInfo(entityPath, params, retvals)
 	if err != nil {
 		t.Fatalf("load %q: %v", entityPath, err)
 	}
-	if ff == nil {
+	if raw == nil {
 		t.Fatalf("load %q: returned nil function", entityPath)
 	}
-	return ff
+	switch f := raw.(type) {
+	case func() error:
+		return func(_ ...interface{}) ([]interface{}, error) { return nil, f() }
+	case func() ([]interface{}, error):
+		return func(_ ...interface{}) ([]interface{}, error) { return f() }
+	case func(...interface{}) error:
+		return func(args ...interface{}) ([]interface{}, error) { return nil, f(args...) }
+	case func(...interface{}) ([]interface{}, error):
+		return f
+	default:
+		t.Fatalf("load %q: unexpected function type %T", entityPath, raw)
+		return nil
+	}
 }
 
 // call invokes ff and fatals on error (fail-fast).
@@ -544,6 +558,81 @@ func TestReturnsBytes(t *testing.T) {
 	for i, v := range want {
 		if arr[i] != v {
 			t.Fatalf("returns_bytes_buffer[%d]: got %d, want %d", i, arr[i], v)
+		}
+	}
+}
+
+// ==========================================================================
+// Packed Arrays (1D primitive arrays via packed CDT path)
+// ==========================================================================
+
+func TestPackedArraySum1dInt(t *testing.T) {
+	ff := load(t, moduleDir, "callable=sum_1d_int_array",
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.INT64_PACKED_ARRAY, 1)},
+		[]IDL.MetaFFITypeInfo{ti(IDL.INT64)})
+	arr := []int64{1, 2, 3, 4, 5}
+	ret := call(t, "sum_1d_int_array", ff, arr)
+	if v, ok := ret[0].(int64); !ok || v != 15 {
+		t.Fatalf("sum_1d_int_array: got %v (%T), want 15", ret[0], ret[0])
+	}
+}
+
+func TestPackedArrayEcho1dInt(t *testing.T) {
+	ff := load(t, moduleDir, "callable=echo_1d_int_array",
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.INT64_PACKED_ARRAY, 1)},
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.INT64_PACKED_ARRAY, 1)})
+	arr := []int64{100, 200, 300}
+	ret := call(t, "echo_1d_int_array", ff, arr)
+	result, ok := ret[0].([]int64)
+	if !ok {
+		t.Fatalf("echo_1d_int_array: unexpected type %T", ret[0])
+	}
+	want := []int64{100, 200, 300}
+	if len(result) != len(want) {
+		t.Fatalf("echo_1d_int_array: len=%d, want %d", len(result), len(want))
+	}
+	for i, v := range want {
+		if result[i] != v {
+			t.Fatalf("echo_1d_int_array[%d]: got %d, want %d", i, result[i], v)
+		}
+	}
+}
+
+func TestPackedArrayEcho1dFloat(t *testing.T) {
+	ff := load(t, moduleDir, "callable=echo_1d_float_array",
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.FLOAT64_PACKED_ARRAY, 1)},
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.FLOAT64_PACKED_ARRAY, 1)})
+	arr := []float64{1.5, 2.5, 3.5}
+	ret := call(t, "echo_1d_float_array", ff, arr)
+	result, ok := ret[0].([]float64)
+	if !ok {
+		t.Fatalf("echo_1d_float_array: unexpected type %T", ret[0])
+	}
+	if len(result) != 3 {
+		t.Fatalf("echo_1d_float_array: len=%d, want 3", len(result))
+	}
+	for i, v := range arr {
+		if result[i] != v {
+			t.Fatalf("echo_1d_float_array[%d]: got %f, want %f", i, result[i], v)
+		}
+	}
+}
+
+func TestPackedArrayMake1dInt(t *testing.T) {
+	ff := load(t, moduleDir, "callable=make_1d_int_array", nil,
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.INT64_PACKED_ARRAY, 1)})
+	ret := call(t, "make_1d_int_array", ff)
+	result, ok := ret[0].([]int64)
+	if !ok {
+		t.Fatalf("make_1d_int_array: unexpected type %T", ret[0])
+	}
+	want := []int64{10, 20, 30, 40, 50}
+	if len(result) != len(want) {
+		t.Fatalf("make_1d_int_array: len=%d, want %d", len(result), len(want))
+	}
+	for i, v := range want {
+		if result[i] != v {
+			t.Fatalf("make_1d_int_array[%d]: got %d, want %d", i, result[i], v)
 		}
 	}
 }

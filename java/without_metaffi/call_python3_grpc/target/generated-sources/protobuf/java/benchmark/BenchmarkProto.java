@@ -7761,6 +7761,1238 @@ public final class BenchmarkProto {
 
   }
 
+  public interface AnyEchoRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:benchmark.AnyEchoRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     * @return Whether the values field is set.
+     */
+    boolean hasValues();
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     * @return The values.
+     */
+    com.google.protobuf.ListValue getValues();
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     */
+    com.google.protobuf.ListValueOrBuilder getValuesOrBuilder();
+  }
+  /**
+   * <pre>
+   * --- Dynamic Any echo ---
+   * </pre>
+   *
+   * Protobuf type {@code benchmark.AnyEchoRequest}
+   */
+  public static final class AnyEchoRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:benchmark.AnyEchoRequest)
+      AnyEchoRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use AnyEchoRequest.newBuilder() to construct.
+    private AnyEchoRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private AnyEchoRequest() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new AnyEchoRequest();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              benchmark.BenchmarkProto.AnyEchoRequest.class, benchmark.BenchmarkProto.AnyEchoRequest.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int VALUES_FIELD_NUMBER = 1;
+    private com.google.protobuf.ListValue values_;
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     * @return Whether the values field is set.
+     */
+    @java.lang.Override
+    public boolean hasValues() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     * @return The values.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ListValue getValues() {
+      return values_ == null ? com.google.protobuf.ListValue.getDefaultInstance() : values_;
+    }
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     */
+    @java.lang.Override
+    public com.google.protobuf.ListValueOrBuilder getValuesOrBuilder() {
+      return values_ == null ? com.google.protobuf.ListValue.getDefaultInstance() : values_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(1, getValues());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getValues());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof benchmark.BenchmarkProto.AnyEchoRequest)) {
+        return super.equals(obj);
+      }
+      benchmark.BenchmarkProto.AnyEchoRequest other = (benchmark.BenchmarkProto.AnyEchoRequest) obj;
+
+      if (hasValues() != other.hasValues()) return false;
+      if (hasValues()) {
+        if (!getValues()
+            .equals(other.getValues())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasValues()) {
+        hash = (37 * hash) + VALUES_FIELD_NUMBER;
+        hash = (53 * hash) + getValues().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(benchmark.BenchmarkProto.AnyEchoRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * --- Dynamic Any echo ---
+     * </pre>
+     *
+     * Protobuf type {@code benchmark.AnyEchoRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:benchmark.AnyEchoRequest)
+        benchmark.BenchmarkProto.AnyEchoRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                benchmark.BenchmarkProto.AnyEchoRequest.class, benchmark.BenchmarkProto.AnyEchoRequest.Builder.class);
+      }
+
+      // Construct using benchmark.BenchmarkProto.AnyEchoRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getValuesFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        values_ = null;
+        if (valuesBuilder_ != null) {
+          valuesBuilder_.dispose();
+          valuesBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public benchmark.BenchmarkProto.AnyEchoRequest getDefaultInstanceForType() {
+        return benchmark.BenchmarkProto.AnyEchoRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public benchmark.BenchmarkProto.AnyEchoRequest build() {
+        benchmark.BenchmarkProto.AnyEchoRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public benchmark.BenchmarkProto.AnyEchoRequest buildPartial() {
+        benchmark.BenchmarkProto.AnyEchoRequest result = new benchmark.BenchmarkProto.AnyEchoRequest(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(benchmark.BenchmarkProto.AnyEchoRequest result) {
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.values_ = valuesBuilder_ == null
+              ? values_
+              : valuesBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof benchmark.BenchmarkProto.AnyEchoRequest) {
+          return mergeFrom((benchmark.BenchmarkProto.AnyEchoRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(benchmark.BenchmarkProto.AnyEchoRequest other) {
+        if (other == benchmark.BenchmarkProto.AnyEchoRequest.getDefaultInstance()) return this;
+        if (other.hasValues()) {
+          mergeValues(other.getValues());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                input.readMessage(
+                    getValuesFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.ListValue values_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.ListValue, com.google.protobuf.ListValue.Builder, com.google.protobuf.ListValueOrBuilder> valuesBuilder_;
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       * @return Whether the values field is set.
+       */
+      public boolean hasValues() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       * @return The values.
+       */
+      public com.google.protobuf.ListValue getValues() {
+        if (valuesBuilder_ == null) {
+          return values_ == null ? com.google.protobuf.ListValue.getDefaultInstance() : values_;
+        } else {
+          return valuesBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public Builder setValues(com.google.protobuf.ListValue value) {
+        if (valuesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          values_ = value;
+        } else {
+          valuesBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public Builder setValues(
+          com.google.protobuf.ListValue.Builder builderForValue) {
+        if (valuesBuilder_ == null) {
+          values_ = builderForValue.build();
+        } else {
+          valuesBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public Builder mergeValues(com.google.protobuf.ListValue value) {
+        if (valuesBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0) &&
+            values_ != null &&
+            values_ != com.google.protobuf.ListValue.getDefaultInstance()) {
+            getValuesBuilder().mergeFrom(value);
+          } else {
+            values_ = value;
+          }
+        } else {
+          valuesBuilder_.mergeFrom(value);
+        }
+        if (values_ != null) {
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public Builder clearValues() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        values_ = null;
+        if (valuesBuilder_ != null) {
+          valuesBuilder_.dispose();
+          valuesBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public com.google.protobuf.ListValue.Builder getValuesBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getValuesFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public com.google.protobuf.ListValueOrBuilder getValuesOrBuilder() {
+        if (valuesBuilder_ != null) {
+          return valuesBuilder_.getMessageOrBuilder();
+        } else {
+          return values_ == null ?
+              com.google.protobuf.ListValue.getDefaultInstance() : values_;
+        }
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.ListValue, com.google.protobuf.ListValue.Builder, com.google.protobuf.ListValueOrBuilder> 
+          getValuesFieldBuilder() {
+        if (valuesBuilder_ == null) {
+          valuesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.ListValue, com.google.protobuf.ListValue.Builder, com.google.protobuf.ListValueOrBuilder>(
+                  getValues(),
+                  getParentForChildren(),
+                  isClean());
+          values_ = null;
+        }
+        return valuesBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:benchmark.AnyEchoRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:benchmark.AnyEchoRequest)
+    private static final benchmark.BenchmarkProto.AnyEchoRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new benchmark.BenchmarkProto.AnyEchoRequest();
+    }
+
+    public static benchmark.BenchmarkProto.AnyEchoRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<AnyEchoRequest>
+        PARSER = new com.google.protobuf.AbstractParser<AnyEchoRequest>() {
+      @java.lang.Override
+      public AnyEchoRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<AnyEchoRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<AnyEchoRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public benchmark.BenchmarkProto.AnyEchoRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface AnyEchoResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:benchmark.AnyEchoResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     * @return Whether the values field is set.
+     */
+    boolean hasValues();
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     * @return The values.
+     */
+    com.google.protobuf.ListValue getValues();
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     */
+    com.google.protobuf.ListValueOrBuilder getValuesOrBuilder();
+  }
+  /**
+   * Protobuf type {@code benchmark.AnyEchoResponse}
+   */
+  public static final class AnyEchoResponse extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:benchmark.AnyEchoResponse)
+      AnyEchoResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use AnyEchoResponse.newBuilder() to construct.
+    private AnyEchoResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private AnyEchoResponse() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new AnyEchoResponse();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoResponse_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              benchmark.BenchmarkProto.AnyEchoResponse.class, benchmark.BenchmarkProto.AnyEchoResponse.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int VALUES_FIELD_NUMBER = 1;
+    private com.google.protobuf.ListValue values_;
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     * @return Whether the values field is set.
+     */
+    @java.lang.Override
+    public boolean hasValues() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     * @return The values.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ListValue getValues() {
+      return values_ == null ? com.google.protobuf.ListValue.getDefaultInstance() : values_;
+    }
+    /**
+     * <code>.google.protobuf.ListValue values = 1;</code>
+     */
+    @java.lang.Override
+    public com.google.protobuf.ListValueOrBuilder getValuesOrBuilder() {
+      return values_ == null ? com.google.protobuf.ListValue.getDefaultInstance() : values_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(1, getValues());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getValues());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof benchmark.BenchmarkProto.AnyEchoResponse)) {
+        return super.equals(obj);
+      }
+      benchmark.BenchmarkProto.AnyEchoResponse other = (benchmark.BenchmarkProto.AnyEchoResponse) obj;
+
+      if (hasValues() != other.hasValues()) return false;
+      if (hasValues()) {
+        if (!getValues()
+            .equals(other.getValues())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasValues()) {
+        hash = (37 * hash) + VALUES_FIELD_NUMBER;
+        hash = (53 * hash) + getValues().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static benchmark.BenchmarkProto.AnyEchoResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(benchmark.BenchmarkProto.AnyEchoResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code benchmark.AnyEchoResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:benchmark.AnyEchoResponse)
+        benchmark.BenchmarkProto.AnyEchoResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoResponse_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                benchmark.BenchmarkProto.AnyEchoResponse.class, benchmark.BenchmarkProto.AnyEchoResponse.Builder.class);
+      }
+
+      // Construct using benchmark.BenchmarkProto.AnyEchoResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getValuesFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        values_ = null;
+        if (valuesBuilder_ != null) {
+          valuesBuilder_.dispose();
+          valuesBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return benchmark.BenchmarkProto.internal_static_benchmark_AnyEchoResponse_descriptor;
+      }
+
+      @java.lang.Override
+      public benchmark.BenchmarkProto.AnyEchoResponse getDefaultInstanceForType() {
+        return benchmark.BenchmarkProto.AnyEchoResponse.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public benchmark.BenchmarkProto.AnyEchoResponse build() {
+        benchmark.BenchmarkProto.AnyEchoResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public benchmark.BenchmarkProto.AnyEchoResponse buildPartial() {
+        benchmark.BenchmarkProto.AnyEchoResponse result = new benchmark.BenchmarkProto.AnyEchoResponse(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(benchmark.BenchmarkProto.AnyEchoResponse result) {
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.values_ = valuesBuilder_ == null
+              ? values_
+              : valuesBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof benchmark.BenchmarkProto.AnyEchoResponse) {
+          return mergeFrom((benchmark.BenchmarkProto.AnyEchoResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(benchmark.BenchmarkProto.AnyEchoResponse other) {
+        if (other == benchmark.BenchmarkProto.AnyEchoResponse.getDefaultInstance()) return this;
+        if (other.hasValues()) {
+          mergeValues(other.getValues());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                input.readMessage(
+                    getValuesFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.ListValue values_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.ListValue, com.google.protobuf.ListValue.Builder, com.google.protobuf.ListValueOrBuilder> valuesBuilder_;
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       * @return Whether the values field is set.
+       */
+      public boolean hasValues() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       * @return The values.
+       */
+      public com.google.protobuf.ListValue getValues() {
+        if (valuesBuilder_ == null) {
+          return values_ == null ? com.google.protobuf.ListValue.getDefaultInstance() : values_;
+        } else {
+          return valuesBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public Builder setValues(com.google.protobuf.ListValue value) {
+        if (valuesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          values_ = value;
+        } else {
+          valuesBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public Builder setValues(
+          com.google.protobuf.ListValue.Builder builderForValue) {
+        if (valuesBuilder_ == null) {
+          values_ = builderForValue.build();
+        } else {
+          valuesBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public Builder mergeValues(com.google.protobuf.ListValue value) {
+        if (valuesBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0) &&
+            values_ != null &&
+            values_ != com.google.protobuf.ListValue.getDefaultInstance()) {
+            getValuesBuilder().mergeFrom(value);
+          } else {
+            values_ = value;
+          }
+        } else {
+          valuesBuilder_.mergeFrom(value);
+        }
+        if (values_ != null) {
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public Builder clearValues() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        values_ = null;
+        if (valuesBuilder_ != null) {
+          valuesBuilder_.dispose();
+          valuesBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public com.google.protobuf.ListValue.Builder getValuesBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getValuesFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      public com.google.protobuf.ListValueOrBuilder getValuesOrBuilder() {
+        if (valuesBuilder_ != null) {
+          return valuesBuilder_.getMessageOrBuilder();
+        } else {
+          return values_ == null ?
+              com.google.protobuf.ListValue.getDefaultInstance() : values_;
+        }
+      }
+      /**
+       * <code>.google.protobuf.ListValue values = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.ListValue, com.google.protobuf.ListValue.Builder, com.google.protobuf.ListValueOrBuilder> 
+          getValuesFieldBuilder() {
+        if (valuesBuilder_ == null) {
+          valuesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.ListValue, com.google.protobuf.ListValue.Builder, com.google.protobuf.ListValueOrBuilder>(
+                  getValues(),
+                  getParentForChildren(),
+                  isClean());
+          values_ = null;
+        }
+        return valuesBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:benchmark.AnyEchoResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:benchmark.AnyEchoResponse)
+    private static final benchmark.BenchmarkProto.AnyEchoResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new benchmark.BenchmarkProto.AnyEchoResponse();
+    }
+
+    public static benchmark.BenchmarkProto.AnyEchoResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<AnyEchoResponse>
+        PARSER = new com.google.protobuf.AbstractParser<AnyEchoResponse>() {
+      @java.lang.Override
+      public AnyEchoResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<AnyEchoResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<AnyEchoResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public benchmark.BenchmarkProto.AnyEchoResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_benchmark_VoidCallRequest_descriptor;
   private static final 
@@ -7831,6 +9063,16 @@ public final class BenchmarkProto {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_benchmark_Empty_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_benchmark_AnyEchoRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_benchmark_AnyEchoRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_benchmark_AnyEchoResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_benchmark_AnyEchoResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -7840,40 +9082,46 @@ public final class BenchmarkProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017benchmark.proto\022\tbenchmark\"\037\n\017VoidCall" +
-      "Request\022\014\n\004secs\030\001 \001(\003\"\022\n\020VoidCallRespons" +
-      "e\"*\n\022DivIntegersRequest\022\t\n\001x\030\001 \001(\003\022\t\n\001y\030" +
-      "\002 \001(\003\"%\n\023DivIntegersResponse\022\016\n\006result\030\001" +
-      " \001(\001\"$\n\022JoinStringsRequest\022\016\n\006values\030\001 \003" +
-      "(\t\"%\n\023JoinStringsResponse\022\016\n\006result\030\001 \001(" +
-      "\t\"!\n\017ArraySumRequest\022\016\n\006values\030\001 \003(\003\"\037\n\020" +
-      "ArraySumResponse\022\013\n\003sum\030\001 \001(\003\"#\n\023ObjectM" +
-      "ethodRequest\022\014\n\004name\030\001 \001(\t\"&\n\024ObjectMeth" +
-      "odResponse\022\016\n\006result\030\001 \001(\t\"B\n\021CallbackCl" +
-      "ientMsg\022\020\n\006invoke\030\001 \001(\010H\000\022\024\n\nadd_result\030" +
-      "\002 \001(\003H\000B\005\n\003msg\"^\n\021CallbackServerMsg\022*\n\007c" +
-      "ompute\030\001 \001(\0132\027.benchmark.CallbackArgsH\000\022" +
-      "\026\n\014final_result\030\002 \001(\003H\000B\005\n\003msg\"$\n\014Callba" +
-      "ckArgs\022\t\n\001a\030\001 \001(\003\022\t\n\001b\030\002 \001(\003\"\007\n\005Empty2\216\004" +
-      "\n\020BenchmarkService\022C\n\010VoidCall\022\032.benchma" +
-      "rk.VoidCallRequest\032\033.benchmark.VoidCallR" +
-      "esponse\022L\n\013DivIntegers\022\035.benchmark.DivIn" +
-      "tegersRequest\032\036.benchmark.DivIntegersRes" +
-      "ponse\022L\n\013JoinStrings\022\035.benchmark.JoinStr" +
-      "ingsRequest\032\036.benchmark.JoinStringsRespo" +
-      "nse\022C\n\010ArraySum\022\032.benchmark.ArraySumRequ" +
-      "est\032\033.benchmark.ArraySumResponse\022O\n\014Obje" +
-      "ctMethod\022\036.benchmark.ObjectMethodRequest" +
-      "\032\037.benchmark.ObjectMethodResponse\022M\n\013Cal" +
-      "lbackAdd\022\034.benchmark.CallbackClientMsg\032\034" +
-      ".benchmark.CallbackServerMsg(\0010\001\0224\n\016Retu" +
-      "rnsAnError\022\020.benchmark.Empty\032\020.benchmark" +
-      ".EmptyB!\n\tbenchmarkB\016BenchmarkProtoZ\004./p" +
-      "bb\006proto3"
+      "\n\017benchmark.proto\022\tbenchmark\032\034google/pro" +
+      "tobuf/struct.proto\"\037\n\017VoidCallRequest\022\014\n" +
+      "\004secs\030\001 \001(\003\"\022\n\020VoidCallResponse\"*\n\022DivIn" +
+      "tegersRequest\022\t\n\001x\030\001 \001(\003\022\t\n\001y\030\002 \001(\003\"%\n\023D" +
+      "ivIntegersResponse\022\016\n\006result\030\001 \001(\001\"$\n\022Jo" +
+      "inStringsRequest\022\016\n\006values\030\001 \003(\t\"%\n\023Join" +
+      "StringsResponse\022\016\n\006result\030\001 \001(\t\"!\n\017Array" +
+      "SumRequest\022\016\n\006values\030\001 \003(\003\"\037\n\020ArraySumRe" +
+      "sponse\022\013\n\003sum\030\001 \001(\003\"#\n\023ObjectMethodReque" +
+      "st\022\014\n\004name\030\001 \001(\t\"&\n\024ObjectMethodResponse" +
+      "\022\016\n\006result\030\001 \001(\t\"B\n\021CallbackClientMsg\022\020\n" +
+      "\006invoke\030\001 \001(\010H\000\022\024\n\nadd_result\030\002 \001(\003H\000B\005\n" +
+      "\003msg\"^\n\021CallbackServerMsg\022*\n\007compute\030\001 \001" +
+      "(\0132\027.benchmark.CallbackArgsH\000\022\026\n\014final_r" +
+      "esult\030\002 \001(\003H\000B\005\n\003msg\"$\n\014CallbackArgs\022\t\n\001" +
+      "a\030\001 \001(\003\022\t\n\001b\030\002 \001(\003\"\007\n\005Empty\"<\n\016AnyEchoRe" +
+      "quest\022*\n\006values\030\001 \001(\0132\032.google.protobuf." +
+      "ListValue\"=\n\017AnyEchoResponse\022*\n\006values\030\001" +
+      " \001(\0132\032.google.protobuf.ListValue2\320\004\n\020Ben" +
+      "chmarkService\022C\n\010VoidCall\022\032.benchmark.Vo" +
+      "idCallRequest\032\033.benchmark.VoidCallRespon" +
+      "se\022L\n\013DivIntegers\022\035.benchmark.DivInteger" +
+      "sRequest\032\036.benchmark.DivIntegersResponse" +
+      "\022L\n\013JoinStrings\022\035.benchmark.JoinStringsR" +
+      "equest\032\036.benchmark.JoinStringsResponse\022C" +
+      "\n\010ArraySum\022\032.benchmark.ArraySumRequest\032\033" +
+      ".benchmark.ArraySumResponse\022O\n\014ObjectMet" +
+      "hod\022\036.benchmark.ObjectMethodRequest\032\037.be" +
+      "nchmark.ObjectMethodResponse\022M\n\013Callback" +
+      "Add\022\034.benchmark.CallbackClientMsg\032\034.benc" +
+      "hmark.CallbackServerMsg(\0010\001\0224\n\016ReturnsAn" +
+      "Error\022\020.benchmark.Empty\032\020.benchmark.Empt" +
+      "y\022@\n\007AnyEcho\022\031.benchmark.AnyEchoRequest\032" +
+      "\032.benchmark.AnyEchoResponseB!\n\tbenchmark" +
+      "B\016BenchmarkProtoZ\004./pbb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.StructProto.getDescriptor(),
         });
     internal_static_benchmark_VoidCallRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -7959,6 +9207,19 @@ public final class BenchmarkProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_benchmark_Empty_descriptor,
         new java.lang.String[] { });
+    internal_static_benchmark_AnyEchoRequest_descriptor =
+      getDescriptor().getMessageTypes().get(14);
+    internal_static_benchmark_AnyEchoRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_benchmark_AnyEchoRequest_descriptor,
+        new java.lang.String[] { "Values", });
+    internal_static_benchmark_AnyEchoResponse_descriptor =
+      getDescriptor().getMessageTypes().get(15);
+    internal_static_benchmark_AnyEchoResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_benchmark_AnyEchoResponse_descriptor,
+        new java.lang.String[] { "Values", });
+    com.google.protobuf.StructProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -375,7 +375,6 @@ class TestArrays:
         assert result == 21, f"sumRaggedArray = {result}, want 21"
         del fn
 
-    @_XFAIL_3D_ARRAY_INVOKE
     def test_sum_3d_array(self, java_module):
         fn = java_module.load_entity(
             "class=guest.ArrayFunctions,callable=sum3dArray",
@@ -420,7 +419,6 @@ class TestArrays:
 
 class TestPrimitives:
 
-    @_XFAIL_CHAR16
     def test_to_upper(self, java_module):
         fn = java_module.load_entity(
             "class=guest.PrimitiveFunctions,callable=toUpper",
@@ -546,4 +544,52 @@ class TestSubModule:
             [ti(T.metaffi_string8_type)])
         result = fn("test_input")
         assert result == "test_input", f"echo('test_input') = {result!r}"
+        del fn
+
+
+# ============================================================================
+# Packed array correctness (packed CDT path)
+# ============================================================================
+
+class TestPackedArrays:
+
+    def test_packed_array_sum_int1d(self, java_module):
+        """sumInt1dArray via packed int32 array."""
+        fn = java_module.load_entity(
+            "class=guest.ArrayFunctions,callable=sumInt1dArray",
+            [ti(T.metaffi_int32_packed_array_type, dims=1)],
+            [ti(T.metaffi_int32_type)])
+        result = fn([1, 2, 3, 4, 5])
+        assert result == 15, f"sumInt1dArray: got {result}, want 15"
+        del fn
+
+    def test_packed_array_echo_long1d(self, java_module):
+        """echoLong1dArray via packed int64 array."""
+        fn = java_module.load_entity(
+            "class=guest.ArrayFunctions,callable=echoLong1dArray",
+            [ti(T.metaffi_int64_packed_array_type, dims=1)],
+            [ti(T.metaffi_int64_packed_array_type, dims=1)])
+        result = fn([100, 200, 300])
+        assert list(result) == [100, 200, 300], f"echoLong1dArray: got {result}"
+        del fn
+
+    def test_packed_array_echo_double1d(self, java_module):
+        """echoDouble1dArray via packed float64 array."""
+        fn = java_module.load_entity(
+            "class=guest.ArrayFunctions,callable=echoDouble1dArray",
+            [ti(T.metaffi_float64_packed_array_type, dims=1)],
+            [ti(T.metaffi_float64_packed_array_type, dims=1)])
+        result = fn([1.5, 2.5, 3.5])
+        assert all(abs(a - b) < 1e-10 for a, b in zip(result, [1.5, 2.5, 3.5])), \
+            f"echoDouble1dArray: got {result}"
+        del fn
+
+    def test_packed_array_make_int1d(self, java_module):
+        """makeInt1dArray returns packed int32 array."""
+        fn = java_module.load_entity(
+            "class=guest.ArrayFunctions,callable=makeInt1dArray",
+            None,
+            [ti(T.metaffi_int32_packed_array_type, dims=1)])
+        result = fn()
+        assert list(result) == [10, 20, 30, 40, 50], f"makeInt1dArray: got {result}"
         del fn

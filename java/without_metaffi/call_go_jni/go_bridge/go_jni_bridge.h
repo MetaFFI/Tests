@@ -12,6 +12,8 @@
 
 #ifndef GO_CGO_GOSTRING_TYPEDEF
 typedef struct { const char *p; ptrdiff_t n; } _GoString_;
+extern size_t _GoStringLen(_GoString_ s);
+extern const char *_GoStringPtr(_GoString_ s);
 #endif
 
 #endif
@@ -58,9 +60,15 @@ typedef size_t GoUintptr;
 typedef float GoFloat32;
 typedef double GoFloat64;
 #ifdef _MSC_VER
+#if !defined(__cplusplus) || _MSVC_LANG <= 201402L
 #include <complex.h>
 typedef _Fcomplex GoComplex64;
 typedef _Dcomplex GoComplex128;
+#else
+#include <complex>
+typedef std::complex<float> GoComplex64;
+typedef std::complex<double> GoComplex128;
+#endif
 #else
 typedef float _Complex GoComplex64;
 typedef double _Complex GoComplex128;
@@ -88,17 +96,19 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern __declspec(dllexport) int GoWaitABit(int64_t ms);
-extern __declspec(dllexport) int GoDivIntegers(int64_t x, int64_t y, double* outResult);
-extern __declspec(dllexport) int GoJoinStrings(char** arr, int arrLen, char** outResult);
-extern __declspec(dllexport) int GoEchoBytes(void* data, int dataLen, void** outData, int* outLen);
-extern __declspec(dllexport) int GoNewTestMap(uint64_t* outHandle);
-extern __declspec(dllexport) int GoTestMapGetName(uint64_t handle, char** outName);
-extern __declspec(dllexport) void GoFreeHandle(uint64_t handle);
-extern __declspec(dllexport) int GoCallCallbackAdd(AddCallbackFunc cb, int64_t* outResult);
-extern __declspec(dllexport) int GoReturnsAnError(char** outErrMsg);
-extern __declspec(dllexport) void GoFreeString(char* str);
-extern __declspec(dllexport) void GoFreeBytes(void* ptr);
+extern int GoWaitABit(int64_t ms);
+extern void GoNoOp(void);
+extern int GoDivIntegers(int64_t x, int64_t y, double* outResult);
+extern int GoJoinStrings(char** arr, int arrLen, char** outResult);
+extern int GoEchoBytes(void* data, int dataLen, void** outData, int* outLen);
+extern int GoNewTestMap(uint64_t* outHandle);
+extern int GoTestMapGetName(uint64_t handle, char** outName);
+extern void GoFreeHandle(uint64_t handle);
+extern int GoCallCallbackAdd(AddCallbackFunc cb, int64_t* outResult);
+extern int GoReturnsAnError(char** outErrMsg);
+extern int GoAnyEchoJSON(char* inJSON, char** outJSON);
+extern void GoFreeString(char* str);
+extern void GoFreeBytes(void* ptr);
 
 #ifdef __cplusplus
 }

@@ -26,6 +26,7 @@ const (
 	BenchmarkService_ObjectMethod_FullMethodName   = "/benchmark.BenchmarkService/ObjectMethod"
 	BenchmarkService_CallbackAdd_FullMethodName    = "/benchmark.BenchmarkService/CallbackAdd"
 	BenchmarkService_ReturnsAnError_FullMethodName = "/benchmark.BenchmarkService/ReturnsAnError"
+	BenchmarkService_AnyEcho_FullMethodName        = "/benchmark.BenchmarkService/AnyEcho"
 )
 
 // BenchmarkServiceClient is the client API for BenchmarkService service.
@@ -47,6 +48,8 @@ type BenchmarkServiceClient interface {
 	CallbackAdd(ctx context.Context, opts ...grpc.CallOption) (BenchmarkService_CallbackAddClient, error)
 	// Scenario 7: error propagation (returnsAnError() -> gRPC INTERNAL error)
 	ReturnsAnError(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
+	// Scenario: dynamic any echo (mixed-type array payload encoded as ListValue)
+	AnyEcho(ctx context.Context, in *AnyEchoRequest, opts ...grpc.CallOption) (*AnyEchoResponse, error)
 }
 
 type benchmarkServiceClient struct {
@@ -142,6 +145,15 @@ func (c *benchmarkServiceClient) ReturnsAnError(ctx context.Context, in *Empty, 
 	return out, nil
 }
 
+func (c *benchmarkServiceClient) AnyEcho(ctx context.Context, in *AnyEchoRequest, opts ...grpc.CallOption) (*AnyEchoResponse, error) {
+	out := new(AnyEchoResponse)
+	err := c.cc.Invoke(ctx, BenchmarkService_AnyEcho_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BenchmarkServiceServer is the server API for BenchmarkService service.
 // All implementations must embed UnimplementedBenchmarkServiceServer
 // for forward compatibility
@@ -161,6 +173,8 @@ type BenchmarkServiceServer interface {
 	CallbackAdd(BenchmarkService_CallbackAddServer) error
 	// Scenario 7: error propagation (returnsAnError() -> gRPC INTERNAL error)
 	ReturnsAnError(context.Context, *Empty) (*Empty, error)
+	// Scenario: dynamic any echo (mixed-type array payload encoded as ListValue)
+	AnyEcho(context.Context, *AnyEchoRequest) (*AnyEchoResponse, error)
 	mustEmbedUnimplementedBenchmarkServiceServer()
 }
 
@@ -188,6 +202,9 @@ func (UnimplementedBenchmarkServiceServer) CallbackAdd(BenchmarkService_Callback
 }
 func (UnimplementedBenchmarkServiceServer) ReturnsAnError(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReturnsAnError not implemented")
+}
+func (UnimplementedBenchmarkServiceServer) AnyEcho(context.Context, *AnyEchoRequest) (*AnyEchoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AnyEcho not implemented")
 }
 func (UnimplementedBenchmarkServiceServer) mustEmbedUnimplementedBenchmarkServiceServer() {}
 
@@ -336,6 +353,24 @@ func _BenchmarkService_ReturnsAnError_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BenchmarkService_AnyEcho_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AnyEchoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BenchmarkServiceServer).AnyEcho(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BenchmarkService_AnyEcho_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BenchmarkServiceServer).AnyEcho(ctx, req.(*AnyEchoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BenchmarkService_ServiceDesc is the grpc.ServiceDesc for BenchmarkService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -366,6 +401,10 @@ var BenchmarkService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReturnsAnError",
 			Handler:    _BenchmarkService_ReturnsAnError_Handler,
+		},
+		{
+			MethodName: "AnyEcho",
+			Handler:    _BenchmarkService_AnyEcho_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

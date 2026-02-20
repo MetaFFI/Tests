@@ -21,6 +21,24 @@ import time
 WARMUP = int(os.environ.get("METAFFI_TEST_WARMUP", "100"))
 ITERATIONS = int(os.environ.get("METAFFI_TEST_ITERATIONS", "10000"))
 
+
+def _parse_scenario_filter() -> set[str] | None:
+    raw = os.environ.get("METAFFI_TEST_SCENARIOS", "").strip()
+    if not raw:
+        return None
+    items = {part.strip() for part in raw.split(",") if part.strip()}
+    return items or None
+
+
+def _scenario_key(name: str, data_size: int | None) -> str:
+    return f"{name}_{data_size}" if data_size is not None else name
+
+
+def _should_run(filter_set: set[str] | None, name: str, data_size: int | None) -> bool:
+    if not filter_set:
+        return True
+    return _scenario_key(name, data_size) in filter_set
+
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 GO_BRIDGE_DIR = os.path.join(THIS_DIR, "go_bridge")
 DLL_PATH = os.path.join(GO_BRIDGE_DIR, "bridge.dll")
@@ -31,8 +49,22 @@ DLL_PATH = os.path.join(GO_BRIDGE_DIR, "bridge.dll")
 # ---------------------------------------------------------------------------
 
 def ensure_bridge_dll():
-    """Build the Go bridge DLL if it doesn't exist."""
-    if os.path.isfile(DLL_PATH):
+    """Build the Go bridge DLL if missing or stale."""
+    must_build = not os.path.isfile(DLL_PATH)
+    if not must_build:
+        dll_mtime = os.path.getmtime(DLL_PATH)
+        for root, _dirs, files in os.walk(GO_BRIDGE_DIR):
+            for name in files:
+                if not name.endswith((".go", ".c", ".h")):
+                    continue
+                src_path = os.path.join(root, name)
+                if os.path.getmtime(src_path) > dll_mtime:
+                    must_build = True
+                    break
+            if must_build:
+                break
+
+    if not must_build:
         return
 
     print(f"Building Go bridge DLL at {DLL_PATH}...", file=sys.stderr)
@@ -59,6 +91,9 @@ def load_bridge():
     # Scenario 1: void call
     lib.GoWaitABit.argtypes = [ctypes.c_int64]
     lib.GoWaitABit.restype = ctypes.c_int
+
+    lib.GoNoOp.argtypes = []
+    lib.GoNoOp.restype = ctypes.c_int
 
     # Scenario 2: primitive echo
     lib.GoDivIntegers.argtypes = [
@@ -105,6 +140,10 @@ def load_bridge():
     # Scenario 7: error propagation
     lib.GoReturnsAnError.argtypes = [ctypes.POINTER(ctypes.c_char_p)]
     lib.GoReturnsAnError.restype = ctypes.c_int
+
+    # Scenario: dynamic any echo (JSON string payload)
+    lib.GoAnyEchoJSON.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_char_p)]
+    lib.GoAnyEchoJSON.restype = ctypes.c_int
 
     # Memory management
     lib.GoFreeString.argtypes = [ctypes.c_char_p]
@@ -279,16 +318,25 @@ def main():
     print(f"Timer overhead: {timer_overhead} ns", file=sys.stderr)
 
     benchmarks = []
+    scenario_filter = _parse_scenario_filter()
+    selected_count = 0
+    if scenario_filter:
+        print(
+            "Scenario filter enabled: " + os.environ.get("METAFFI_TEST_SCENARIOS", ""),
+            file=sys.stderr,
+        )
 
     # --- Scenario 1: Void call ---
     def bench_void():
-        ret = lib.GoWaitABit(ctypes.c_int64(0))
+        ret = lib.GoNoOp()
         if ret != 0:
-            raise RuntimeError("GoWaitABit failed")
+            raise RuntimeError("GoNoOp failed")
 
-    benchmarks.append(run_benchmark(
-        "void_call", None, WARMUP, ITERATIONS, bench_void
-    ))
+    if _should_run(scenario_filter, "void_call", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "void_call", None, WARMUP, ITERATIONS, bench_void
+        ))
 
     # --- Scenario 2: Primitive echo (int64 -> float64) ---
     out_double = ctypes.c_double()
@@ -303,9 +351,11 @@ def main():
         if abs(out_double.value - 5.0) > 1e-10:
             raise RuntimeError(f"DivIntegers(10,2) = {out_double.value}, want 5.0")
 
-    benchmarks.append(run_benchmark(
-        "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
-    ))
+    if _should_run(scenario_filter, "primitive_echo", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
+        ))
 
     # --- Scenario 3: String echo ---
     # Pre-allocate the C string array for ["hello", "world"]
@@ -321,12 +371,17 @@ def main():
         if result != "hello,world":
             raise RuntimeError(f"JoinStrings = {result!r}, want 'hello,world'")
 
-    benchmarks.append(run_benchmark(
-        "string_echo", None, WARMUP, ITERATIONS, bench_string
-    ))
+    if _should_run(scenario_filter, "string_echo", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "string_echo", None, WARMUP, ITERATIONS, bench_string
+        ))
 
     # --- Scenario 4: Array echo (varying sizes) ---
     for size in [10, 100, 1000, 10000]:
+        if not _should_run(scenario_filter, "array_echo", size):
+            continue
+        selected_count += 1
         data = bytes(i % 256 for i in range(size))
         out_ptr = ctypes.c_void_p()
         out_len = ctypes.c_int()
@@ -366,9 +421,11 @@ def main():
         if name != "name1":
             raise RuntimeError(f"TestMap.Name = {name!r}, want 'name1'")
 
-    benchmarks.append(run_benchmark(
-        "object_method", None, WARMUP, ITERATIONS, bench_object
-    ))
+    if _should_run(scenario_filter, "object_method", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "object_method", None, WARMUP, ITERATIONS, bench_object
+        ))
 
     # --- Scenario 6: Callback invocation ---
     @AddCallbackType
@@ -384,9 +441,11 @@ def main():
         if cb_result.value != 3:
             raise RuntimeError(f"CallCallbackAdd: got {cb_result.value}, want 3")
 
-    benchmarks.append(run_benchmark(
-        "callback", None, WARMUP, ITERATIONS, bench_callback
-    ))
+    if _should_run(scenario_filter, "callback", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "callback", None, WARMUP, ITERATIONS, bench_callback
+        ))
 
     # --- Scenario 7: Error propagation ---
     err_msg = ctypes.c_char_p()
@@ -398,9 +457,39 @@ def main():
         # Free the error string
         lib.GoFreeString(err_msg)
 
-    benchmarks.append(run_benchmark(
-        "error_propagation", None, WARMUP, ITERATIONS, bench_error
-    ))
+    if _should_run(scenario_filter, "error_propagation", None):
+        selected_count += 1
+        benchmarks.append(run_benchmark(
+            "error_propagation", None, WARMUP, ITERATIONS, bench_error
+        ))
+
+    # --- Scenario: Dynamic any echo (mixed payload) ---
+    any_echo_size = 100
+    if _should_run(scenario_filter, "any_echo", any_echo_size):
+        selected_count += 1
+        pattern = ["1", "\"two\"", "3.0"]
+        payload_json = "[" + ",".join(pattern[i % len(pattern)] for i in range(any_echo_size)) + "]"
+        payload_bytes = payload_json.encode("utf-8")
+        out_any_json = ctypes.c_char_p()
+
+        def bench_any_echo(data=payload_bytes, expected=payload_json):
+            ret = lib.GoAnyEchoJSON(data, ctypes.byref(out_any_json))
+            if ret != 0:
+                raise RuntimeError("GoAnyEchoJSON failed")
+            echoed = out_any_json.value.decode("utf-8")
+            lib.GoFreeString(out_any_json)
+            if echoed != expected:
+                raise RuntimeError("GoAnyEchoJSON returned mismatched payload")
+
+        benchmarks.append(run_benchmark(
+            "any_echo", any_echo_size, WARMUP, ITERATIONS, bench_any_echo
+        ))
+
+    if scenario_filter and selected_count == 0:
+        raise RuntimeError(
+            "METAFFI_TEST_SCENARIOS selected no benchmark scenarios: "
+            + os.environ.get("METAFFI_TEST_SCENARIOS", "")
+        )
 
     # --- Write results ---
     write_results(benchmarks, timer_overhead, init_ns)

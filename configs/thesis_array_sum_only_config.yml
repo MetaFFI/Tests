@@ -1,0 +1,34 @@
+# Thesis rerun profile for array_sum_10000 scenarios only.
+# Intended for scenario rerun mode:
+#   python tests/run_all_tests.py --config tests/configs/thesis_array_sum_only_config.yml --scenario array_sum_10000
+
+run:
+  include_benchmarks: true
+  include_correctness: false
+  repeats: 5
+  warmup_iterations: 100
+  measured_iterations: 10000
+  batch_min_elapsed_ns: 10000
+  batch_max_calls: 100000
+  heartbeat_seconds: 20
+
+selection:
+  hosts: [go, python3, java]
+  # Pairs that implement array_sum_* scenarios
+  pairs: [go:java, go:python3, java:python3, python3:java]
+  mechanisms: [metaffi, grpc, cpython, jni, ctypes, jpype, jep]
+
+execution:
+  rerun_existing: true
+  fail_fast: true
+  default_timeout_seconds: 600
+  java_metaffi_timeout_seconds: 3600
+
+outputs:
+  canonical_results_dir: tests/results
+  repeat_root_dir: tests/results/repeats
+  write_repeat_files: true
+  run_complexity: false
+  run_consolidation: true
+  run_tables: false
+  run_report: false

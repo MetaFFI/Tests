@@ -9,7 +9,18 @@ if (-not $env:JAVA_HOME) {
 }
 
 $env:CGO_ENABLED = "1"
-$env:CGO_CFLAGS = "-I`"$env:JAVA_HOME\include`" -I`"$env:JAVA_HOME\include\win32`""
+
+# Mirror JDK headers into a local path without spaces (CGO/GCC on Windows is
+# fragile with quoted include paths in CGO_CFLAGS).
+$localJavaInclude = Join-Path $PSScriptRoot ".java_include"
+if (Test-Path $localJavaInclude) {
+    Remove-Item -Recurse -Force $localJavaInclude
+}
+New-Item -ItemType Directory -Path $localJavaInclude | Out-Null
+Copy-Item -Recurse -Force (Join-Path $env:JAVA_HOME "include\\*") $localJavaInclude
+
+$localJavaIncludePosix = ($localJavaInclude -replace "\\", "/")
+$env:CGO_CFLAGS = "-I$localJavaIncludePosix -I$localJavaIncludePosix/win32"
 
 Write-Host "Building go_jni_bridge.dll..."
 Write-Host "  JAVA_HOME=$env:JAVA_HOME"

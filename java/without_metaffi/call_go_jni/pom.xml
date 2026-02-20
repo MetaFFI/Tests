@@ -39,6 +39,7 @@
                         <METAFFI_TEST_WARMUP>${env.METAFFI_TEST_WARMUP}</METAFFI_TEST_WARMUP>
                         <METAFFI_TEST_ITERATIONS>${env.METAFFI_TEST_ITERATIONS}</METAFFI_TEST_ITERATIONS>
                         <METAFFI_TEST_MODE>${env.METAFFI_TEST_MODE}</METAFFI_TEST_MODE>
+                        <METAFFI_TEST_SCENARIOS>${env.METAFFI_TEST_SCENARIOS}</METAFFI_TEST_SCENARIOS>
                         <METAFFI_TEST_RESULTS_FILE>${env.METAFFI_TEST_RESULTS_FILE}</METAFFI_TEST_RESULTS_FILE>
                     </environmentVariables>
                     <argLine>-Djava.library.path="${project.basedir}/go_bridge"</argLine>

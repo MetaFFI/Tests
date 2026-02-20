@@ -14,6 +14,7 @@ import sys
 import time
 
 import grpc
+from google.protobuf import struct_pb2
 
 # Add this directory to sys.path so generated stubs are importable
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,6 +32,24 @@ WARMUP = int(os.environ.get("METAFFI_TEST_WARMUP", "100"))
 ITERATIONS = int(os.environ.get("METAFFI_TEST_ITERATIONS", "10000"))
 SERVER_DIR = os.path.join(THIS_DIR, "server")
 SERVER_EXE = os.path.join(SERVER_DIR, "server.exe")
+
+
+def _parse_scenario_filter() -> set[str] | None:
+    raw = os.environ.get("METAFFI_TEST_SCENARIOS", "").strip()
+    if not raw:
+        return None
+    items = {part.strip() for part in raw.split(",") if part.strip()}
+    return items or None
+
+
+def _scenario_key(name: str, data_size: int | None) -> str:
+    return f"{name}_{data_size}" if data_size is not None else name
+
+
+def _should_run(filter_set: set[str] | None, name: str, data_size: int | None) -> bool:
+    if not filter_set:
+        return True
+    return _scenario_key(name, data_size) in filter_set
 
 
 # ---------------------------------------------------------------------------
@@ -243,16 +262,25 @@ def main():
         print(f"Timer overhead: {timer_overhead} ns", file=sys.stderr)
 
         benchmarks = []
+        scenario_filter = _parse_scenario_filter()
+        selected_count = 0
+        if scenario_filter:
+            print(
+                "Scenario filter enabled: " + os.environ.get("METAFFI_TEST_SCENARIOS", ""),
+                file=sys.stderr,
+            )
 
         # --- Scenario 1: Void call ---
-        void_req = benchmark_pb2.VoidCallRequest(ms=0)
+        void_req = benchmark_pb2.VoidCallRequest()
 
         def bench_void():
             stub.VoidCall(void_req)
 
-        benchmarks.append(run_benchmark(
-            "void_call", None, WARMUP, ITERATIONS, bench_void
-        ))
+        if _should_run(scenario_filter, "void_call", None):
+            selected_count += 1
+            benchmarks.append(run_benchmark(
+                "void_call", None, WARMUP, ITERATIONS, bench_void
+            ))
 
         # --- Scenario 2: Primitive echo ---
         div_req = benchmark_pb2.DivIntegersRequest(x=10, y=2)
@@ -262,9 +290,11 @@ def main():
             if abs(resp.result - 5.0) > 1e-10:
                 raise RuntimeError(f"DivIntegers: {resp.result}, want 5.0")
 
-        benchmarks.append(run_benchmark(
-            "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
-        ))
+        if _should_run(scenario_filter, "primitive_echo", None):
+            selected_count += 1
+            benchmarks.append(run_benchmark(
+                "primitive_echo", None, WARMUP, ITERATIONS, bench_primitive
+            ))
 
         # --- Scenario 3: String echo ---
         join_req = benchmark_pb2.JoinStringsRequest(values=["hello", "world"])
@@ -274,12 +304,17 @@ def main():
             if resp.result != "hello,world":
                 raise RuntimeError(f"JoinStrings: {resp.result!r}")
 
-        benchmarks.append(run_benchmark(
-            "string_echo", None, WARMUP, ITERATIONS, bench_string
-        ))
+        if _should_run(scenario_filter, "string_echo", None):
+            selected_count += 1
+            benchmarks.append(run_benchmark(
+                "string_echo", None, WARMUP, ITERATIONS, bench_string
+            ))
 
         # --- Scenario 4: Array echo (varying sizes) ---
         for size in [10, 100, 1000, 10000]:
+            if not _should_run(scenario_filter, "array_echo", size):
+                continue
+            selected_count += 1
             data = bytes(i % 256 for i in range(size))
             echo_req = benchmark_pb2.EchoBytesRequest(data=data)
 
@@ -294,6 +329,32 @@ def main():
                 "array_echo", size, WARMUP, ITERATIONS, bench_array
             ))
 
+        # --- Scenario: dynamic any echo (mixed array payload) ---
+        any_echo_size = 100
+        if _should_run(scenario_filter, "any_echo", any_echo_size):
+            selected_count += 1
+            values = struct_pb2.ListValue()
+            for i in range(any_echo_size):
+                mod = i % 3
+                if mod == 0:
+                    values.values.add(number_value=1)
+                elif mod == 1:
+                    values.values.add(string_value="two")
+                else:
+                    values.values.add(number_value=3.0)
+            any_req = benchmark_pb2.AnyEchoRequest(values=values)
+
+            def bench_any_echo(r=any_req, expected_len=any_echo_size):
+                resp = stub.AnyEcho(r)
+                if len(resp.values.values) != expected_len:
+                    raise RuntimeError(
+                        f"AnyEcho: got len {len(resp.values.values)}, want {expected_len}"
+                    )
+
+            benchmarks.append(run_benchmark(
+                "any_echo", any_echo_size, WARMUP, ITERATIONS, bench_any_echo
+            ))
+
         # --- Scenario 5: Object method ---
         obj_req = benchmark_pb2.ObjectMethodRequest(name="bench")
 
@@ -302,9 +363,11 @@ def main():
             if resp.result != "name1":
                 raise RuntimeError(f"ObjectMethod: {resp.result!r}, want 'name1'")
 
-        benchmarks.append(run_benchmark(
-            "object_method", None, WARMUP, ITERATIONS, bench_object
-        ))
+        if _should_run(scenario_filter, "object_method", None):
+            selected_count += 1
+            benchmarks.append(run_benchmark(
+                "object_method", None, WARMUP, ITERATIONS, bench_object
+            ))
 
         # --- Scenario 6: Callback via bidirectional streaming ---
         def bench_callback():
@@ -403,9 +466,11 @@ def main():
             send_q.put(None)
             t.join(timeout=5)
 
-        benchmarks.append(run_benchmark(
-            "callback", None, WARMUP, ITERATIONS, bench_callback_threaded
-        ))
+        if _should_run(scenario_filter, "callback", None):
+            selected_count += 1
+            benchmarks.append(run_benchmark(
+                "callback", None, WARMUP, ITERATIONS, bench_callback_threaded
+            ))
 
         # --- Scenario 7: Error propagation ---
         empty_req = benchmark_pb2.Empty()
@@ -418,9 +483,17 @@ def main():
                 if e.code() != grpc.StatusCode.INTERNAL:
                     raise RuntimeError(f"Expected INTERNAL, got {e.code()}")
 
-        benchmarks.append(run_benchmark(
-            "error_propagation", None, WARMUP, ITERATIONS, bench_error
-        ))
+        if _should_run(scenario_filter, "error_propagation", None):
+            selected_count += 1
+            benchmarks.append(run_benchmark(
+                "error_propagation", None, WARMUP, ITERATIONS, bench_error
+            ))
+
+        if scenario_filter and selected_count == 0:
+            raise RuntimeError(
+                "METAFFI_TEST_SCENARIOS selected no benchmark scenarios: "
+                + os.environ.get("METAFFI_TEST_SCENARIOS", "")
+            )
 
         # --- Write results ---
         write_results(benchmarks, timer_overhead, init_ns)

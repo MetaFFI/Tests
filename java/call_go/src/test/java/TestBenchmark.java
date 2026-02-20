@@ -14,7 +14,9 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -85,6 +87,36 @@ public class TestBenchmark
 		String val = System.getenv(name);
 		if (val == null || val.isEmpty()) return defaultValue;
 		return Integer.parseInt(val);
+	}
+
+	private static Set<String> parseScenarioFilter()
+	{
+		String raw = System.getenv("METAFFI_TEST_SCENARIOS");
+		if (raw == null || raw.trim().isEmpty())
+		{
+			return null;
+		}
+
+		Set<String> filter = new HashSet<>();
+		for (String part : raw.split(","))
+		{
+			String k = part.trim();
+			if (!k.isEmpty())
+			{
+				filter.add(k);
+			}
+		}
+		return filter.isEmpty() ? null : filter;
+	}
+
+	private static String scenarioKey(String scenario, Integer dataSize)
+	{
+		return dataSize == null ? scenario : scenario + "_" + dataSize;
+	}
+
+	private static boolean shouldRunScenario(Set<String> filter, String scenario, Integer dataSize)
+	{
+		return filter == null || filter.contains(scenarioKey(scenario, dataSize));
 	}
 
 	// ---- Helper types and methods ----
@@ -271,38 +303,55 @@ public class TestBenchmark
 		return a + b;
 	}
 
-	// ---- Main benchmark test ----
-
-	@Test
-	public void testAllBenchmarks() throws Throwable
+	/** Validate that an any_echo result has the expected collection length. */
+	private static void validateAnyEchoResult(Object echoed, int expectedSize)
 	{
-		String mode = System.getenv().getOrDefault("METAFFI_TEST_MODE", "");
-		if ("correctness".equals(mode))
+		if (echoed instanceof Object[])
 		{
-			System.err.println("Skipping benchmarks: METAFFI_TEST_MODE=correctness");
-			return;
+			if (((Object[]) echoed).length != expectedSize)
+			{
+				throw new RuntimeException("any_echo: wrong Object[] length");
+			}
 		}
+		else if (echoed instanceof java.util.List<?>)
+		{
+			if (((java.util.List<?>) echoed).size() != expectedSize)
+			{
+				throw new RuntimeException("any_echo: wrong List size");
+			}
+		}
+		else
+		{
+			throw new RuntimeException("any_echo: unexpected return type " +
+				(echoed == null ? "null" : echoed.getClass().getName()));
+		}
+	}
 
-		long timerOverhead = measureTimerOverhead();
-		System.err.println("Timer overhead: " + timerOverhead + " ns");
+	// ---- Individual scenario benchmarks ----
 
-		List<String> benchmarkJsons = new ArrayList<>();
+	private void benchVoidCall(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "void_call", null)) return;
 
-		// --- Scenario 1: Void call ---
-		Caller waitFn = goModule.load("callable=WaitABit",
-			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64)}, null);
-		assertNotNull("Failed to load WaitABit", waitFn);
+		Caller noopFn = goModule.load("callable=NoOp", null, null);
+		assertNotNull("Failed to load NoOp", noopFn);
 
-		benchmarkJsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
-			() -> waitFn.call(0L)));
+		jsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
+			() -> noopFn.call()));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Scenario 2: Primitive echo (int64 -> float64) ---
+	private void benchPrimitiveEcho(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "primitive_echo", null)) return;
+
 		Caller divFn = goModule.load("callable=DivIntegers",
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64), t(MetaFFITypes.MetaFFIInt64)},
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIFloat64)});
 		assertNotNull("Failed to load DivIntegers", divFn);
 
-		benchmarkJsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
+		jsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
 			() -> {
 				Object[] result = divFn.call(10L, 2L);
 				if (Math.abs((Double) result[0] - 5.0) > 1e-10)
@@ -310,15 +359,21 @@ public class TestBenchmark
 					throw new RuntimeException("DivIntegers: got " + result[0] + ", want 5.0");
 				}
 			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Scenario 3: String echo ---
+	private void benchStringEcho(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "string_echo", null)) return;
+
 		Caller joinFn = goModule.load("callable=JoinStrings",
 			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIString8Array, 1)},
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIString8)});
 		assertNotNull("Failed to load JoinStrings", joinFn);
 
 		String[] joinArgs = new String[]{"hello", "world"};
-		benchmarkJsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
+		jsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
 			() -> {
 				Object[] result = joinFn.call((Object) joinArgs);
 				if (!"hello,world".equals(result[0]))
@@ -326,21 +381,35 @@ public class TestBenchmark
 					throw new RuntimeException("JoinStrings: got " + result[0]);
 				}
 			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Scenario 4: Array echo (varying sizes) ---
+	private void benchArrayEcho(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		// Check if any array_echo size is requested
+		boolean anyRequested = false;
+		for (int s : new int[]{10, 100, 1000, 10000})
+		{
+			if (shouldRunScenario(filter, "array_echo", s)) anyRequested = true;
+		}
+		if (!anyRequested) return;
+
 		Caller echoFn = goModule.load("callable=EchoBytes",
-			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8Array, 1)},
-			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8Array, 1)});
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8PackedArray, 1)},
+			new MetaFFITypeInfo[]{arr(MetaFFITypes.MetaFFIUInt8PackedArray, 1)});
 		assertNotNull("Failed to load EchoBytes", echoFn);
 
 		for (int size : new int[]{10, 100, 1000, 10000})
 		{
+			if (!shouldRunScenario(filter, "array_echo", size)) continue;
+
 			byte[] data = new byte[size];
 			for (int i = 0; i < size; i++) data[i] = (byte) (i % 256);
 			final byte[] finalData = data;
 			final int finalSize = size;
 
-			benchmarkJsons.add(runBenchmark("array_echo", size, WARMUP, ITERATIONS,
+			jsons.add(runBenchmark("array_echo", size, WARMUP, ITERATIONS,
 				() -> {
 					Object[] result = echoFn.call((Object) finalData);
 					if (((byte[]) result[0]).length != finalSize)
@@ -348,9 +417,15 @@ public class TestBenchmark
 						throw new RuntimeException("EchoBytes: wrong length");
 					}
 				}));
+			writeResults(jsons, timerOverhead);
+			System.gc();
 		}
+	}
 
-		// --- Scenario 5: Object create + method call ---
+	private void benchObjectMethod(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "object_method", null)) return;
+
 		Caller newTestMap = goModule.load("callable=NewTestMap", null,
 			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)});
 		Caller nameGetter = goModule.load("callable=TestMap.GetName",
@@ -359,7 +434,7 @@ public class TestBenchmark
 		assertNotNull("Failed to load NewTestMap", newTestMap);
 		assertNotNull("Failed to load TestMap.GetName", nameGetter);
 
-		benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
+		jsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
 			() -> {
 				Object[] mapResult = newTestMap.call();
 				MetaFFIHandle handle = (MetaFFIHandle) mapResult[0];
@@ -369,38 +444,18 @@ public class TestBenchmark
 					throw new RuntimeException("TestMap.Name: got " + nameResult[0]);
 				}
 			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Scenario 6: Callback invocation ---
-		try
-		{
-			Caller callCb = goModule.load("callable=CallCallbackAdd",
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFICallable)},
-				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64)});
-			assertNotNull("Failed to load CallCallbackAdd", callCb);
+	private void benchErrorPropagation(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "error_propagation", null)) return;
 
-			Method addMethod = TestBenchmark.class.getMethod("javaAdd", long.class, long.class);
-			Caller javaAdder = MetaFFIRuntime.makeMetaFFICallable(addMethod);
-
-			benchmarkJsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
-				() -> {
-					Object[] result = callCb.call(javaAdder);
-					if ((Long) result[0] != 3L)
-					{
-						throw new RuntimeException("CallCallbackAdd: got " + result[0] + ", want 3");
-					}
-				}));
-		}
-		catch (Throwable e)
-		{
-			System.err.println("Callback scenario failed: " + e.getMessage());
-			benchmarkJsons.add(makeFailedResult("callback", null, e.getMessage()));
-		}
-
-		// --- Scenario 7: Error propagation ---
 		Caller errFn = goModule.load("callable=ReturnsAnError", null, null);
 		assertNotNull("Failed to load ReturnsAnError", errFn);
 
-		benchmarkJsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
+		jsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
 			() -> {
 				try
 				{
@@ -417,8 +472,121 @@ public class TestBenchmark
 					// Expected: Go error -> Java throwable
 				}
 			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
 
-		// --- Write results ---
+	private void benchCallback(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		if (!shouldRunScenario(filter, "callback", null)) return;
+
+		try
+		{
+			Caller callCb = goModule.load("callable=CallCallbackAdd",
+				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFICallable)},
+				new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIInt64)});
+			assertNotNull("Failed to load CallCallbackAdd", callCb);
+
+			Method addMethod = TestBenchmark.class.getMethod("javaAdd", long.class, long.class);
+			Caller javaAdder = MetaFFIRuntime.makeMetaFFICallable(addMethod);
+
+			jsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
+				() -> {
+					Object[] result = callCb.call(javaAdder);
+					if ((Long) result[0] != 3L)
+					{
+						throw new RuntimeException("CallCallbackAdd: got " + result[0] + ", want 3");
+					}
+				}));
+		}
+		catch (Throwable e)
+		{
+			System.err.println("Callback scenario failed: " + e.getMessage());
+			jsons.add(makeFailedResult("callback", null, e.getMessage()));
+		}
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
+
+	private void benchAnyEcho(Set<String> filter, List<String> jsons, long timerOverhead) throws Throwable
+	{
+		final int anyEchoSize = 100;
+		if (!shouldRunScenario(filter, "any_echo", anyEchoSize)) return;
+
+		Caller newTestMap = goModule.load("callable=NewTestMap", null,
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle)});
+		Caller setFn = goModule.load("callable=TestMap.Set",
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle), t(MetaFFITypes.MetaFFIString8), t(MetaFFITypes.MetaFFIAny)},
+			null);
+		Caller getFn = goModule.load("callable=TestMap.Get",
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIHandle), t(MetaFFITypes.MetaFFIString8)},
+			new MetaFFITypeInfo[]{t(MetaFFITypes.MetaFFIAny)});
+		assertNotNull("Failed to load NewTestMap", newTestMap);
+		assertNotNull("Failed to load TestMap.Set", setFn);
+		assertNotNull("Failed to load TestMap.Get", getFn);
+
+		Object[] mapResult = newTestMap.call();
+		MetaFFIHandle handle = (MetaFFIHandle) mapResult[0];
+		final String key = "any_echo_payload";
+		final Object[] pattern = new Object[]{1L, "two", 3.0};
+		final Object[] payload = new Object[anyEchoSize];
+		for (int i = 0; i < anyEchoSize; i++)
+		{
+			payload[i] = pattern[i % pattern.length];
+		}
+
+		jsons.add(runBenchmark("any_echo", anyEchoSize, WARMUP, ITERATIONS,
+			() -> {
+				setFn.call(handle, key, payload);
+				Object[] out = getFn.call(handle, key);
+				if (out == null || out.length == 0 || out[0] == null)
+				{
+					throw new RuntimeException("TestMap.Get(any_echo_payload): got null/empty return");
+				}
+				validateAnyEchoResult(out[0], anyEchoSize);
+			}));
+		writeResults(jsons, timerOverhead);
+		System.gc();
+	}
+
+	// ---- Main benchmark test ----
+
+	@Test
+	public void testAllBenchmarks() throws Throwable
+	{
+		String mode = System.getenv().getOrDefault("METAFFI_TEST_MODE", "");
+		if ("correctness".equals(mode))
+		{
+			System.err.println("Skipping benchmarks: METAFFI_TEST_MODE=correctness");
+			return;
+		}
+
+		long timerOverhead = measureTimerOverhead();
+		System.err.println("Timer overhead: " + timerOverhead + " ns");
+		Set<String> scenarioFilter = parseScenarioFilter();
+		if (scenarioFilter != null)
+		{
+			System.err.println("Scenario filter enabled: " + String.join(",", scenarioFilter));
+		}
+
+		List<String> benchmarkJsons = new ArrayList<>();
+
+		// Run each scenario (each method handles its own filter check)
+		benchVoidCall(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchPrimitiveEcho(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchStringEcho(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchArrayEcho(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchObjectMethod(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchErrorPropagation(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchCallback(scenarioFilter, benchmarkJsons, timerOverhead);
+		benchAnyEcho(scenarioFilter, benchmarkJsons, timerOverhead);
+
+		if (benchmarkJsons.isEmpty())
+		{
+			fail("METAFFI_TEST_SCENARIOS selected no benchmark scenarios: " + System.getenv("METAFFI_TEST_SCENARIOS"));
+		}
+
+		// Final write (in case no scenario triggered an intermediate save)
 		writeResults(benchmarkJsons, timerOverhead);
 	}
 

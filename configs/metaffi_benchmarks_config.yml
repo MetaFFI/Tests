@@ -1,0 +1,33 @@
+# MetaFFI-only benchmark configuration with report generation.
+# Usage:
+#   python tests/run_all_tests.py --config tests/configs/metaffi_benchmarks_config.yml
+
+run:
+  include_benchmarks: true
+  include_correctness: false
+  repeats: 5
+  warmup_iterations: 100
+  measured_iterations: 10000
+  batch_min_elapsed_ns: 10000
+  batch_max_calls: 100000
+  heartbeat_seconds: 20
+
+selection:
+  hosts: [go, python3, java]
+  pairs: []
+  mechanisms: [metaffi]
+
+execution:
+  rerun_existing: true
+  fail_fast: true
+  default_timeout_seconds: 600
+  java_metaffi_timeout_seconds: 3600
+
+outputs:
+  canonical_results_dir: tests/results
+  repeat_root_dir: tests/results/repeats
+  write_repeat_files: true
+  run_complexity: false
+  run_consolidation: true
+  run_tables: true
+  run_report: true

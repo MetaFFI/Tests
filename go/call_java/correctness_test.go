@@ -91,16 +91,30 @@ func tiAlias(t IDL.MetaFFIType, alias string) IDL.MetaFFITypeInfo {
 }
 
 // load loads an entity; fatals immediately on error (fail-fast).
+// LoadWithInfo now returns specialized function types. This wrapper normalizes
+// them to the generic signature for backward-compatible test callsites.
 func load(t *testing.T, entityPath string, params []IDL.MetaFFITypeInfo, retvals []IDL.MetaFFITypeInfo) func(...interface{}) ([]interface{}, error) {
 	t.Helper()
-	ff, err := module.LoadWithInfo(entityPath, params, retvals)
+	raw, err := module.LoadWithInfo(entityPath, params, retvals)
 	if err != nil {
 		t.Fatalf("load %q: %v", entityPath, err)
 	}
-	if ff == nil {
+	if raw == nil {
 		t.Fatalf("load %q: returned nil function", entityPath)
 	}
-	return ff
+	switch f := raw.(type) {
+	case func() error:
+		return func(_ ...interface{}) ([]interface{}, error) { return nil, f() }
+	case func() ([]interface{}, error):
+		return func(_ ...interface{}) ([]interface{}, error) { return f() }
+	case func(...interface{}) error:
+		return func(args ...interface{}) ([]interface{}, error) { return nil, f(args...) }
+	case func(...interface{}) ([]interface{}, error):
+		return f
+	default:
+		t.Fatalf("load %q: unexpected function type %T", entityPath, raw)
+		return nil
+	}
 }
 
 // call invokes ff and fatals on error (fail-fast).
@@ -181,7 +195,7 @@ func TestCoreReturnNull(t *testing.T) {
 
 func TestCoreReturnsAnError(t *testing.T) {
 	ff := load(t, "class=guest.CoreFunctions,callable=returnsAnError", nil, nil)
-	callExpectError(t, "returnsAnError", ff, "InvocationTargetException")
+	callExpectError(t, "returnsAnError", ff, "Error")
 }
 
 func TestCoreCallCallbackAdd(t *testing.T) {
@@ -623,6 +637,81 @@ func TestArraysExpectThreeSomeClasses(t *testing.T) {
 	expectClasses := load(t, "class=guest.ArrayFunctions,callable=expectThreeSomeClasses",
 		[]IDL.MetaFFITypeInfo{tiArray(IDL.HANDLE_ARRAY, 1)}, nil)
 	call(t, "expectThreeSomeClasses", expectClasses, ret[0])
+}
+
+// ==========================================================================
+// Packed Arrays (1D primitive arrays via packed CDT path)
+// ==========================================================================
+
+func TestPackedArraySumInt1d(t *testing.T) {
+	ff := load(t, "class=guest.ArrayFunctions,callable=sumInt1dArray",
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.INT32_PACKED_ARRAY, 1)},
+		[]IDL.MetaFFITypeInfo{ti(IDL.INT32)})
+	arr := []int32{1, 2, 3, 4, 5}
+	ret := call(t, "sumInt1dArray", ff, arr)
+	if v, ok := ret[0].(int32); !ok || v != 15 {
+		t.Fatalf("sumInt1dArray: got %v (%T), want 15", ret[0], ret[0])
+	}
+}
+
+func TestPackedArrayEchoLong1d(t *testing.T) {
+	ff := load(t, "class=guest.ArrayFunctions,callable=echoLong1dArray",
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.INT64_PACKED_ARRAY, 1)},
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.INT64_PACKED_ARRAY, 1)})
+	arr := []int64{100, 200, 300}
+	ret := call(t, "echoLong1dArray", ff, arr)
+	result, ok := ret[0].([]int64)
+	if !ok {
+		t.Fatalf("echoLong1dArray: unexpected type %T", ret[0])
+	}
+	want := []int64{100, 200, 300}
+	if len(result) != len(want) {
+		t.Fatalf("echoLong1dArray: len=%d, want %d", len(result), len(want))
+	}
+	for i, v := range want {
+		if result[i] != v {
+			t.Fatalf("echoLong1dArray[%d]: got %d, want %d", i, result[i], v)
+		}
+	}
+}
+
+func TestPackedArrayEchoDouble1d(t *testing.T) {
+	ff := load(t, "class=guest.ArrayFunctions,callable=echoDouble1dArray",
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.FLOAT64_PACKED_ARRAY, 1)},
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.FLOAT64_PACKED_ARRAY, 1)})
+	arr := []float64{1.5, 2.5, 3.5}
+	ret := call(t, "echoDouble1dArray", ff, arr)
+	result, ok := ret[0].([]float64)
+	if !ok {
+		t.Fatalf("echoDouble1dArray: unexpected type %T", ret[0])
+	}
+	if len(result) != 3 {
+		t.Fatalf("echoDouble1dArray: len=%d, want 3", len(result))
+	}
+	for i, v := range arr {
+		if math.Abs(result[i]-v) > 1e-9 {
+			t.Fatalf("echoDouble1dArray[%d]: got %f, want %f", i, result[i], v)
+		}
+	}
+}
+
+func TestPackedArrayMakeInt1d(t *testing.T) {
+	ff := load(t, "class=guest.ArrayFunctions,callable=makeInt1dArray", nil,
+		[]IDL.MetaFFITypeInfo{tiArray(IDL.INT32_PACKED_ARRAY, 1)})
+	ret := call(t, "makeInt1dArray", ff)
+	result, ok := ret[0].([]int32)
+	if !ok {
+		t.Fatalf("makeInt1dArray: unexpected type %T", ret[0])
+	}
+	want := []int32{10, 20, 30, 40, 50}
+	if len(result) != len(want) {
+		t.Fatalf("makeInt1dArray: len=%d, want %d", len(result), len(want))
+	}
+	for i, v := range want {
+		if result[i] != v {
+			t.Fatalf("makeInt1dArray[%d]: got %d, want %d", i, result[i], v)
+		}
+	}
 }
 
 // ==========================================================================

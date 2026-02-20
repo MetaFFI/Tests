@@ -10,7 +10,9 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -48,8 +50,8 @@ public class BenchmarkTest
 		interp.exec("sys.path.insert(0, '" + modulePath + "')");
 
 		// Import guest module functions
-		interp.exec("from module.core_functions import (wait_a_bit, div_integers, " +
-			"join_strings, call_callback_add, returns_an_error)");
+		interp.exec("from module.core_functions import (wait_a_bit, no_op, div_integers, " +
+			"join_strings, call_callback_add, returns_an_error, echo_any)");
 		interp.exec("from module.objects_and_classes import SomeClass, TestMap");
 		interp.exec("from module.types_and_arrays import accepts_ragged_array");
 
@@ -72,6 +74,36 @@ public class BenchmarkTest
 		String val = System.getenv(name);
 		if (val == null || val.isEmpty()) return defaultValue;
 		return Integer.parseInt(val);
+	}
+
+	private static Set<String> parseScenarioFilter()
+	{
+		String raw = System.getenv("METAFFI_TEST_SCENARIOS");
+		if (raw == null || raw.trim().isEmpty())
+		{
+			return new HashSet<>();
+		}
+
+		Set<String> out = new HashSet<>();
+		for (String part : raw.split(","))
+		{
+			String s = part.trim();
+			if (!s.isEmpty())
+			{
+				out.add(s);
+			}
+		}
+		return out;
+	}
+
+	private static String scenarioKey(String scenario, Integer dataSize)
+	{
+		return dataSize == null ? scenario : scenario + "_" + dataSize;
+	}
+
+	private static boolean shouldRunScenario(Set<String> filter, String scenario, Integer dataSize)
+	{
+		return filter.isEmpty() || filter.contains(scenarioKey(scenario, dataSize));
 	}
 
 	// ---- Statistical helpers ----
@@ -221,37 +253,61 @@ public class BenchmarkTest
 		System.err.println("Timer overhead: " + timerOverhead + " ns");
 
 		List<String> benchmarkJsons = new ArrayList<>();
+		Set<String> scenarioFilter = parseScenarioFilter();
+		int selectedCount = 0;
+		if (!scenarioFilter.isEmpty())
+		{
+			System.err.println("Scenario filter enabled: " + System.getenv("METAFFI_TEST_SCENARIOS"));
+		}
 
 		// --- Scenario 1: Void call ---
-		benchmarkJsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
-			() -> interp.exec("wait_a_bit(0)")));
+		if (shouldRunScenario(scenarioFilter, "void_call", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("void_call", null, WARMUP, ITERATIONS,
+				() -> interp.exec("no_op()")));
+		}
 
 		// --- Scenario 2: Primitive echo ---
-		benchmarkJsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
-			() -> {
-				interp.exec("_r = div_integers(10, 2)");
-				Object result = interp.getValue("_r");
-				double val = ((Number) result).doubleValue();
-				if (Math.abs(val - 5.0) > 1e-10)
-				{
-					throw new RuntimeException("div_integers: got " + val + ", want 5.0");
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "primitive_echo", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("primitive_echo", null, WARMUP, ITERATIONS,
+				() -> {
+					interp.exec("_r = div_integers(10, 2)");
+					Object result = interp.getValue("_r");
+					double val = ((Number) result).doubleValue();
+					if (Math.abs(val - 5.0) > 1e-10)
+					{
+						throw new RuntimeException("div_integers: got " + val + ", want 5.0");
+					}
+				}));
+		}
 
 		// --- Scenario 3: String echo ---
-		benchmarkJsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
-			() -> {
-				interp.exec("_r = join_strings(['hello', 'world'])");
-				String result = (String) interp.getValue("_r");
-				if (!"hello,world".equals(result))
-				{
-					throw new RuntimeException("join_strings: got " + result);
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "string_echo", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("string_echo", null, WARMUP, ITERATIONS,
+				() -> {
+					interp.exec("_r = join_strings(['hello', 'world'])");
+					String result = (String) interp.getValue("_r");
+					if (!"hello,world".equals(result))
+					{
+						throw new RuntimeException("join_strings: got " + result);
+					}
+				}));
+		}
 
 		// --- Scenario 4: Array sum (varying sizes) ---
 		for (int size : new int[]{10, 100, 1000, 10000})
 		{
+			if (!shouldRunScenario(scenarioFilter, "array_sum", size))
+			{
+				continue;
+			}
+			selectedCount++;
+
 			// Pre-create the Python list for this size
 			interp.exec("_arr_" + size + " = [[i+1 for i in range(" + size + ")]]");
 			long expectedSum = (long) size * (size + 1) / 2;
@@ -270,54 +326,97 @@ public class BenchmarkTest
 				}));
 		}
 
-		// --- Scenario 5: Object method ---
-		benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
-			() -> {
-				interp.exec("_obj = SomeClass('bench')");
-				interp.exec("_r = _obj.print()");
-				String result = (String) interp.getValue("_r");
-				if (result == null || !result.contains("bench"))
-				{
-					throw new RuntimeException("SomeClass.print: got " + result);
-				}
-			}));
-
-		// --- Scenario 6: Callback ---
-		try
+		// --- Scenario: dynamic any echo (mixed array payload) ---
+		final int anyEchoSize = 100;
+		if (shouldRunScenario(scenarioFilter, "any_echo", anyEchoSize))
 		{
-			// Define a Python callback function that adds two numbers
-			interp.exec("def _java_add(a, b): return a + b");
-
-			benchmarkJsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
+			selectedCount++;
+			interp.exec("_any_payload_100 = [1, 'two', 3.0] * 33 + [1]");
+			benchmarkJsons.add(runBenchmark("any_echo", anyEchoSize, WARMUP, ITERATIONS,
 				() -> {
-					interp.exec("_r = call_callback_add(_java_add)");
+					interp.exec("_r = echo_any(_any_payload_100)");
 					Object result = interp.getValue("_r");
-					long val = ((Number) result).longValue();
-					if (val != 3L)
+					if (result == null)
 					{
-						throw new RuntimeException("call_callback_add: got " + val + ", want 3");
+						throw new RuntimeException("echo_any: got null return");
+					}
+					if (!(result instanceof List<?>))
+					{
+						throw new RuntimeException("echo_any: unexpected return type " + result.getClass().getName());
+					}
+					List<?> out = (List<?>) result;
+					if (out.size() != anyEchoSize)
+					{
+						throw new RuntimeException("echo_any: got len " + out.size() + ", want " + anyEchoSize);
 					}
 				}));
 		}
-		catch (Throwable e)
+
+		// --- Scenario 5: Object method ---
+		if (shouldRunScenario(scenarioFilter, "object_method", null))
 		{
-			System.err.println("Callback scenario failed: " + e.getMessage());
-			benchmarkJsons.add(makeFailedResult("callback", null, e.getMessage()));
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("object_method", null, WARMUP, ITERATIONS,
+				() -> {
+					interp.exec("_obj = SomeClass('bench')");
+					interp.exec("_r = _obj.print()");
+					String result = (String) interp.getValue("_r");
+					if (result == null || !result.contains("bench"))
+					{
+						throw new RuntimeException("SomeClass.print: got " + result);
+					}
+				}));
+		}
+
+		// --- Scenario 6: Callback ---
+		if (shouldRunScenario(scenarioFilter, "callback", null))
+		{
+			selectedCount++;
+			try
+			{
+				// Define a Python callback function that adds two numbers
+				interp.exec("def _java_add(a, b): return a + b");
+
+				benchmarkJsons.add(runBenchmark("callback", null, WARMUP, ITERATIONS,
+					() -> {
+						interp.exec("_r = call_callback_add(_java_add)");
+						Object result = interp.getValue("_r");
+						long val = ((Number) result).longValue();
+						if (val != 3L)
+						{
+							throw new RuntimeException("call_callback_add: got " + val + ", want 3");
+						}
+					}));
+			}
+			catch (Throwable e)
+			{
+				System.err.println("Callback scenario failed: " + e.getMessage());
+				benchmarkJsons.add(makeFailedResult("callback", null, e.getMessage()));
+			}
 		}
 
 		// --- Scenario 7: Error propagation ---
-		benchmarkJsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
-			() -> {
-				try
-				{
-					interp.exec("returns_an_error()");
-					throw new RuntimeException("returns_an_error did not throw");
-				}
-				catch (JepException e)
-				{
-					// Expected: Python error -> JepException
-				}
-			}));
+		if (shouldRunScenario(scenarioFilter, "error_propagation", null))
+		{
+			selectedCount++;
+			benchmarkJsons.add(runBenchmark("error_propagation", null, WARMUP, ITERATIONS,
+				() -> {
+					try
+					{
+						interp.exec("returns_an_error()");
+						throw new RuntimeException("returns_an_error did not throw");
+					}
+					catch (JepException e)
+					{
+						// Expected: Python error -> JepException
+					}
+				}));
+		}
+
+		if (!scenarioFilter.isEmpty() && selectedCount == 0)
+		{
+			fail("METAFFI_TEST_SCENARIOS selected no benchmark scenarios: " + System.getenv("METAFFI_TEST_SCENARIOS"));
+		}
 
 		// --- Write results ---
 		writeResults(benchmarkJsons, timerOverhead);

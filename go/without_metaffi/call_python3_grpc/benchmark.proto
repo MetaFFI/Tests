@@ -4,8 +4,10 @@ package benchmark;
 
 option go_package = "./pb";
 
+import "google/protobuf/struct.proto";
+
 // BenchmarkService wraps the Python guest module for cross-language benchmarking.
-// Each RPC maps to one of the 7 benchmark scenarios.
+// Each RPC maps to one benchmark scenario (including dynamic Any echo extension).
 service BenchmarkService {
   // Scenario 1: void call (wait_a_bit(0))
   rpc VoidCall(VoidCallRequest) returns (VoidCallResponse);
@@ -28,6 +30,9 @@ service BenchmarkService {
 
   // Scenario 7: error propagation (returns_an_error() -> gRPC INTERNAL error)
   rpc ReturnsAnError(Empty) returns (Empty);
+
+  // Scenario: dynamic any echo (mixed-type array payload encoded as ListValue)
+  rpc AnyEcho(AnyEchoRequest) returns (AnyEchoResponse);
 }
 
 // --- Scenario 1 ---
@@ -89,3 +94,12 @@ message CallbackArgs {
 
 // --- Scenario 7 ---
 message Empty {}
+
+// --- Dynamic Any echo ---
+message AnyEchoRequest {
+  google.protobuf.ListValue values = 1;
+}
+
+message AnyEchoResponse {
+  google.protobuf.ListValue values = 1;
+}
