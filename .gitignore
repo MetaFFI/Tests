@@ -93,3 +93,9 @@ results/**
 results/report_figures/*
 *.class
 
+
+java/call_go/target/surefire-reports/
+
+results/
+
+java/call_python3/target/surefire-reports/
