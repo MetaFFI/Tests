@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -18,9 +19,9 @@ import (
 // ---------------------------------------------------------------------------
 
 var (
-	metaffiRT    *api.MetaFFIRuntime
-	moduleDir    *api.MetaFFIModule // Python package: module/
-	moduleFile   *api.MetaFFIModule // Single file: single_file_module.py
+	metaffiRT  *api.MetaFFIRuntime
+	moduleDir  *api.MetaFFIModule // Python package: module/
+	moduleFile *api.MetaFFIModule // Single file: single_file_module.py
 )
 
 func TestMain(m *testing.M) {
@@ -39,6 +40,11 @@ func TestMain(m *testing.M) {
 	// Resolve guest module paths
 	moduleDirPath := filepath.Join(srcRoot, "sdk", "test_modules", "guest_modules", "python3", "module")
 	moduleFilePath := filepath.Join(srcRoot, "sdk", "test_modules", "guest_modules", "python3", "single_file_module.py")
+	fmt.Fprintf(os.Stderr, "+++ go_call_python3 TestMain go=%s\n", runtime.Version())
+	fmt.Fprintf(os.Stderr, "+++ go_call_python3 TestMain METAFFI_HOME=%s\n", home)
+	fmt.Fprintf(os.Stderr, "+++ go_call_python3 TestMain METAFFI_SOURCE_ROOT=%s\n", srcRoot)
+	fmt.Fprintf(os.Stderr, "+++ go_call_python3 TestMain module_dir=%s\n", moduleDirPath)
+	fmt.Fprintf(os.Stderr, "+++ go_call_python3 TestMain module_file=%s\n", moduleFilePath)
 
 	metaffiRT = api.NewMetaFFIRuntime("python3")
 	if err := metaffiRT.LoadRuntimePlugin(); err != nil {
@@ -83,6 +89,7 @@ func tiArray(t IDL.MetaFFIType, dims int) IDL.MetaFFITypeInfo {
 // them to the generic signature for backward-compatible test callsites.
 func load(t *testing.T, mod *api.MetaFFIModule, entityPath string, params []IDL.MetaFFITypeInfo, retvals []IDL.MetaFFITypeInfo) func(...interface{}) ([]interface{}, error) {
 	t.Helper()
+	fmt.Fprintf(os.Stderr, "+++ go_call_python3 load entity=%s params=%v retvals=%v\n", entityPath, params, retvals)
 	raw, err := mod.LoadWithInfo(entityPath, params, retvals)
 	if err != nil {
 		t.Fatalf("load %q: %v", entityPath, err)
@@ -108,10 +115,13 @@ func load(t *testing.T, mod *api.MetaFFIModule, entityPath string, params []IDL.
 // call invokes ff and fatals on error (fail-fast).
 func call(t *testing.T, name string, ff func(...interface{}) ([]interface{}, error), args ...interface{}) []interface{} {
 	t.Helper()
+	fmt.Fprintf(os.Stderr, "+++ go_call_python3 call start name=%s argc=%d\n", name, len(args))
 	ret, err := ff(args...)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "+++ go_call_python3 call fail name=%s err=%v args=%#v\n", name, err, args)
 		t.Fatalf("%s: unexpected error: %v", name, err)
 	}
+	fmt.Fprintf(os.Stderr, "+++ go_call_python3 call ok name=%s retc=%d\n", name, len(ret))
 	return ret
 }
 
