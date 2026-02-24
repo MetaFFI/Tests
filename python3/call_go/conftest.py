@@ -4,6 +4,7 @@ Provides session-scoped fixtures for the MetaFFI Go runtime and module,
 used by both correctness and benchmark tests.
 """
 
+import atexit
 import os
 import sys
 import time
@@ -22,6 +23,12 @@ if _sdk_python_path not in sys.path:
 
 import pytest
 import metaffi
+
+
+def _atexit_probe():
+    print("+++ call_go fixture: atexit handler reached (Python interpreter still alive)", file=sys.stderr, flush=True)
+
+atexit.register(_atexit_probe)
 
 
 def _guest_module_filename() -> str:
