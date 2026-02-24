@@ -23,15 +23,23 @@ if _sdk_python_path not in sys.path:
 import pytest
 import metaffi
 
-# Go runtime plugin requires the compiled DLL path (not the source directory)
+def _guest_module_filename() -> str:
+    if sys.platform.startswith("win"):
+        return "guest_MetaFFIGuest.dll"
+    if sys.platform == "darwin":
+        return "guest_MetaFFIGuest.dylib"
+    return "guest_MetaFFIGuest.so"
+
+
+# Go runtime plugin requires the compiled guest shared library path
 GO_GUEST_MODULE_PATH = os.path.join(
     METAFFI_SOURCE_ROOT, "sdk", "test_modules", "guest_modules", "go",
-    "test_bin", "guest_MetaFFIGuest.dll"
+    "test_bin", _guest_module_filename()
 )
 
 if not os.path.isfile(GO_GUEST_MODULE_PATH):
     raise RuntimeError(
-        f"Go guest module DLL not found: {GO_GUEST_MODULE_PATH}\n"
+        f"Go guest module library not found: {GO_GUEST_MODULE_PATH}\n"
         "Build it first: cmake --build ... (see sdk/test_modules/guest_modules/go/CMakeLists.txt)"
     )
 

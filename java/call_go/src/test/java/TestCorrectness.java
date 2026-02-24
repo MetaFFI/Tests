@@ -34,9 +34,23 @@ public class TestCorrectness
 		runtime.loadRuntimePlugin();
 
 		String modulePath = sourceRoot.replace('\\', '/') +
-			"/sdk/test_modules/guest_modules/go/test_bin/guest_MetaFFIGuest.dll";
+			"/sdk/test_modules/guest_modules/go/test_bin/" + getGoGuestModuleFilename();
 		goModule = runtime.loadModule(modulePath);
 		assertNotNull("Failed to load Go guest module", goModule);
+	}
+
+	private static String getGoGuestModuleFilename()
+	{
+		String os = System.getProperty("os.name", "").toLowerCase();
+		if (os.contains("win"))
+		{
+			return "guest_MetaFFIGuest.dll";
+		}
+		if (os.contains("mac"))
+		{
+			return "guest_MetaFFIGuest.dylib";
+		}
+		return "guest_MetaFFIGuest.so";
 	}
 
 	@AfterClass
