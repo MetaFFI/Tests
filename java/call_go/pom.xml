@@ -53,7 +53,7 @@
                         <METAFFI_TEST_SCENARIOS>${env.METAFFI_TEST_SCENARIOS}</METAFFI_TEST_SCENARIOS>
                         <METAFFI_TEST_RESULTS_FILE>${env.METAFFI_TEST_RESULTS_FILE}</METAFFI_TEST_RESULTS_FILE>
                     </environmentVariables>
-                    <argLine>-Djava.library.path="${env.METAFFI_HOME}/sdk/api/jvm;${env.METAFFI_HOME};${env.METAFFI_HOME}/go;${env.METAFFI_HOME}/jvm"</argLine>
+                    <argLine>-Djava.library.path="${env.METAFFI_HOME}/sdk/api/jvm${path.separator}${env.METAFFI_HOME}${path.separator}${env.METAFFI_HOME}/go${path.separator}${env.METAFFI_HOME}/jvm"</argLine>
                 </configuration>
             </plugin>
         </plugins>

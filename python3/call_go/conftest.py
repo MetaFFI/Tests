@@ -103,3 +103,11 @@ def pytest_sessionstart(session):
 
 def pytest_sessionfinish(session, exitstatus):
     print(f"+++ call_go fixture: pytest_sessionfinish exitstatus={exitstatus}", file=sys.stderr, flush=True)
+    # On Linux, Go runtime atexit handlers corrupt the heap during normal
+    # Python interpreter teardown ("corrupted size vs. prev_size" / SIGABRT).
+    # os._exit() skips Python finalizers and prevents the crash.
+    # The pytest exit status is already captured at this point.
+    if sys.platform.startswith("linux"):
+        sys.stderr.flush()
+        sys.stdout.flush()
+        os._exit(exitstatus)
