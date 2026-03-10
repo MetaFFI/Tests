@@ -23,5 +23,7 @@ set_tests_properties(metaffi_tests_correctness PROPERTIES
     LABELS "metaffi;correctness"
 )
 
+add_subdirectory(cpp)
+
 add_custom_target(metaffi_tests)
 set(metaffi_tests metaffi_tests PARENT_SCOPE)

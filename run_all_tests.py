@@ -33,7 +33,7 @@ import yaml
 TESTS_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_ROOT.parent
 
-HOSTS = ["go", "python3", "java"]
+HOSTS = ["go", "python3", "java", "cpp"]
 NATIVE_MECHANISMS = {
     ("go", "python3"): "cpython",
     ("go", "java"): "jni",
@@ -49,8 +49,15 @@ for h in HOSTS:
         if h == g:
             continue
         ALL_TRIPLES.append((h, g, "metaffi"))
-        ALL_TRIPLES.append((h, g, NATIVE_MECHANISMS[(h, g)]))
-        ALL_TRIPLES.append((h, g, "grpc"))
+        nm = NATIVE_MECHANISMS.get((h, g))
+        if nm:
+            ALL_TRIPLES.append((h, g, nm))
+            ALL_TRIPLES.append((h, g, "grpc"))
+
+# C-as-guest triples (C is not a host, only a guest via the cpp runtime)
+C_GUEST_HOSTS = ["go", "python3", "java"]
+for h in C_GUEST_HOSTS:
+    ALL_TRIPLES.append((h, "c", "metaffi"))
 
 ALL_MECHANISMS = sorted({m for _, _, m in ALL_TRIPLES})
 
@@ -461,6 +468,13 @@ def build_stage_commands(
         if host == "java":
             mvn = _find_maven()
             return [[mvn, "test", "-Dtest=TestCorrectness", "-pl", "."]], cwd, env
+        if host == "cpp":
+            # C++ tests are built via CMake and run as executables
+            if sys.platform.startswith("win"):
+                exe = str(cwd / f"cpp_call_{guest}_test.exe")
+            else:
+                exe = str(cwd / f"cpp_call_{guest}_test")
+            return [[exe]], cwd, env
         raise RunnerError(f"Unsupported host: {host}")
 
     if host == "go":

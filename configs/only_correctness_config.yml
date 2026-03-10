@@ -18,7 +18,7 @@ run:
   heartbeat_seconds: 20
 
 selection:
-  hosts: [go, python3, java]
+  hosts: [go, python3, java, cpp]
   pairs: []
   # Restrict to MetaFFI where correctness suites exist.
   mechanisms: [metaffi]
