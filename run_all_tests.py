@@ -469,11 +469,15 @@ def build_stage_commands(
             mvn = _find_maven()
             return [[mvn, "test", "-Dtest=TestCorrectness", "-pl", "."]], cwd, env
         if host == "cpp":
-            # C++ tests are built via CMake and run as executables
+            # C++ tests are built by CMake and placed in METAFFI_HOME
+            mffi_home = os.environ.get("METAFFI_HOME", "")
+            if not mffi_home:
+                raise RunnerError("METAFFI_HOME not set; cannot locate cpp host test binaries")
+            bin_dir = Path(mffi_home)
             if sys.platform.startswith("win"):
-                exe = str(cwd / f"cpp_call_{guest}_test.exe")
+                exe = str(bin_dir / f"cpp_call_{guest}_test.exe")
             else:
-                exe = str(cwd / f"cpp_call_{guest}_test")
+                exe = str(bin_dir / f"cpp_call_{guest}_test")
             return [[exe]], cwd, env
         raise RunnerError(f"Unsupported host: {host}")
 
