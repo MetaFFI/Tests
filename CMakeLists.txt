@@ -26,4 +26,13 @@ set_tests_properties(metaffi_tests_correctness PROPERTIES
 add_subdirectory(cpp)
 
 add_custom_target(metaffi_tests)
+if(DEFINED cpp_call_go_test)
+	add_dependencies(metaffi_tests ${cpp_call_go_test})
+endif()
+if(DEFINED cpp_call_python3_test)
+	add_dependencies(metaffi_tests ${cpp_call_python3_test})
+endif()
+if(DEFINED cpp_call_java_test)
+	add_dependencies(metaffi_tests ${cpp_call_java_test})
+endif()
 set(metaffi_tests metaffi_tests PARENT_SCOPE)

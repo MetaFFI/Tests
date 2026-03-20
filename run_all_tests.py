@@ -426,6 +426,54 @@ def _find_jep_home() -> str | None:
         pass
     return None
 
+def _build_cpp_host_tests() -> None:
+    """Configure and build all 3 C++ host test executables via cmake.
+
+    Uses TESTS_ROOT/cpp as the cmake source (dual-use CMakeLists.txt).
+    Build dir is persistent at TESTS_ROOT/cpp/.cmake_build for incremental rebuilds.
+    """
+    cmake_exe = shutil.which("cmake")
+    if not cmake_exe:
+        raise RunnerError("cmake not found on PATH; cannot build C++ host tests")
+
+    build_dir = TESTS_ROOT / "cpp" / ".cmake_build"
+    src_dir   = TESTS_ROOT / "cpp"
+    build_dir.mkdir(parents=True, exist_ok=True)
+
+    # Platform-specific generator and build args
+    if sys.platform.startswith("win"):
+        vs_bt = Path(r"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools")
+        vs_pf = Path(r"C:\Program Files\Microsoft Visual Studio\2022\BuildTools")
+        if vs_bt.exists() or vs_pf.exists():
+            generator  = "Visual Studio 17 2022"
+            extra_args = ["-A", "x64"]
+            # Use Release so the exe links against the Release CRT (vcruntime140.dll /
+            # msvcp140.dll) which is present via the VC++ Redistributable.
+            # Debug CRT DLLs (vcruntime140d.dll etc.) are not redistributed and would
+            # cause STATUS_DLL_NOT_FOUND at runtime in a minimal container.
+            build_args = ["--config", "Release"]
+        else:
+            generator  = "Ninja"
+            extra_args = ["-DCMAKE_BUILD_TYPE=Release"]
+            build_args = []
+    else:
+        generator  = "Ninja"
+        extra_args = ["-DCMAKE_BUILD_TYPE=Debug"]
+        build_args = []
+
+    # Pass vcpkg toolchain when VCPKG_ROOT is set (Windows with vcpkg)
+    vcpkg_root = os.environ.get("VCPKG_ROOT", "")
+    toolchain  = Path(vcpkg_root) / "scripts" / "buildsystems" / "vcpkg.cmake"
+    if toolchain.exists():
+        extra_args += [f"-DCMAKE_TOOLCHAIN_FILE={toolchain}"]
+
+    configure_cmd = [cmake_exe, "-G", generator, "-B", str(build_dir), "-S", str(src_dir)] + extra_args
+    build_cmd     = [cmake_exe, "--build", str(build_dir)] + build_args
+
+    subprocess.run(configure_cmd, check=True)
+    subprocess.run(build_cmd,     check=True)
+
+
 def build_stage_commands(
     triple: tuple[str, str, str],
     stage: str,
@@ -469,15 +517,27 @@ def build_stage_commands(
             mvn = _find_maven()
             return [[mvn, "test", "-Dtest=TestCorrectness", "-pl", "."]], cwd, env
         if host == "cpp":
-            # C++ tests are built by CMake and placed in METAFFI_HOME
+            # C++ tests are built by CMake (dual-use CMakeLists.txt) and placed in METAFFI_HOME
             mffi_home = os.environ.get("METAFFI_HOME", "")
             if not mffi_home:
                 raise RunnerError("METAFFI_HOME not set; cannot locate cpp host test binaries")
-            bin_dir = Path(mffi_home)
-            if sys.platform.startswith("win"):
-                exe = str(bin_dir / f"cpp_call_{guest}_test.exe")
-            else:
-                exe = str(bin_dir / f"cpp_call_{guest}_test")
+            bin_dir    = Path(mffi_home)
+            exe_suffix = ".exe" if sys.platform.startswith("win") else ""
+            exe        = str(bin_dir / f"cpp_call_{guest}_test{exe_suffix}")
+
+            # Build all 3 executables when any one is missing
+            if not Path(exe).exists():
+                _build_cpp_host_tests()
+
+            # At runtime the exe needs: METAFFI_HOME/<guest> for the guest plugin DLLs/SOs.
+            # spdlog is linked header-only so no vcpkg DLLs are needed at runtime.
+            path_sep = ";" if sys.platform.startswith("win") else ":"
+            extra_dirs = [str(bin_dir / guest)]  # METAFFI_HOME/<guest>
+            path_key = "PATH" if sys.platform.startswith("win") else "LD_LIBRARY_PATH"
+
+            existing = env.get(path_key, os.environ.get(path_key, ""))
+            env[path_key] = path_sep.join(extra_dirs + ([existing] if existing else []))
+
             return [[exe]], cwd, env
         raise RunnerError(f"Unsupported host: {host}")
 

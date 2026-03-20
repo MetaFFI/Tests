@@ -1,6 +1,5 @@
 # C++ host test: C++ -> Go guest via MetaFFI
 
-find_or_install_package(Boost COMPONENTS filesystem)
 find_or_install_package(doctest)
 
 set(test_src
@@ -14,18 +13,24 @@ set(test_includes
 	${metaffi_sdk_root}/api/cpp/include
 	${CMAKE_CURRENT_LIST_DIR}
 	${doctest_INCLUDE_DIRS}
-	${Boost_INCLUDE_DIRS}
 )
 
 c_cpp_exe(cpp_call_go_test
 	"${test_src}"
 	"${test_includes}"
-	"doctest::doctest;Boost::filesystem;metaffi.api.cpp"
+	"doctest::doctest"
 	"$ENV{METAFFI_HOME}"
 )
 
+# Header-only API: force-include metaffi.h so all TUs get inline implementations
+if(MSVC)
+	target_compile_options(cpp_call_go_test PRIVATE "/FImetaffi/metaffi.h")
+else()
+	target_compile_options(cpp_call_go_test PRIVATE -include metaffi/metaffi.h)
+endif()
+
 target_compile_definitions(cpp_call_go_test PRIVATE
-	GO_GUEST_LIB_NAME="${CMAKE_SHARED_LIBRARY_PREFIX}guest_MetaFFIGuest${CMAKE_SHARED_LIBRARY_SUFFIX}"
+	GO_GUEST_LIB_NAME="guest_MetaFFIGuest${CMAKE_SHARED_LIBRARY_SUFFIX}"
 	DOCTEST_CONFIG_NO_WINDOWS_SEH
 )
 
@@ -44,3 +49,5 @@ else()
 	set_tests_properties(cpp_call_go_test PROPERTIES
 		ENVIRONMENT "LD_LIBRARY_PATH=$ENV{METAFFI_HOME}/go:$ENV{METAFFI_HOME}/cpp:$ENV{LD_LIBRARY_PATH}")
 endif()
+
+set(cpp_call_go_test cpp_call_go_test PARENT_SCOPE)
