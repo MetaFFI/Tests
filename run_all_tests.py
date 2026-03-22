@@ -596,10 +596,11 @@ def timeout_for(triple: tuple[str, str, str], cfg: Config) -> int:
 
 
 def _tail_shows_all_passed(tail: str) -> bool:
-    """Return True if pytest/go-test output indicates all tests passed with no failures.
+    """Return True if pytest/go-test/maven output indicates all tests passed with no failures.
 
     Used to detect 'cleanup crash' scenarios where the test logic succeeds but
-    the process crashes during teardown (e.g. free(): invalid pointer in JVM cleanup).
+    the process crashes during teardown (e.g. free(): invalid pointer in JVM cleanup,
+    or Maven ForkStarter exit-code-1 after all JUnit tests pass).
     """
     import re
     # pytest summary: "N passed" with no "failed" or "error" count
@@ -607,6 +608,11 @@ def _tail_shows_all_passed(tail: str) -> bool:
         return True
     # go test: "ok  " prefix or "PASS" with no "FAIL"
     if ('PASS' in tail or '--- PASS' in tail) and 'FAIL' not in tail:
+        return True
+    # Maven Surefire: "Tests run: N, Failures: 0, Errors: 0" with no failure lines
+    if re.search(r'Tests run: \d+, Failures: 0, Errors: 0', tail) and \
+            not re.search(r'Tests run: \d+, Failures: [1-9]', tail) and \
+            not re.search(r'Tests run: \d+, Errors: [1-9]', tail):
         return True
     return False
 
@@ -692,7 +698,7 @@ def run_command_with_heartbeat(
         elapsed = time.monotonic() - start
         full_log = log_path.read_text(encoding="utf-8", errors="replace")
         lines = [ln for ln in full_log.splitlines() if ln.strip()]
-        tail = "\n".join(lines[-40:]) if lines else ""
+        tail = "\n".join(lines[-150:]) if lines else ""
         return rc, elapsed, tail, timed_out
     finally:
         try:
@@ -772,11 +778,14 @@ def run_stage(
             if rc == 0:
                 break
 
-            # Signal death (rc < 0 on Unix) after tests all passed = cleanup crash,
-            # not a logic failure. The test binary is killed by the OS during teardown
-            # (e.g. JVM/Python heap corruption on exit). Treat as PASS with a warning.
-            if rc < 0 and _tail_shows_all_passed(tail):
-                print(f"        WARNING: signal {-rc} during cleanup (tests passed) — treating as PASS")
+            # Non-zero exit after tests all passed = cleanup crash, not a logic failure.
+            # Covers two cases:
+            #   rc < 0  — signal death (e.g. SIGABRT/-6 from JVM/Python heap corruption)
+            #   rc == 1 — Maven ForkStarter crashes on teardown after all JUnit tests pass
+            # In both cases the test logic succeeded; only the process teardown died.
+            if (rc < 0 or rc == 1) and _tail_shows_all_passed(tail):
+                sig_info = f"signal {-rc}" if rc < 0 else f"exit code {rc}"
+                print(f"        WARNING: {sig_info} during cleanup (tests passed) — treating as PASS")
                 break
 
             if attempt == 1 and should_retry_transient_failure(triple, stage, tail):
