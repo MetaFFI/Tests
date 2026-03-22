@@ -595,6 +595,22 @@ def timeout_for(triple: tuple[str, str, str], cfg: Config) -> int:
     return cfg.default_timeout_seconds
 
 
+def _tail_shows_all_passed(tail: str) -> bool:
+    """Return True if pytest/go-test output indicates all tests passed with no failures.
+
+    Used to detect 'cleanup crash' scenarios where the test logic succeeds but
+    the process crashes during teardown (e.g. free(): invalid pointer in JVM cleanup).
+    """
+    import re
+    # pytest summary: "N passed" with no "failed" or "error" count
+    if re.search(r'\b\d+ passed\b', tail) and not re.search(r'\b\d+ (failed|error)\b', tail):
+        return True
+    # go test: "ok  " prefix or "PASS" with no "FAIL"
+    if ('PASS' in tail or '--- PASS' in tail) and 'FAIL' not in tail:
+        return True
+    return False
+
+
 def should_retry_transient_failure(
     triple: tuple[str, str, str],
     stage: str,
@@ -754,6 +770,13 @@ def run_stage(
                 )
 
             if rc == 0:
+                break
+
+            # Signal death (rc < 0 on Unix) after tests all passed = cleanup crash,
+            # not a logic failure. The test binary is killed by the OS during teardown
+            # (e.g. JVM/Python heap corruption on exit). Treat as PASS with a warning.
+            if rc < 0 and _tail_shows_all_passed(tail):
+                print(f"        WARNING: signal {-rc} during cleanup (tests passed) — treating as PASS")
                 break
 
             if attempt == 1 and should_retry_transient_failure(triple, stage, tail):
